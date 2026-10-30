@@ -6,13 +6,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.CreditCardController">
    <children>
@@ -57,39 +56,23 @@
                      <children>
                         <Button fx:id="AddDebtButton" onAction="#handleAddDebt" text="%creditCard.button.addDebt">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/add.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                         <Button fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" text="%creditCard.button.addCreditCard">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/credit_card.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-credit_card" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button onAction="#handleRecurringTransactions" text="%transaction.button.periodicTransaction">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/reload.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleViewArchivedCreditCards" text="%creditCard.button.creditCardArchive">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/archive.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-archive" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                      </children>
@@ -115,38 +98,22 @@
                                                          <children>
                                                             <Button onAction="#handleEditDebt" text="%creditCard.debtsList.button.edit">
                                                                <graphic>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/edit.png" />
-                                                                     </image>
-                                                                  </ImageView>
+                                                                  <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                                                                </graphic>
                                                             </Button>
                                                             <Button onAction="#handleRefundDebt" text="%creditCard.debtsList.button.refund">
                                                                <graphic>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/refund.png" />
-                                                                     </image>
-                                                                  </ImageView>
+                                                                  <FontIcon iconLiteral="mdmz-undo" styleClass="app-icon, icon-size-20" />
                                                                </graphic>
                                                             </Button>
                                                             <Button onAction="#handleDeleteDebt" text="%creditCard.debtsList.button.delete">
                                                                <graphic>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/remove.png" />
-                                                                     </image>
-                                                                  </ImageView>
+                                                                  <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
                                                                </graphic>
                                                             </Button>
                                                             <Button onAction="#handleMaterializeDebt" text="%creditCard.debtsList.button.materialize">
                                                                <graphic>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/check.png" />
-                                                                     </image>
-                                                                  </ImageView>
+                                                                  <FontIcon iconLiteral="mdal-check" styleClass="app-icon, icon-size-20" />
                                                                </graphic>
                                                             </Button>
                                                          </children>
@@ -167,11 +134,7 @@
                                                       </HBox>
                                                       <HBox alignment="CENTER_RIGHT" spacing="5.0" VBox.vgrow="ALWAYS">
                                                          <children>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/find.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
                                                             <TextField fx:id="debtSearchField" maxWidth="400.0" promptText="%creditCard.debtsList.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
@@ -190,11 +153,7 @@
                                        <children>
                                           <Button onAction="#handleTablePrevMonth">
                                              <graphic>
-                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/arrow_left.png" />
-                                                   </image>
-                                                </ImageView>
+                                                <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                              </graphic>
                                           </Button>
                                           <Region prefWidth="20.0" />
@@ -206,11 +165,7 @@
                                           <Region prefWidth="20.0" />
                                           <Button onAction="#handleTableNextMonth">
                                              <graphic>
-                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/arrow_right.png" />
-                                                   </image>
-                                                </ImageView>
+                                                <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                              </graphic>
                                           </Button>
                                        </children>
@@ -224,20 +179,12 @@
                               <Label fx:id="creditCardsTitle" styleClass="title" text="%creditCard.creditCards.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <Button fx:id="crcPrevButton" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_left.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                  </graphic>
                               </Button>
                               <Button fx:id="crcNextButton" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_right.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                  </graphic>
                               </Button>
                               <HBox alignment="CENTER" fillHeight="false" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">

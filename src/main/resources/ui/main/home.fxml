@@ -5,13 +5,12 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane fx:id="rootAnchorPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.HomeController">
    <children>
@@ -26,19 +25,11 @@
                               <Label fx:id="walletPaneTitle" styleClass="title" text="%home.wallet.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <Button fx:id="walletPrevButton" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_left.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                  </graphic></Button>
                               <Button fx:id="walletNextButton" ellipsisString="" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_right.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                  </graphic>
                                  <font>
                                     <Font />
@@ -56,19 +47,11 @@
                               <Label fx:id="creditCardPaneTitle" styleClass="title" text="%home.creditCard.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <Button fx:id="creditCardPrevButton" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_left.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                  </graphic></Button>
                               <Button fx:id="creditCardNextButton" graphicTextGap="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_right.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                  </graphic></Button>
                               <HBox layoutX="108.0" minWidth="260.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                  <children>
@@ -103,21 +86,14 @@
                               </HBox>
                               <Button fx:id="recalculateNetWorthButton" onAction="#handleRecalculateNetWorth" styleClass="button-primary" text="%home.recalculateNetWorthButton" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <graphic>
-                                    <ImageView fx:id="recalculateNetWorthButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/reload.png" />
-                                       </image></ImageView>
+                                    <FontIcon fx:id="recalculateNetWorthButtonIcon" iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-20" />
                                  </graphic>
                               </Button>
                               <HBox fx:id="sankeyNavigator" alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
                                  <children>
                                     <Button onAction="#handleSankeyPrevMonth">
                                        <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/arrow_left.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                        </graphic>
                                     </Button>
                                     <Region prefWidth="20.0" />
@@ -129,31 +105,19 @@
                                     <Region prefWidth="20.0" />
                                     <Button onAction="#handleSankeyNextMonth">
                                        <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/arrow_right.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                        </graphic>
                                     </Button>
                                  </children>
                               </HBox>
                               <Button fx:id="graphPrevButton" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_left.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                  </graphic>
                               </Button>
                               <Button fx:id="graphNextButton" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../icon/common/arrow_right.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                  </graphic>
                               </Button>
                               <AnchorPane fx:id="graphView" minWidth="300.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />

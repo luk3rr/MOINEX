@@ -4,13 +4,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane fx:id="root" minHeight="125.0" minWidth="250.0" stylesheets="@../../css/scene/pane.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.WalletPaneController">
    <children>
@@ -18,10 +17,7 @@
          <children>
             <HBox fx:id="header" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <ImageView fx:id="walletIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
-                     <image>
-                        <Image url="@../../icon/common/default.png" />
-                     </image></ImageView>
+                  <FontIcon fx:id="walletIcon" iconLiteral="mdal-help_outline" styleClass="app-icon, icon-size-40" />
                   <VBox alignment="CENTER" prefWidth="200.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label fx:id="walletName" text="Name" />
@@ -45,11 +41,7 @@
                               <MenuItem fx:id="addTransferMenuItem" mnemonicParsing="false" onAction="#handleAddTransfer" text="%common.wallet.addTransfer" />
                           </items>
                            <graphic>
-                              <ImageView fx:id="addButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/add.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon fx:id="addButtonIcon" iconLiteral="mdal-add" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </MenuButton>
                         <MenuButton fx:id="menuButton" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
@@ -61,11 +53,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#handleDeleteWallet" text="%common.wallet.delete" />
                           </items>
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/options.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-more_vert" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </MenuButton>
                      </children>

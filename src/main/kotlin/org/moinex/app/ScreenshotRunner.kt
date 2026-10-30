@@ -90,7 +90,7 @@ class ScreenshotRunner(
             themeService.applyCurrentTheme()
             logger.info("Capturing theme '{}'", theme)
 
-            for (target in CapturePlan.targets) {
+            for (target in CapturePlan.selectedTargets(System.getProperty(CapturePlan.PROPERTY_CAPTURE_ONLY))) {
                 val file = File(directory, CapturePlan.relativePath(theme, target).toString())
                 file.parentFile.mkdirs()
 

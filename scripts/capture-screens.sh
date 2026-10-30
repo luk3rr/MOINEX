@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generates one PNG per screen and theme with the development screenshot runner.
-# Usage: scripts/capture-screens.sh <output-dir>
+# Usage: scripts/capture-screens.sh <output-dir>   (CAPTURE_ONLY=home,wallets limits the screens)
 # The app runs with a throwaway user.home and a dummy database, never with the real data.
 set -euo pipefail
 
@@ -53,6 +53,6 @@ echo "[3/4] Loading the dummy data"
 python3 "$ROOT/scripts/generate_dummy_data.py" --db_path "$DB_PATH"
 
 echo "[4/4] Capturing the screens into $OUT_DIR"
-"$JAVA_BIN" "${JAVA_OPTS[@]}" "-Dmoinex.capture.dir=$OUT_DIR" -jar "$JAR"
+"$JAVA_BIN" "${JAVA_OPTS[@]}" "-Dmoinex.capture.dir=$OUT_DIR" "-Dmoinex.capture.only=${CAPTURE_ONLY:-}" -jar "$JAR"
 
 echo "Done: $(find "$OUT_DIR" -name '*.png' | wc -l) images in $OUT_DIR"

@@ -6,11 +6,10 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" prefWidth="370.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.creditcard.EditCreditCardDebtController">
    <children>
@@ -58,11 +57,7 @@
       </VBox>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
          <children>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../../icon/common/pencil.png" />
-               </image>
-            </ImageView>
+            <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
             <TextField fx:id="descriptionField" promptText="%dialog.label.description" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
@@ -79,11 +74,7 @@
                                     <Font size="10.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../icon/common/coin.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-monetization_on" styleClass="app-icon, icon-size-20" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
@@ -111,11 +102,7 @@
                                     <Font size="10.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../icon/common/reload.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-20" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER">

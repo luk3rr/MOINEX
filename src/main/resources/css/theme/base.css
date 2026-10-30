@@ -25,3 +25,65 @@
     -color-button-fg-focused: theme-on-accent;
     -color-button-fg-pressed: theme-on-accent;
 }
+
+.app-icon {
+    -fx-icon-color: theme-icon;
+}
+
+.app-icon.icon-positive {
+    -fx-icon-color: theme-positive;
+}
+
+.app-icon.icon-negative {
+    -fx-icon-color: theme-negative;
+}
+
+.app-icon.icon-size-15 {
+    -fx-icon-size: 15px;
+    -fx-font-size: 15px;
+}
+
+.app-icon.icon-size-16 {
+    -fx-icon-size: 16px;
+    -fx-font-size: 16px;
+}
+
+.app-icon.icon-size-18 {
+    -fx-icon-size: 18px;
+    -fx-font-size: 18px;
+}
+
+.app-icon.icon-size-20 {
+    -fx-icon-size: 20px;
+    -fx-font-size: 20px;
+}
+
+.app-icon.icon-size-30 {
+    -fx-icon-size: 30px;
+    -fx-font-size: 30px;
+}
+
+.app-icon.icon-size-32 {
+    -fx-icon-size: 32px;
+    -fx-font-size: 32px;
+}
+
+.app-icon.icon-size-35 {
+    -fx-icon-size: 35px;
+    -fx-font-size: 35px;
+}
+
+.app-icon.icon-size-40 {
+    -fx-icon-size: 40px;
+    -fx-font-size: 40px;
+}
+
+.app-icon.icon-size-42 {
+    -fx-icon-size: 42px;
+    -fx-font-size: 42px;
+}
+
+.app-icon.icon-size-48 {
+    -fx-icon-size: 48px;
+    -fx-font-size: 48px;
+}

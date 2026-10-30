@@ -9,10 +9,7 @@ object Files {
     const val SCRIPT_PATH: String = "/scripts/"
 
     // Paths
-    const val WALLET_TYPE_ICONS_PATH: String = "/icon/wallet_type/"
-    const val SIDEBAR_ICONS_PATH: String = "/icon/sidebar/"
     const val CRC_OPERATOR_ICONS_PATH: String = "/icon/crc_operator/"
-    const val COMMON_ICONS_PATH: String = "/icon/common/"
     const val APP_ICONS_PATH: String = "/icon/app/"
 
     const val UI_MAIN_PATH: String = "/ui/main/"
@@ -170,17 +167,6 @@ object Files {
 
     const val CALCULATOR_FXML: String = UI_COMMON_PATH + "calculator.fxml"
     const val CALENDAR_FXML: String = UI_COMMON_PATH + "calendar.fxml"
-
-    // Icons
-    const val HOME_EXPENSE_ICON: String = COMMON_ICONS_PATH + "expense.png"
-    const val HOME_INCOME_ICON: String = COMMON_ICONS_PATH + "income.png"
-    const val SUCCESS_ICON: String = COMMON_ICONS_PATH + "success.png"
-    const val DEFAULT_ICON: String = COMMON_ICONS_PATH + "default.png"
-    const val TROPHY_ICON: String = COMMON_ICONS_PATH + "trophy.png"
-    const val HIDE_ICON: String = COMMON_ICONS_PATH + "hide.png"
-    const val SHOW_ICON: String = COMMON_ICONS_PATH + "show.png"
-
-    const val RELOAD_ICON: String = COMMON_ICONS_PATH + "reload.png"
 
     // CSS – theme tokens
     const val LIGHT_TOKENS_CSS: String = CSS_THEME_PATH + "tokens.light.css"

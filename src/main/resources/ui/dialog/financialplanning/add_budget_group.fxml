@@ -7,11 +7,10 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" prefWidth="500.0" spacing="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.financialplanning.AddBudgetGroupController">
     <padding>
@@ -68,16 +67,12 @@
                             <children>
                                 <Button fx:id="addCategoryButton" contentDisplay="GRAPHIC_ONLY">
                                     <graphic>
-                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                            <image><Image url="@../../../icon/common/arrow_right.png" /></image>
-                                        </ImageView>
+                                        <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                     </graphic>
                                 </Button>
                                 <Button fx:id="removeCategoryButton" contentDisplay="GRAPHIC_ONLY">
                                     <graphic>
-                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                            <image><Image url="@../../../icon/common/arrow_left.png" /></image>
-                                        </ImageView>
+                                        <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                     </graphic>
                                 </Button>
                             </children>

@@ -60,6 +60,18 @@ class CapturePlanTest :
             }
         }
 
+        Given("a comma separated list of ids to capture") {
+            Then("only those targets are selected, in plan order") {
+                CapturePlan.selectedTargets("wallets, home").map { it.id } shouldContainExactly
+                    listOf("home", "wallets")
+            }
+
+            Then("an empty or missing list selects every target") {
+                CapturePlan.selectedTargets(null) shouldContainExactly CapturePlan.targets
+                CapturePlan.selectedTargets("") shouldContainExactly CapturePlan.targets
+            }
+        }
+
         Given("the two capture themes") {
             Then("they are light and dark") {
                 CapturePlan.themes shouldContainExactly listOf("light", "dark")

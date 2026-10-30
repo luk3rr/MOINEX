@@ -20,8 +20,6 @@ import javafx.scene.chart.StackedBarChart
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.GridPane
@@ -33,13 +31,13 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.chart.DoughnutChart
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
@@ -168,7 +166,7 @@ class SavingsOverviewController(
     private lateinit var recalculateInvestmentPerformanceButton: Button
 
     @FXML
-    private lateinit var recalculateInvestmentPerformanceButtonIcon: ImageView
+    private lateinit var recalculateInvestmentPerformanceButtonIcon: FontIcon
 
     @FXML
     private lateinit var overviewTabBottonPaneTitle: Label
@@ -550,9 +548,6 @@ class SavingsOverviewController(
         recalculateRotation = null
         recalculateInvestmentPerformanceButtonIcon.rotate = 0.0
         recalculateInvestmentPerformanceButton.isDisable = false
-        recalculateInvestmentPerformanceButtonIcon.image =
-            Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
-        recalculateInvestmentPerformanceButtonIcon.applyIconTheme(preferencesService.isDarkMode())
         recalculateInvestmentPerformanceButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATE)
     }

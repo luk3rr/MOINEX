@@ -7,13 +7,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.TransactionController">
    <children>
@@ -103,39 +102,23 @@
                      <children>
                         <Button onAction="#handleAddIncome" text="%transaction.button.addIncome">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/income_black.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-arrow_upward" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleAddExpense" text="%transaction.button.addExpense">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/expense_black.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-arrow_downward" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button onAction="#handleRecurringTransactions" text="%transaction.button.periodicTransaction">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/reload.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleManageCategories" text="%transaction.button.manageCategories">
                            <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/category.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-category" styleClass="app-icon, icon-size-16" />
                            </graphic>
                         </Button>
                      </children>
@@ -161,20 +144,12 @@
                                                          <children>
                                                             <Button onAction="#handleEditTransaction" text="%transaction.transactionList.button.edit">
                                                                <graphic>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/edit.png" />
-                                                                     </image>
-                                                                  </ImageView>
+                                                                  <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                                                                </graphic>
                                                             </Button>
                                                             <Button onAction="#handleDeleteTransaction" text="%transaction.transactionList.button.delete">
                                                                <graphic>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/remove.png" />
-                                                                     </image>
-                                                                  </ImageView>
+                                                                  <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
                                                                </graphic>
                                                             </Button>
                                                          </children>
@@ -223,11 +198,7 @@
                                                       </HBox>
                                                       <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
                                                          <children>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/find.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
                                                             <TextField fx:id="transactionsSearchField" promptText="%transaction.transactionList.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>

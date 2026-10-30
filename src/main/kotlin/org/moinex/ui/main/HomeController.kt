@@ -27,7 +27,6 @@ import javafx.scene.control.OverrunStyle
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
@@ -36,6 +35,7 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import javafx.util.StringConverter
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.chart.SankeyChart
 import org.moinex.common.chart.SankeyLinkData
@@ -44,12 +44,14 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.IconMapper
+import org.moinex.common.ui.Icons
+import org.moinex.common.ui.icon
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -150,7 +152,7 @@ class HomeController(
     private lateinit var recalculateNetWorthButton: Button
 
     @FXML
-    private lateinit var recalculateNetWorthButtonIcon: ImageView
+    private lateinit var recalculateNetWorthButtonIcon: FontIcon
 
     @FXML
     private lateinit var sankeyMonthComboBox: ComboBox<Month>
@@ -285,9 +287,6 @@ class HomeController(
         recalculateRotation = null
         recalculateNetWorthButtonIcon.rotate = 0.0
         recalculateNetWorthButton.isDisable = false
-        recalculateNetWorthButtonIcon.image =
-            Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
-        recalculateNetWorthButtonIcon.applyIconTheme(preferencesService.isDarkMode())
         recalculateNetWorthButton.text =
             preferencesService.translate(TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON)
     }
@@ -449,16 +448,13 @@ class HomeController(
     }
 
     private fun createTransactionCell(transaction: WalletTransaction): HBox {
+        val isIncome = transaction.type == WalletTransactionType.INCOME
         val icon =
-            ImageView(
-                if (transaction.type == WalletTransactionType.INCOME) {
-                    Files.HOME_INCOME_ICON
-                } else {
-                    Files.HOME_EXPENSE_ICON
-                },
+            icon(
+                if (isIncome) Icons.INCOME else Icons.EXPENSE,
+                Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE,
             ).apply {
-                fitHeight = Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE.toDouble()
-                fitWidth = Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE.toDouble()
+                styleClass.add(if (isIncome) Styles.ICON_POSITIVE else Styles.ICON_NEGATIVE)
             }
 
         val descriptionLabel =
@@ -788,12 +784,7 @@ class HomeController(
                 }
             }
 
-        val icon =
-            ImageView(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon).apply {
-                fitHeight = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
-                fitWidth = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
-                applyIconTheme(preferencesService.isDarkMode())
-            }
+        val icon = icon(IconMapper.walletTypeLiteral(wallet.type.icon), Constants.WALLET_TYPE_ICONS_SIZE)
 
         val iconVBox =
             VBox().apply {

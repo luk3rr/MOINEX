@@ -6,6 +6,7 @@ ch-qos-logback-logback-classic = "1.5.32"
 com-diffplug-spotless-spotless-maven-plugin = "2.44.4"
 com-h2database-h2 = "2.3.232"
 io-github-mkpaz-atlantafx-base = "3.0.0"
+org-kordamp-ikonli = "12.4.0"
 com-opencsv-opencsv = "5.9"
 net-minidev-json-smart = "2.5.2"
 net-objecthunter-exp4j = "0.4.8"
@@ -42,6 +43,8 @@ ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", ve
 com-diffplug-spotless-spotless-maven-plugin = { module = "com.diffplug.spotless:spotless-maven-plugin", version.ref = "com-diffplug-spotless-spotless-maven-plugin" }
 com-h2database-h2 = { module = "com.h2database:h2", version.ref = "com-h2database-h2" }
 io-github-mkpaz-atlantafx-base = { module = "io.github.mkpaz:atlantafx-base", version.ref = "io-github-mkpaz-atlantafx-base" }
+org-kordamp-ikonli-ikonli-javafx = { module = "org.kordamp.ikonli:ikonli-javafx", version.ref = "org-kordamp-ikonli" }
+org-kordamp-ikonli-ikonli-material2-pack = { module = "org.kordamp.ikonli:ikonli-material2-pack", version.ref = "org-kordamp-ikonli" }
 com-opencsv-opencsv = { module = "com.opencsv:opencsv", version.ref = "com-opencsv-opencsv" }
 net-minidev-json-smart = { module = "net.minidev:json-smart", version.ref = "net-minidev-json-smart" }
 net-objecthunter-exp4j = { module = "net.objecthunter:exp4j", version.ref = "net-objecthunter-exp4j" }

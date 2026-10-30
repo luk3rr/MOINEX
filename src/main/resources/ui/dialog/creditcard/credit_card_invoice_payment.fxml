@@ -5,11 +5,10 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.creditcard.CreditCardInvoicePaymentController">
    <children>
@@ -124,11 +123,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../icon/common/coin.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdmz-monetization_on" styleClass="app-icon, icon-size-20" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
@@ -150,11 +145,7 @@
                         </Label>
                         <Button minWidth="80.0" onAction="#handleOpenCalculator">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../icon/common/calculator.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-calculate" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                      </children>
@@ -178,11 +169,7 @@
                         </Label>
                         <Button minWidth="80.0" onAction="#handleOpenPartialCalculator">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../icon/common/calculator.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-calculate" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                      </children>

@@ -6,14 +6,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsBondsController">
    <children>
@@ -89,29 +88,17 @@
                      <children>
                         <Button onAction="#handleRegisterBond" text="%savings.bonds.button.registerBond">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/add.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleOpenBondArchive" text="%savings.bonds.button.bondArchive">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/archive.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-archive" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleShowBondTransactions" text="%savings.bonds.button.showTransactions">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/list.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-list" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Region HBox.hgrow="ALWAYS" />
@@ -134,47 +121,27 @@
                                              <children>
                                                 <Button onAction="#handleEditBond" text="%savings.bonds.button.edit">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/edit.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleDeleteBond" text="%savings.bonds.button.delete">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/remove.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleBuyBond" text="%savings.bonds.button.buyBond">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/sign_in.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-login" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleSellBond" text="%savings.bonds.button.sellBond">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/sign_out.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-exit_to_app" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleShowInterestHistory" text="%savings.bonds.button.interestHistory">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/list.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-list" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                              </children>
@@ -201,11 +168,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
                                        <children>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/find.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
                                           <TextField fx:id="bondsTabBondSearchField" prefWidth="300.0" promptText="%savings.bonds.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>

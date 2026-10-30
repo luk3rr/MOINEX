@@ -6,12 +6,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane stylesheets="@../../css/component/charts.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.WishlistController">
    <children>
@@ -50,56 +49,32 @@
                                                    <children>
                                                       <Button minWidth="100.0" onAction="#handleAdd" text="%wishlist.button.add">
                                                          <graphic>
-                                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/add.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
                                                          </graphic>
                                                       </Button>
                                                       <Button minWidth="100.0" onAction="#handleViewDetails" text="%wishlist.button.viewDetails">
                                                          <graphic>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/details.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-20" />
                                                          </graphic>
                                                       </Button>
                                                       <Button minWidth="120.0" onAction="#handleMarkAsPurchased" text="%wishlist.button.markPurchased">
                                                          <graphic>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/purchased.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdmz-shopping_cart" styleClass="app-icon, icon-size-20" />
                                                          </graphic>
                                                       </Button>
                                                       <Button minWidth="120.0" onAction="#handleMarkAsPending" text="%wishlist.button.markPending">
                                                          <graphic>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/pending.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdal-hourglass_empty" styleClass="app-icon, icon-size-20" />
                                                          </graphic>
                                                       </Button>
                                                       <Button minWidth="80.0" onAction="#handleEdit" text="%wishlist.button.edit">
                                                          <graphic>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/edit.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                                                          </graphic>
                                                       </Button>
                                                       <Button minWidth="80.0" onAction="#handleDelete" text="%wishlist.button.delete">
                                                          <graphic>
-                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                               <image>
-                                                                  <Image url="@../../icon/common/remove.png" />
-                                                               </image>
-                                                            </ImageView>
+                                                            <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
                                                          </graphic>
                                                       </Button>
                                                    </children>
@@ -152,11 +127,7 @@
                                     </HBox>
                                     <HBox alignment="CENTER_RIGHT" spacing="5.0">
                                        <children>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/find.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
                                           <TextField fx:id="searchField" maxWidth="400.0" minWidth="200.0" promptText="%wishlist.search.placeholder" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>

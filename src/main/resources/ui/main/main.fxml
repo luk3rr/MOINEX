@@ -3,13 +3,12 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="768.0" minWidth="1450.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.MainController">
    <children>
@@ -22,11 +21,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                      <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/menu.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdmz-menu" styleClass="app-icon, icon-size-30" />
                      </graphic>
                      <opaqueInsets>
                         <Insets />
@@ -37,11 +32,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/home.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-home" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets top="40.0" />
@@ -49,11 +40,7 @@
                   </Button>
                   <Button fx:id="walletButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.wallet" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/wallet.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-account_balance_wallet" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets />
@@ -67,11 +54,7 @@
                         <Insets />
                      </opaqueInsets>
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/credit-card.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-credit_card" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets />
@@ -82,11 +65,7 @@
                   </Button>
                   <Button fx:id="transactionButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.transaction" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/transaction.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdmz-receipt" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets />
@@ -97,11 +76,7 @@
                   </Button>
                   <Button fx:id="goalsAndPlanButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.goalsAndPlans" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/goal.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-flag" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <font>
                         <Font name="System Bold" size="14.0" />
@@ -109,11 +84,7 @@
                   </Button>
                   <Button fx:id="savingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.savings" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/savings.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdmz-money" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets />
@@ -124,11 +95,7 @@
                   </Button>
                   <Button fx:id="annualSummaryButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.annualSummary" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/summary.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-bar_chart" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets />
@@ -139,11 +106,7 @@
                   </Button>
                   <Button fx:id="aiChatButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.aiChat" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                           <image>
-                              <Image url="@../../icon/sidebar/ai-chat.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-chat" styleClass="app-icon, icon-size-35" />
                      </graphic>
                      <VBox.margin>
                         <Insets />
@@ -156,11 +119,7 @@
                      <children>
                         <Button fx:id="settingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" onAction="#handleOpenSettings" text="%main.settings" wrapText="true">
                            <graphic>
-                              <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
-                                 <image>
-                                    <Image url="@../../icon/sidebar/settings.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-settings" styleClass="app-icon, icon-size-35" />
                            </graphic>
                            <font>
                               <Font name="System Bold" size="14.0" />
@@ -183,11 +142,7 @@
                               <Font size="9.0" />
                            </font>
                            <graphic>
-                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/calendar.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-calendar_today" styleClass="app-icon, icon-size-15" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleOpenCalculator" text="%main.calculator">
@@ -195,11 +150,7 @@
                               <Font size="9.0" />
                            </font>
                            <graphic>
-                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/calculator.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-calculate" styleClass="app-icon, icon-size-15" />
                            </graphic>
                         </Button>
                         <Button fx:id="notificationsButton" onAction="#handleToggleNotifications" text="%main.notifications">
@@ -208,11 +159,7 @@
                            </font>
                            <graphic>
                               <StackPane>
-                                 <ImageView fx:id="bellIcon" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                       <Image url="@../../icon/common/notification.png" />
-                                    </image>
-                                 </ImageView>
+                                 <FontIcon fx:id="bellIcon" iconLiteral="mdmz-notifications" styleClass="app-icon, icon-size-15" />
                                  <Label fx:id="unreadBadge" styleClass="notification-badge" text="0" visible="false" StackPane.alignment="TOP_RIGHT" />
                               </StackPane>
                            </graphic>
@@ -222,11 +169,7 @@
                               <Font size="9.0" />
                            </font>
                            <graphic>
-                              <ImageView fx:id="toggleMonetaryValuesIcon" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/hide.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon fx:id="toggleMonetaryValuesIcon" iconLiteral="mdmz-visibility_off" styleClass="app-icon, icon-size-15" />
                            </graphic>
                         </Button>
                      </children>

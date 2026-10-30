@@ -3,14 +3,13 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane stylesheets="@../../css/component/charts.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsOverviewController">
    <children>
@@ -96,29 +95,17 @@
                                     <AnchorPane fx:id="pieChartAnchorPane" prefHeight="240.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
                                     <Button fx:id="recalculateInvestmentPerformanceButton" onAction="#handleRecalculateInvestmentPerformance" styleClass="button-primary" text="%savings.button.recalculate" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <graphic>
-                                          <ImageView fx:id="recalculateInvestmentPerformanceButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/reload.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon fx:id="recalculateInvestmentPerformanceButtonIcon" iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-20" />
                                        </graphic>
                                     </Button>
                                     <Button fx:id="graphPrevButton" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                        <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/arrow_left.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                        </graphic>
                                     </Button>
                                     <Button fx:id="graphNextButton" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                        <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/arrow_right.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                        </graphic>
                                     </Button>
                                  </children>
@@ -132,11 +119,7 @@
                                     </Label>
                                     <Button onAction="#handleEditInvestmentTarget" text="%investment.button.editInvestmentTarget" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <graphic>
-                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../icon/common/edit.png" />
-                                             </image>
-                                          </ImageView>
+                                          <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                                        </graphic>
                                     </Button>
                                     <HBox fx:id="portfolioP5" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />

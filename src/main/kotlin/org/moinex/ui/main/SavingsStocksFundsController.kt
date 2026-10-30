@@ -21,15 +21,14 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.util.Duration
 import javafx.util.StringConverter
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isValidForFundamentalAnalysis
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -99,7 +98,7 @@ class SavingsStocksFundsController(
     private lateinit var updatePortfolioPricesButton: Button
 
     @FXML
-    private lateinit var updatePricesButtonIcon: ImageView
+    private lateinit var updatePricesButtonIcon: FontIcon
 
     private lateinit var tickers: List<Ticker>
     private lateinit var dividends: List<Dividend>
@@ -632,11 +631,6 @@ class SavingsStocksFundsController(
         updatePricesRotation = null
         updatePricesButtonIcon.rotate = 0.0
         updatePortfolioPricesButton.isDisable = false
-        updatePricesButtonIcon.image =
-            Image(
-                javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm(),
-            )
-        updatePricesButtonIcon.applyIconTheme(preferencesService.isDarkMode())
         updatePortfolioPricesButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES)
 

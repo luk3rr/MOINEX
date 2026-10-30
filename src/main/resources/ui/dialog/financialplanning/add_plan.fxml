@@ -9,12 +9,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" minWidth="1100.0" prefWidth="1100.0" spacing="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.financialplanning.AddPlanController">
     <fx:define>
@@ -159,20 +158,12 @@
                <children>
                   <Button fx:id="prevButton" minWidth="80.0">
                      <graphic>
-                        <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../icon/common/arrow_left.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-15" />
                      </graphic>
                   </Button>
                   <Button fx:id="nextButton" minWidth="80.0">
                      <graphic>
-                        <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../icon/common/arrow_right.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-15" />
                      </graphic>
                   </Button>
                </children>
@@ -184,9 +175,7 @@
       </VBox>
         <Button onAction="#handleAddBudgetGroup" style="-fx-text-fill: #0d9488; -fx-font-weight: bold;" text="%financialplanning.label.addNewGroup">
             <graphic>
-                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                    <image><Image url="@../../../icon/common/add.png" /></image>
-                </ImageView>
+                <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
             </graphic>
         </Button>
 

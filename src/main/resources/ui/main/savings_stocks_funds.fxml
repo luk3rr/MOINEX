@@ -6,14 +6,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsStocksFundsController">
    <children>
@@ -89,48 +88,28 @@
                      <children>
                         <Button onAction="#handleRegisterTicker" text="%savings.stocksFunds.button.registerTicker">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/add.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleOpenTickerArchive" text="%savings.stocksFunds.button.tickerArchive">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/archive.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-archive" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleAddCryptoExchange" text="%savings.stocksFunds.button.exchangeCryptos">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/trade.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdmz-swap_horiz" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Button onAction="#handleShowTransactions" text="%savings.stocksFunds.button.showTransactions">
                            <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/list.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-list" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="updatePortfolioPricesButton" onAction="#handleUpdatePortfolioPrices" text="%savings.stocksFunds.button.updatePrices">
                            <graphic>
-                              <ImageView fx:id="updatePricesButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/common/synchronize.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon fx:id="updatePricesButtonIcon" iconLiteral="mdmz-sync" styleClass="app-icon, icon-size-20" />
                            </graphic>
                         </Button>
                      </children>
@@ -152,56 +131,32 @@
                                              <children>
                                                 <Button onAction="#handleEditTicker" text="%savings.stocksFunds.button.edit">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/edit.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleDeleteTicker" text="%savings.stocksFunds.button.delete">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/remove.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleBuyTicker" text="%savings.stocksFunds.button.buyTicker">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/sign_in.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-login" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleSellTicker" text="%savings.stocksFunds.button.sellTicker">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/sign_out.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-exit_to_app" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleAddDividend" text="%savings.stocksFunds.button.addDividend">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/income_black.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdal-arrow_upward" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                                 <Button onAction="#handleViewFundamentalAnalysis" text="%savings.stocksFunds.button.fundamentalAnalysis">
                                                    <graphic>
-                                                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../../icon/common/profit.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <FontIcon iconLiteral="mdmz-trending_up" styleClass="app-icon, icon-size-20" />
                                                    </graphic>
                                                 </Button>
                                              </children>
@@ -230,11 +185,7 @@
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
                                              <children>
-                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/find.png" />
-                                                   </image>
-                                                </ImageView>
+                                                <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
                                                 <TextField fx:id="stocksFundsTabTickerSearchField" prefWidth="300.0" promptText="%savings.stocksFunds.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                              </children>
                                           </HBox>

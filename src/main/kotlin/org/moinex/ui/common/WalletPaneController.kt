@@ -13,18 +13,17 @@ import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.control.MenuButton
 import javafx.scene.control.MenuItem
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.VBox
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
+import org.moinex.common.ui.IconMapper
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Transfer
@@ -61,7 +60,7 @@ class WalletPaneController(
     private lateinit var rootVBox: VBox
 
     @FXML
-    private lateinit var walletIcon: ImageView
+    private lateinit var walletIcon: FontIcon
 
     @FXML
     private lateinit var walletName: Label
@@ -180,8 +179,7 @@ class WalletPaneController(
 
         walletName.text = wallet.name
         walletType.text = UIUtils.translateWalletType(wallet.type)
-        walletIcon.image = Image(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon)
-        walletIcon.applyIconTheme(preferencesService.isDarkMode())
+        walletIcon.iconLiteral = IconMapper.walletTypeLiteral(wallet.type.icon)
 
         val confirmedIncomesSum =
             transactions

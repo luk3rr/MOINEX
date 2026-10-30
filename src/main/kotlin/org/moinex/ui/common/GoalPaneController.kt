@@ -12,17 +12,17 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.control.MenuItem
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isZero
+import org.moinex.common.ui.IconMapper
+import org.moinex.common.ui.Icons
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
@@ -60,7 +60,7 @@ class GoalPaneController(
     private lateinit var infosVBox: VBox
 
     @FXML
-    private lateinit var goalIcon: ImageView
+    private lateinit var goalIcon: FontIcon
 
     @FXML
     private lateinit var goalName: Label
@@ -123,15 +123,8 @@ class GoalPaneController(
         goalName.text = currentGoal.name
         goalMotivation.text = currentGoal.motivation
 
-        goalIcon.image =
-            Image(
-                if (currentGoal.isCompleted()) {
-                    Files.TROPHY_ICON
-                } else {
-                    Files.WALLET_TYPE_ICONS_PATH + currentGoal.type.icon
-                },
-            )
-        goalIcon.applyIconTheme(preferencesService.isDarkMode())
+        goalIcon.iconLiteral =
+            if (currentGoal.isCompleted()) Icons.TROPHY else IconMapper.walletTypeLiteral(currentGoal.type.icon)
 
         goalTargetAmount.text = UIUtils.formatCurrency(currentGoal.targetBalance)
         goalTargetDate.text = UIUtils.formatDateForDisplay(currentGoal.targetDate)

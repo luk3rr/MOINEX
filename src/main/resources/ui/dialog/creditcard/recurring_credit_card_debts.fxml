@@ -5,10 +5,9 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" prefWidth="1800.0" spacing="10.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.creditcard.RecurringCreditCardDebtsController">
    <children>
@@ -16,11 +15,7 @@
          <children>
             <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                <children>
-                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../icon/common/find.png" />
-                     </image>
-                  </ImageView>
+                  <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
                   <TextField fx:id="searchField" promptText="%creditCard.recurring.searchPlaceholder" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>

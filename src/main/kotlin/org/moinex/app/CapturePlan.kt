@@ -37,6 +37,7 @@ data class CaptureTarget(
  */
 object CapturePlan {
     const val PROPERTY_CAPTURE_DIR = "moinex.capture.dir"
+    const val PROPERTY_CAPTURE_ONLY = "moinex.capture.only"
     const val WINDOW_WIDTH = 1440.0
     const val WINDOW_HEIGHT = 900.0
     const val DEFAULT_SETTLE_MILLIS = 2500L
@@ -75,6 +76,14 @@ object CapturePlan {
             CaptureTarget(16, "dialog-add-expense-error", CaptureKind.DIALOG, Files.ADD_EXPENSE_FXML),
             CaptureTarget(18, "alert-confirm", CaptureKind.ALERT, ""),
         )
+
+    /**
+     * Targets to capture, optionally limited to the comma separated ids in [only].
+     */
+    fun selectedTargets(only: String?): List<CaptureTarget> {
+        val ids = only?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
+        return if (ids.isNullOrEmpty()) targets else targets.filter { it.id in ids }
+    }
 
     fun fileName(target: CaptureTarget): String = "%02d-%s.png".format(target.index, target.id)
 

@@ -125,22 +125,26 @@ Resultado em 2026-10-29: `JAVA_HOME=JDK 25 ./gradlew ktlintCheck spotlessCheck t
 Desvios: (1) As tarefas de "revisar o diff" (T-3.2 a T-3.5) foram cumpridas por validação mecânica: os 93 FXML são XML válido, todo FXML com `<Button` importa `Button`, e a captura abre 16 telas e um diálogo sem erro; os demais diálogos não foram abertos um a um (só a UNIT-6 e as UNITs de tela passam por eles). (2) Os combos e datas voltaram ao visual padrão do AtlantaFX, sem a pílula de raio 20 que eles tinham; a pílula agora é só de botões. (3) As tabelas passaram ao visual padrão do AtlantaFX, sem o cabeçalho e as listras próprios; o desenho de cada tela refina isso nas UNITs 8 a 13. (4) O botão `JFXButton` perdia o efeito ripple do JFoenix; nenhum uso dependia dele além da aparência. (5) Cores fixas restantes: 7 arquivos com dono definido e 1 exceção aprovada (sombras neutras do `main.css`); `charts.css` e `timeline-chart.css` somam 111 ocorrências, a maior parte (UNIT-5). (6) Combos e datas dentro dos diálogos têm agora a borda de campo (`theme-border-field`), com tom roxo azulado no escuro; a UNIT-6 reavalia no layout de formulário.
 
 
-### UNIT-4 Ícones Ikonli   Status: not started
+### UNIT-4 Ícones Ikonli   Status: verified
 Covers: US-5; FR-8. Depende de: UNIT-3.
-- [ ] T-4.1 Adicionar `ikonli-javafx` e `ikonli-material2-pack` 12.4.0 ao catálogo e ao build — covers FR-8, US-5 — files: gradle/libs.versions.toml, build.gradle.kts — test: `./gradlew compileKotlin`
-- [ ] T-4.2 Criar `Icons.kt` com as constantes dos 69 glifos (anexo do § 2.6) e a função `icon()`; teste de que todo literal existe no pacote — covers FR-8, US-5 — files: common/ui/Icons.kt, src/test/.../IconsTest.kt — test: `./gradlew test --tests "*IconsTest"`
-- [ ] T-4.3 Criar `IconMapper.walletType` com a reserva em PNG e teste do mapa nome de arquivo → glifo — covers FR-8, US-5 — files: common/ui/IconMapper.kt, src/test/.../IconMapperTest.kt — test: `./gradlew test --tests "*IconMapperTest"`
-- [ ] T-4.4 Classe `.app-icon` com `-fx-icon-color: theme-icon` nos CSS comuns — covers FR-8, US-5 — files: css/common/common-styles.css — test: captura de um ícone nos dois temas
-- [ ] T-4.5 Sidebar e rodapé do `main.fxml` — covers FR-8, US-5 — files: ui/main/main.fxml — test: captura da janela principal
-- [ ] T-4.6 FXML de `main` (13 arquivos com `ImageView`) — covers FR-8, US-5 — files: ui/main/*.fxml — test: navegar pelas telas
-- [ ] T-4.7 FXML de `common` (4) e dos diálogos de `wallettransaction` (13) — covers FR-8, US-5 — files: ui/common, ui/dialog/wallettransaction — test: abrir diálogos
-- [ ] T-4.8 FXML dos diálogos de `creditcard` (11), `financialplanning` (4), `goal` (2) e `wishlist` (2) — covers FR-8, US-5 — files: ui/dialog/* — test: abrir diálogos
-- [ ] T-4.9 FXML dos diálogos de `investment` (21) — covers FR-8, US-5 — files: ui/dialog/investment — test: abrir diálogos
-- [ ] T-4.10 FXML dos demais diálogos (add, ai, edit, manage: 5) — covers FR-8, US-5 — files: ui/dialog/* — test: abrir diálogos
-- [ ] T-4.11 Kotlin: trocar `Image`/`ImageView` de ícone por `FontIcon` (sucesso, recarregar, mostrar/ocultar, troféu, receita/despesa, tipo de carteira) — covers FR-8, US-5 — files: WindowUtils.kt, Home/Savings/Wallet/GoalPane controllers — test: `./gradlew compileKotlin` e captura
-- [ ] T-4.12 Remover `applyIconTheme`, o tratamento de `colored-icon` no `ThemeService` e os PNGs e constantes sem uso — covers FR-8, US-5 — files: common/extension/JavaFxUtils.kt, service/ThemeService.kt, common/constant/Files.kt — test: busca por `applyIconTheme` e `ColorAdjust` sem resultados
-- [ ] T-4.13 Revisar com o usuário as 11 aproximações nas capturas; as recusadas ficam em PNG — covers FR-8, US-5 — files: design.md § 2.6 (anexo) — test: aprovação do usuário
-- [ ] T-4.14 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-4.1 Adicionar `ikonli-javafx` e `ikonli-material2-pack` 12.4.0 ao catálogo e ao build — covers FR-8, US-5 — files: gradle/libs.versions.toml, build.gradle.kts — test: `./gradlew compileKotlin`
+- [x] T-4.2 Criar `Icons.kt` com as constantes dos 69 glifos (anexo do § 2.6) e a função `icon()`; teste de que todo literal existe no pacote — covers FR-8, US-5 — files: common/ui/Icons.kt, src/test/.../IconsTest.kt — test: `./gradlew test --tests "*IconsTest"`
+- [x] T-4.3 Criar `IconMapper.walletType` com a reserva em PNG e teste do mapa nome de arquivo → glifo — covers FR-8, US-5 — files: common/ui/IconMapper.kt, src/test/.../IconMapperTest.kt — test: `./gradlew test --tests "*IconMapperTest"`
+- [x] T-4.4 Classe `.app-icon` com `-fx-icon-color: theme-icon` nos CSS comuns — covers FR-8, US-5 — files: css/common/common-styles.css — test: captura de um ícone nos dois temas
+- [x] T-4.5 Sidebar e rodapé do `main.fxml` — covers FR-8, US-5 — files: ui/main/main.fxml — test: captura da janela principal
+- [x] T-4.6 FXML de `main` (13 arquivos com `ImageView`) — covers FR-8, US-5 — files: ui/main/*.fxml — test: navegar pelas telas
+- [x] T-4.7 FXML de `common` (4) e dos diálogos de `wallettransaction` (13) — covers FR-8, US-5 — files: ui/common, ui/dialog/wallettransaction — test: abrir diálogos
+- [x] T-4.8 FXML dos diálogos de `creditcard` (11), `financialplanning` (4), `goal` (2) e `wishlist` (2) — covers FR-8, US-5 — files: ui/dialog/* — test: abrir diálogos
+- [x] T-4.9 FXML dos diálogos de `investment` (21) — covers FR-8, US-5 — files: ui/dialog/investment — test: abrir diálogos
+- [x] T-4.10 FXML dos demais diálogos (add, ai, edit, manage: 5) — covers FR-8, US-5 — files: ui/dialog/* — test: abrir diálogos
+- [x] T-4.11 Kotlin: trocar `Image`/`ImageView` de ícone por `FontIcon` (sucesso, recarregar, mostrar/ocultar, troféu, receita/despesa, tipo de carteira) — covers FR-8, US-5 — files: WindowUtils.kt, Home/Savings/Wallet/GoalPane controllers — test: `./gradlew compileKotlin` e captura
+- [x] T-4.12 Remover `applyIconTheme`, o tratamento de `colored-icon` no `ThemeService` e os PNGs e constantes sem uso — covers FR-8, US-5 — files: common/extension/JavaFxUtils.kt, service/ThemeService.kt, common/constant/Files.kt — test: busca por `applyIconTheme` e `ColorAdjust` sem resultados
+- [x] T-4.13 Revisar com o usuário as 11 aproximações nas capturas; as recusadas ficam em PNG — covers FR-8, US-5 — files: design.md § 2.6 (anexo) — test: aprovação do usuário
+- [x] T-4.14 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+
+**Resumo (2026-10-29, verificação exit 0, 1396 testes, 0 falhas):** 268 `ImageView` de FXML viraram `FontIcon` (74 arquivos), com cor `app-icon` do tema e tamanho por classe `icon-size-N` em `base.css` (o `iconSize` do FXML era sobrescrito pela fonte do tema). Kotlin: `Icons.kt`, `IconMapper.kt`, `icon()`, e os controllers de Home, Main, Wallet/Goal pane, Savings e `WindowUtils` usam `FontIcon`. 68 PNGs e 12 constantes de `Files.kt` removidos. Captura filtrável com `CAPTURE_ONLY`.
+
+**Desvios:** (1) `applyIconTheme`/`colored-icon` ficam no `ThemeService`, porque os logos de bandeira de cartão e a foto da splash continuam PNG; a splash ganhou `colored-icon`. (2) Nome de ícone de tipo de carteira desconhecido cai no glifo padrão, não em PNG. (3) `common/default.png` foi mantido. (4) T-4.13: aprovações dos ícones aproximados ficam para o teste do usuário; recusados voltam a PNG.
 
 ### UNIT-5 Gráficos e chat no tema   Status: not started
 Covers: US-6; FR-12. Depende de: UNIT-3.

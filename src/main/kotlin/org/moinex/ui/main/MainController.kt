@@ -20,20 +20,19 @@ import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.ContentDisplay
 import javafx.scene.control.Label
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import javafx.util.Pair
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.Icons
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
@@ -96,10 +95,10 @@ class MainController(
     private lateinit var contentArea: AnchorPane
 
     @FXML
-    private lateinit var toggleMonetaryValuesIcon: ImageView
+    private lateinit var toggleMonetaryValuesIcon: FontIcon
 
     @FXML
-    private lateinit var bellIcon: ImageView
+    private lateinit var bellIcon: FontIcon
 
     @FXML
     private lateinit var unreadBadge: Label
@@ -208,10 +207,6 @@ class MainController(
 
         updateUnreadBadge()
 
-        val darkMode = preferencesService.isDarkMode()
-        toggleMonetaryValuesIcon.applyIconTheme(darkMode)
-        bellIcon.applyIconTheme(darkMode)
-
         loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
         updateSelectedButton(homeButton)
     }
@@ -250,15 +245,8 @@ class MainController(
     private fun handleToggleMonetaryValues() {
         preferencesService.toggleHideMonetaryValues()
 
-        toggleMonetaryValuesIcon.image =
-            Image(
-                if (preferencesService.showMonetaryValues()) {
-                    Files.SHOW_ICON
-                } else {
-                    Files.HIDE_ICON
-                },
-            )
-        toggleMonetaryValuesIcon.applyIconTheme(preferencesService.isDarkMode())
+        toggleMonetaryValuesIcon.iconLiteral =
+            if (preferencesService.showMonetaryValues()) Icons.SHOW else Icons.HIDE
 
         currentContent?.let { loadContent(it.key, it.value) }
     }

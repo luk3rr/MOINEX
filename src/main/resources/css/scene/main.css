@@ -61,6 +61,10 @@
 }
 */
 
+#sidebar .app-icon {
+  -fx-icon-color: theme-on-sidebar;
+}
+
 #sidebar .sidebar-button-selected {
   -fx-background-color: theme-bg-sidebar-hover;
   -fx-text-fill: theme-on-sidebar;

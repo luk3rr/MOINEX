@@ -6,11 +6,10 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wallettransaction.create.AddExpenseController">
    <children>
@@ -48,29 +47,17 @@
       </VBox>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
          <children>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../../../icon/common/pencil.png" />
-               </image>
-            </ImageView>
+            <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
             <TextField fx:id="descriptionField" promptText="%dialog.label.description" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
          <children>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../../../icon/common/coin.png" />
-               </image>
-            </ImageView>
+            <FontIcon iconLiteral="mdmz-monetization_on" styleClass="app-icon, icon-size-20" />
             <TextField fx:id="transactionValueField" promptText="\$ 0.00" HBox.hgrow="ALWAYS" />
             <Button minWidth="80.0" onAction="#handleOpenCalculator">
                <graphic>
-                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../../icon/common/calculator.png" />
-                     </image>
-                  </ImageView>
+                  <FontIcon iconLiteral="mdal-calculate" styleClass="app-icon, icon-size-20" />
                </graphic>
             </Button>
          </children>

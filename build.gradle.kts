@@ -51,6 +51,8 @@ dependencies {
 	implementation(libs.org.openjfx.javafx.fxml)
 	implementation(libs.org.openjfx.javafx.web)
 	implementation(libs.io.github.mkpaz.atlantafx.base)
+	implementation(libs.org.kordamp.ikonli.ikonli.javafx)
+	implementation(libs.org.kordamp.ikonli.ikonli.material2.pack)
 
 	// Utilities
 	implementation(libs.com.opencsv.opencsv)

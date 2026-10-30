@@ -15,13 +15,14 @@ import javafx.scene.Scene
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.ButtonType
-import javafx.scene.image.Image
-import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.moinex.app.JavaFXApp
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.Icons
+import org.moinex.common.ui.icon
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
@@ -30,6 +31,7 @@ import java.util.ResourceBundle
 
 object WindowUtils {
     private val logger = LoggerFactory.getLogger(WindowUtils::class.java)
+    private const val SUCCESS_ICON_SIZE = 48
 
     private fun Alert.setAttributes(
         title: String,
@@ -114,12 +116,9 @@ object WindowUtils {
     ) {
         Alert(AlertType.INFORMATION).apply {
             graphic =
-                ImageView(
-                    Image(
-                        WindowUtils::class.java.getResource(Files.SUCCESS_ICON)?.toString()
-                            ?: throw IllegalStateException("Success icon not found"),
-                    ),
-                )
+                icon(Icons.SUCCESS, SUCCESS_ICON_SIZE).apply {
+                    styleClass.add(Styles.ICON_POSITIVE)
+                }
 
             val title =
                 resources?.getString(TranslationKeys.DIALOG_SUCCESS_TITLE) ?: "Success"

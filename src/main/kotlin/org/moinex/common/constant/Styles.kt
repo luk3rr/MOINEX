@@ -10,6 +10,10 @@ object Styles {
     const val PROGRESS_BAR_YELLOW_COLOR_STYLE: String = "progress-bar-yellow"
     const val PROGRESS_BAR_GREEN_COLOR_STYLE: String = "progress-bar-green"
 
+    // Icon color styles from base.css
+    const val ICON_POSITIVE: String = "icon-positive"
+    const val ICON_NEGATIVE: String = "icon-negative"
+
     // Shared page styles from common-styles.css
     const val CARD: String = "card"
     const val PAGE_TITLE: String = "page-title"

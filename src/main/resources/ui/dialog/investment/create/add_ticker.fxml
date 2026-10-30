@@ -5,11 +5,10 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.investment.create.AddTickerController">
    <children>
@@ -26,11 +25,7 @@
                                     <Font size="10.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../../icon/common/pencil.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                            </children>
                         </VBox>
                      </children>
@@ -58,11 +53,7 @@
                                     <Font size="10.0" />
                                  </font>
                               </Label>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../../icon/common/pencil.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
                            </children>
                         </VBox>
                      </children>
@@ -86,11 +77,7 @@
                         </Label>
                         <Button fx:id="yahooLookupButton" onAction="#goToYahooLookup">
                            <graphic>
-                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../../icon/common/question.png" />
-                                 </image>
-                              </ImageView>
+                              <FontIcon iconLiteral="mdal-help_outline" styleClass="app-icon, icon-size-15" />
                            </graphic>
                         </Button>
                      </children>
@@ -110,11 +97,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../../icon/common/coin.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdmz-monetization_on" styleClass="app-icon, icon-size-20" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
@@ -138,11 +121,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../../icon/common/quantity.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdal-format_list_numbered" styleClass="app-icon, icon-size-20" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER">
@@ -166,11 +145,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../../icon/common/coin.png" />
-                           </image>
-                        </ImageView>
+                        <FontIcon iconLiteral="mdmz-monetization_on" styleClass="app-icon, icon-size-20" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER">
