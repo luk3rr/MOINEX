@@ -230,7 +230,8 @@ Covers: US-8, US-9; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-9.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-8, US-9 — files: (saída local) — test: aprovação do usuário
 - [ ] T-9.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+**Resumo (2026-10-30):** Carteiras: faixa de botões movida para o cabeçalho, acima dos cards (o saldo, a lista e os gráficos em cards já existiam). Cartões: a tabela de dívidas ganhou linhas separadas (título e filtros; ações; busca no topo), e os quatro botões deixaram de ser cortados em "..."; o bloco de pagamento do card deixou de sobrepor a navegação. Essas duas correções eram regressão do botão pill nas capturas, não aprovadas antes.
+
 
 ### UNIT-10 Redesenho: Transações   Status: partial
 Covers: US-10; FR-9. Depende de: UNIT-4, UNIT-5.
