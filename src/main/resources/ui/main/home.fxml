@@ -77,18 +77,19 @@
                      <children>
                         <AnchorPane fx:id="graphPane" minWidth="800.0" prefWidth="800.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label fx:id="graphTitle" layoutX="32.0" layoutY="10.0" styleClass="title" text="%home.moneyFlow.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                              <HBox spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <HBox fx:id="graphHeader" alignment="CENTER_LEFT" spacing="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
+                                    <Label fx:id="graphTitle" styleClass="title" text="%home.moneyFlow.title" />
+                                    <Region HBox.hgrow="ALWAYS" />
                                     <ComboBox fx:id="sankeyMonthComboBox" minWidth="150.0" />
                                     <ComboBox fx:id="sankeyYearComboBox" minWidth="80.0" />
+                                    <Button fx:id="recalculateNetWorthButton" onAction="#handleRecalculateNetWorth" text="%home.recalculateNetWorthButton">
+                                       <graphic>
+                                          <FontIcon fx:id="recalculateNetWorthButtonIcon" iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-20" />
+                                       </graphic>
+                                    </Button>
                                  </children>
                               </HBox>
-                              <Button fx:id="recalculateNetWorthButton" onAction="#handleRecalculateNetWorth" styleClass="button-primary" text="%home.recalculateNetWorthButton" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                 <graphic>
-                                    <FontIcon fx:id="recalculateNetWorthButtonIcon" iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-20" />
-                                 </graphic>
-                              </Button>
                               <HBox fx:id="sankeyNavigator" alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
                                  <children>
                                     <Button onAction="#handleSankeyPrevMonth">

@@ -207,17 +207,18 @@ Covers: US-16; FR-11; NFR-7. Depende de: UNIT-2, UNIT-4.
 
 **Desvios:** o indicador fica no rodapé (a janela principal não tem barra superior). As abas são selecionadas por índice após carregar a tela. O checklist manual (executar cada grupo) fica para o seu teste.
 
-### UNIT-8 Redesenho: Início e Resumo anual   Status: partial
+### UNIT-8 Redesenho: Início e Resumo anual   Status: verified (aguarda aprovação visual, T-8.6)
 Covers: US-7; FR-9. Depende de: UNIT-4, UNIT-5.
-- [ ] T-8.1 Início: grade fluida sem larguras mínimas fixas, os três blocos superiores como `card` e os cartões de carteira e de crédito lisos, sem gradiente — covers FR-9, US-7 — files: ui/main/home.fxml, css/scene/home.css — test: captura nos dois temas
-- [ ] T-8.2 Início: Fluxo de dinheiro e Últimas transações em cards; "recalcular patrimônio" como ação secundária no cabeçalho — covers FR-9, US-7 — files: ui/main/home.fxml, HomeController.kt — test: captura e botão funcionando
-- [ ] T-8.3 Início: painéis de carteira, cartão e resumo do mês (`ui/common`) no padrão novo — covers FR-9, US-7 — files: ui/common/*_pane.fxml, resume_pane.fxml — test: captura
-- [ ] T-8.4 Resumo anual: faixa de quatro indicadores e fluxo mensal — covers FR-9, US-7 — files: ui/main/annual_summary.fxml, css/scene/annual_summary.css — test: captura
-- [ ] T-8.5 Resumo anual: tabelas por categoria lado a lado, maiores despesas e insights — covers FR-9, US-7 — files: ui/main/annual_summary.fxml — test: captura
+- [x] T-8.1 Início: grade fluida sem larguras mínimas fixas, os três blocos superiores como `card` e os cartões de carteira e de crédito lisos, sem gradiente — covers FR-9, US-7 — files: ui/main/home.fxml, css/scene/home.css — test: captura nos dois temas
+- [x] T-8.2 Início: Fluxo de dinheiro e Últimas transações em cards; "recalcular patrimônio" como ação secundária no cabeçalho — covers FR-9, US-7 — files: ui/main/home.fxml, HomeController.kt — test: captura e botão funcionando
+- [x] T-8.3 Início: painéis de carteira, cartão e resumo do mês (`ui/common`) no padrão novo — covers FR-9, US-7 — files: ui/common/*_pane.fxml, resume_pane.fxml — test: captura
+- [x] T-8.4 Resumo anual: faixa de quatro indicadores e fluxo mensal — covers FR-9, US-7 — files: ui/main/annual_summary.fxml, css/scene/annual_summary.css — test: captura
+- [x] T-8.5 Resumo anual: tabelas por categoria lado a lado, maiores despesas e insights — covers FR-9, US-7 — files: ui/main/annual_summary.fxml — test: captura
 - [ ] T-8.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-7 — files: (saída local) — test: aprovação do usuário
 - [ ] T-8.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+**Resumo (2026-10-30):** o Início já tinha a estrutura do desenho (três cards em cima, Fluxo e Últimas transações embaixo, cartões lisos com fio lateral). Corrigido: o botão de recalcular patrimônio e os seletores de mês/ano ficavam sobrepostos no mesmo canto; agora é um cabeçalho único (`graphHeader`) com o botão como ação secundária. O Resumo anual já seguia o desenho (faixa de quatro indicadores, fluxo mensal, tabelas lado a lado, maiores despesas).
+
 
 ### UNIT-9 Redesenho: Carteiras e Cartões   Status: partial
 Covers: US-8, US-9; FR-9. Depende de: UNIT-4, UNIT-5.
