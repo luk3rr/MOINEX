@@ -351,7 +351,7 @@ class MainController(
         AnchorPane.setRightAnchor(notificationPanel, 0.0)
     }
 
-    private fun openNotificationPanel() {
+    fun openNotificationPanel() {
         notificationCenterController.refresh()
         notificationService.markAllAsRead()
 
@@ -374,7 +374,7 @@ class MainController(
         updateUnreadBadge()
     }
 
-    private fun closeNotificationPanel() {
+    fun closeNotificationPanel() {
         val slideOut =
             TranslateTransition(Duration.millis(Constants.NOTIFICATION_DRAWER_ANIMATION_MS), notificationPanel).apply {
                 fromX = 0.0

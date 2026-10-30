@@ -184,6 +184,10 @@ def get_dynamic_date(months_offset, days_offset):
     date = datetime.now().replace(day=1) + timedelta(days=total_days_offset)
     return date.strftime('%Y-%m-%dT%H:%M:%S')
 
+def get_dynamic_day(months_offset, days_offset):
+    """Igual a get_dynamic_date, mas devolve só a data (yyyy-MM-dd), formato das colunas de data pura."""
+    return get_dynamic_date(months_offset, days_offset)[:10]
+
 def execute_query(cursor, query, params=()):
     """Executa uma query e ignora erros de forma silenciosa."""
     try:
@@ -214,16 +218,20 @@ def populate_initial_data(cursor, data):
 
     for row in data["goal"]:
         wallet_id, motivation, initial_balance, target_balance, target_date_offsets, completion_date_offsets = row
-        target_date = get_dynamic_date(target_date_offsets[0], target_date_offsets[1])
+        target_date = get_dynamic_day(target_date_offsets[0], target_date_offsets[1])
         completion_date = None
         if completion_date_offsets:
-            completion_date = get_dynamic_date(completion_date_offsets[0], completion_date_offsets[1])
+            completion_date = get_dynamic_day(completion_date_offsets[0], completion_date_offsets[1])
 
         params = (wallet_id, completion_date, initial_balance, motivation, target_balance, target_date)
         execute_query(cursor, "INSERT INTO goal (wallet_id, completion_date, initial_balance, motivation, target_balance, target_date) VALUES (?, ?, ?, ?, ?, ?);", params)
 
     for row in data["financial_plan"]:
-        execute_query(cursor, "INSERT INTO financial_plan (id, name, base_income, archived) VALUES (?, ?, ?, ?);", row)
+        execute_query(
+            cursor,
+            "INSERT INTO financial_plan (id, name, base_income, archived, start_date) VALUES (?, ?, ?, ?, ?);",
+            row + (get_dynamic_day(-6, 0),),
+        )
 
     for row in data["budget_group"]:
         execute_query(cursor, "INSERT INTO budget_group (id, name, target_percentage, plan_id) VALUES (?, ?, ?, ?);", row)
@@ -233,9 +241,9 @@ def populate_initial_data(cursor, data):
 
     for row in data["recurring_transaction"]:
         rec_id, amount, desc, type, freq, start_offsets, end_offsets, next_due_offsets, status, cat_id, wallet_id = row
-        start_date = get_dynamic_date(start_offsets[0], start_offsets[1])
-        end_date = get_dynamic_date(end_offsets[0], end_offsets[1])
-        next_due_date = get_dynamic_date(next_due_offsets[0], next_due_offsets[1])
+        start_date = get_dynamic_day(start_offsets[0], start_offsets[1])
+        end_date = get_dynamic_day(end_offsets[0], end_offsets[1])
+        next_due_date = get_dynamic_day(next_due_offsets[0], next_due_offsets[1])
         params = (rec_id, amount, desc, type, end_date, freq, next_due_date, start_date, status, cat_id, wallet_id)
         execute_query(cursor, "INSERT INTO recurring_transaction (id, amount, description, type, end_date, frequency, next_due_date, start_date, status, category_id, wallet_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", params)
 
@@ -331,7 +339,7 @@ def populate_bonds(cursor, data):
     print("Inserting bonds...")
     for row in data["bond"]:
         bond_id, name, symbol, bond_type, issuer, maturity_date_offsets, interest_type, interest_index, interest_rate, archived = row
-        maturity_date = get_dynamic_date(maturity_date_offsets[0], maturity_date_offsets[1])
+        maturity_date = get_dynamic_day(maturity_date_offsets[0], maturity_date_offsets[1])
         params = (bond_id, name, symbol, bond_type, issuer, maturity_date, interest_type, interest_index, interest_rate, archived)
         execute_query(cursor, "INSERT INTO bond (id, name, symbol, type, issuer, maturity_date, interest_type, interest_index, interest_rate, archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", params)
     print("Bonds inserted successfully.")

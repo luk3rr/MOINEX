@@ -33,6 +33,7 @@ buildNumber.properties
 .aidlc/**/state.md
 .aidlc/**/audit.md
 .aidlc/**/archive/
+.aidlc/**/screenshots/
 
 # VSCode
 .vscode/

@@ -92,6 +92,8 @@ class JavaFXApp : Application() {
                     }
                     splashStage.close()
 
+                    springContext.getBean<ScreenshotRunner>().runIfEnabled(primaryStage)
+
                     val fallbackPath = System.getProperty(SpringApp.DB_FALLBACK_PROPERTY)
                     if (fallbackPath != null) {
                         WindowUtils.showErrorDialog(

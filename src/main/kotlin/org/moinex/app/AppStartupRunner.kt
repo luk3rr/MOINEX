@@ -49,6 +49,11 @@ class AppStartupRunner(
     }
 
     override fun run(args: ApplicationArguments) {
+        if (ScreenshotRunner.isEnabled()) {
+            logger.info("AppStartupRunner skipped: screenshot capture mode")
+            return
+        }
+
         logger.info("AppStartupRunner started")
 
         FxUtils.launchOnBackground {
