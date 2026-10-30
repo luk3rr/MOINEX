@@ -6,7 +6,6 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -15,6 +14,7 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
@@ -75,10 +75,10 @@ class AnnualSummaryController(
     private lateinit var chartTitleLabel: Label
 
     @FXML
-    private lateinit var chartPrevButton: JFXButton
+    private lateinit var chartPrevButton: Button
 
     @FXML
-    private lateinit var chartNextButton: JFXButton
+    private lateinit var chartNextButton: Button
 
     @FXML
     private lateinit var monthlyFlowView: AnchorPane

@@ -8,7 +8,6 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import jakarta.persistence.EntityNotFoundException
 import javafx.animation.Interpolator
 import javafx.animation.RotateTransition
@@ -17,6 +16,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.geometry.Pos
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
@@ -96,7 +96,7 @@ class SavingsStocksFundsController(
     private lateinit var stocksFundsTabTickerTypeComboBox: ComboBox<AssetType>
 
     @FXML
-    private lateinit var updatePortfolioPricesButton: JFXButton
+    private lateinit var updatePortfolioPricesButton: Button
 
     @FXML
     private lateinit var updatePricesButtonIcon: ImageView

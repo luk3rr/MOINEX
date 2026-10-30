@@ -8,9 +8,9 @@
 
 package org.moinex.ui.dialog.investment.create
 
-import com.jfoenix.controls.JFXButton
 import jakarta.persistence.EntityExistsException
 import javafx.fxml.FXML
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TextField
@@ -57,10 +57,10 @@ open class AddBondController(
     private lateinit var interestRateField: TextField
 
     @FXML
-    private lateinit var saveButton: JFXButton
+    private lateinit var saveButton: Button
 
     @FXML
-    private lateinit var cancelButton: JFXButton
+    private lateinit var cancelButton: Button
 
     @FXML
     fun initialize() {

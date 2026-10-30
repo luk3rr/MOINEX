@@ -8,9 +8,9 @@
 
 package org.moinex.ui.dialog.investment.update
 
-import com.jfoenix.controls.JFXButton
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
+import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
@@ -61,10 +61,10 @@ class EditBondController(
     private lateinit var archivedCheckBox: CheckBox
 
     @FXML
-    private lateinit var saveButton: JFXButton
+    private lateinit var saveButton: Button
 
     @FXML
-    private lateinit var cancelButton: JFXButton
+    private lateinit var cancelButton: Button
 
     private lateinit var bond: Bond
 

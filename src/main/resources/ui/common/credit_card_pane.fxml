@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
@@ -161,7 +161,7 @@
                                                 <Label fx:id="invoiceMonthLabel" text="\$ 0.00" />
                                              </children>
                                           </HBox>
-                                          <JFXButton alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="%common.creditCard.registerPayment" textAlignment="RIGHT">
+                                          <Button alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="%common.creditCard.registerPayment" textAlignment="RIGHT">
                                              <graphic>
                                                 <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -169,7 +169,7 @@
                                                    </image>
                                                 </ImageView>
                                              </graphic>
-                                          </JFXButton>
+                                          </Button>
                                        </children>
                                     </VBox>
                                  </children>
@@ -180,7 +180,7 @@
                            <children>
                               <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <JFXButton fx:id="prevButton" onAction="#handlePrevMonth">
+                                    <Button fx:id="prevButton" onAction="#handlePrevMonth">
                                        <graphic>
                                           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -188,7 +188,7 @@
                                              </image>
                                           </ImageView>
                                        </graphic>
-                                    </JFXButton>
+                                    </Button>
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label fx:id="invoiceMonthNavigatorBarLabel" alignment="CENTER" prefWidth="60.0" text="MM/YY" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                        <font>
@@ -196,7 +196,7 @@
                                        </font>
                                     </Label>
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <JFXButton fx:id="nextButton" onAction="#handleNextMonth">
+                                    <Button fx:id="nextButton" onAction="#handleNextMonth">
                                        <graphic>
                                           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -204,7 +204,7 @@
                                              </image>
                                           </ImageView>
                                        </graphic>
-                                    </JFXButton>
+                                    </Button>
                                  </children>
                               </HBox>
                            </children>

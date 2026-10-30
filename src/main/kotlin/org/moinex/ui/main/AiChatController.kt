@@ -6,13 +6,13 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.concurrent.Worker
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.Node
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TextField
@@ -80,10 +80,10 @@ class AiChatController(
     private lateinit var inputField: TextField
 
     @FXML
-    private lateinit var sendButton: JFXButton
+    private lateinit var sendButton: Button
 
     @FXML
-    private lateinit var attachButton: JFXButton
+    private lateinit var attachButton: Button
 
     @FXML
     private lateinit var attachmentsContainer: FlowPane
@@ -298,7 +298,7 @@ class AiChatController(
                 tooltip = Tooltip(attachment.fileName)
             }
         val removeButton =
-            JFXButton("✕").apply {
+            Button("✕").apply {
                 styleClass.add(STYLE_ATTACHMENT_REMOVE)
                 setOnAction { removeAttachment(attachment) }
             }
@@ -356,7 +356,7 @@ class AiChatController(
 
     private fun renderReviewButton(pending: PendingTransactionReview) {
         val button =
-            JFXButton(reviewButtonText(pending.transactions.size)).apply {
+            Button(reviewButtonText(pending.transactions.size)).apply {
                 styleClass.add(STYLE_ATTACH_BUTTON)
             }
         val row = HBox(button).apply { alignment = Pos.CENTER_LEFT }
@@ -370,7 +370,7 @@ class AiChatController(
 
     private fun openTransactionReview(
         pending: PendingTransactionReview,
-        button: JFXButton,
+        button: Button,
         row: HBox,
     ) {
         var controllerRef: TransactionReviewController? = null
@@ -409,7 +409,7 @@ class AiChatController(
 
     private fun renderInvestmentReviewButton(pending: PendingInvestmentReview) {
         val button =
-            JFXButton(investmentReviewButtonText(pending.operations.size)).apply {
+            Button(investmentReviewButtonText(pending.operations.size)).apply {
                 styleClass.add(STYLE_ATTACH_BUTTON)
             }
         val row = HBox(button).apply { alignment = Pos.CENTER_LEFT }
@@ -423,7 +423,7 @@ class AiChatController(
 
     private fun openInvestmentOperationReview(
         pending: PendingInvestmentReview,
-        button: JFXButton,
+        button: Button,
         row: HBox,
     ) {
         var controllerRef: InvestmentOperationReviewController? = null

@@ -8,7 +8,6 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -18,6 +17,7 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.PieChart
 import javafx.scene.chart.XYChart
+import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
@@ -95,10 +95,10 @@ class WalletController(
     private lateinit var totalBalancePaneInfoVBox: VBox
 
     @FXML
-    private lateinit var walletPrevButton: JFXButton
+    private lateinit var walletPrevButton: Button
 
     @FXML
-    private lateinit var walletNextButton: JFXButton
+    private lateinit var walletNextButton: Button
 
     @FXML
     private lateinit var totalBalancePaneWalletTypeComboBox: ComboBox<String>

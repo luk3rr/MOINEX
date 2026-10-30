@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -68,7 +68,7 @@
             </AnchorPane>
             <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <JFXButton fx:id="prevButton" minWidth="80.0" stylesheets="@../../../css/component/buttons.css">
+                  <Button fx:id="prevButton" minWidth="80.0">
                      <graphic>
                         <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -76,8 +76,8 @@
                            </image>
                         </ImageView>
                      </graphic>
-                  </JFXButton>
-                  <JFXButton fx:id="nextButton" minWidth="80.0" stylesheets="@../../../css/component/buttons.css">
+                  </Button>
+                  <Button fx:id="nextButton" minWidth="80.0">
                      <graphic>
                         <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -85,7 +85,7 @@
                            </image>
                         </ImageView>
                      </graphic>
-                  </JFXButton>
+                  </Button>
                </children>
                <padding>
                   <Insets top="10.0" />
@@ -93,19 +93,19 @@
             </HBox>
          </children>
       </VBox>
-        <JFXButton onAction="#handleAddBudgetGroup" style="-fx-text-fill: #0d9488; -fx-font-weight: bold;" text="%financialplanning.label.addNewGroup">
+        <Button onAction="#handleAddBudgetGroup" style="-fx-text-fill: #0d9488; -fx-font-weight: bold;" text="%financialplanning.label.addNewGroup">
             <graphic>
                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                     <image><Image url="@../../../icon/common/add.png" /></image>
                 </ImageView>
             </graphic>
-        </JFXButton>
+        </Button>
 
         <!-- Action Buttons -->
         <HBox alignment="CENTER" spacing="10.0">
             <children>
-                <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
-                <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
+                <Button minWidth="80.0" onAction="#handleCancel" text="%dialog.button.cancel" />
+                <Button minWidth="80.0" onAction="#handleSave" text="%dialog.button.save" />
             </children>
             <padding>
                 <Insets top="10.0" />

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
@@ -95,7 +95,7 @@
 
                               <HBox alignment="CENTER_RIGHT">
                                  <children>
-                                    <JFXButton fx:id="calculateButton" onAction="#handleCalculate" stylesheets="@../../css/component/buttons.css" text="%fire.button.calculate" />
+                                    <Button fx:id="calculateButton" onAction="#handleCalculate" text="%fire.button.calculate" />
                                  </children>
                               </HBox>
                            </children>
@@ -154,7 +154,7 @@
                   <Label styleClass="title" text="%fire.chart.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                   <HBox spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                      <children>
-                        <ComboBox fx:id="chartYearsComboBox" stylesheets="@../../css/component/combo-box.css" />
+                        <ComboBox fx:id="chartYearsComboBox" />
                      </children>
                   </HBox>
                   <LineChart fx:id="projectionChart" animated="false" createSymbols="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="50.0">

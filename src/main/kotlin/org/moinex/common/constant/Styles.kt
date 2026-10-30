@@ -10,6 +10,13 @@ object Styles {
     const val PROGRESS_BAR_YELLOW_COLOR_STYLE: String = "progress-bar-yellow"
     const val PROGRESS_BAR_GREEN_COLOR_STYLE: String = "progress-bar-green"
 
+    // Shared page styles from common-styles.css
+    const val CARD: String = "card"
+    const val PAGE_TITLE: String = "page-title"
+    const val CARD_TITLE: String = "card-title"
+    const val CARD_SUBTITLE: String = "card-subtitle"
+    const val VALUE_LARGE: String = "value-large"
+
     // Info styles from common-styles.css
     const val INFO_LABEL_RED_STYLE: String = "info-label-red"
     const val INFO_LABEL_GREEN_STYLE: String = "info-label-green"

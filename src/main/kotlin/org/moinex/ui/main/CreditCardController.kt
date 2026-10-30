@@ -8,7 +8,6 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -19,6 +18,7 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.StackedBarChart
 import javafx.scene.chart.XYChart
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.TableColumn
@@ -96,10 +96,10 @@ class CreditCardController(
     private lateinit var debtsFlowPane: AnchorPane
 
     @FXML
-    private lateinit var crcNextButton: JFXButton
+    private lateinit var crcNextButton: Button
 
     @FXML
-    private lateinit var crcPrevButton: JFXButton
+    private lateinit var crcPrevButton: Button
 
     @FXML
     private lateinit var invoiceMonth: Label

@@ -50,7 +50,6 @@ dependencies {
 	implementation(libs.org.openjfx.javafx.controls)
 	implementation(libs.org.openjfx.javafx.fxml)
 	implementation(libs.org.openjfx.javafx.web)
-	implementation(libs.com.jfoenix.jfoenix)
 	implementation(libs.io.github.mkpaz.atlantafx.base)
 
 	// Utilities

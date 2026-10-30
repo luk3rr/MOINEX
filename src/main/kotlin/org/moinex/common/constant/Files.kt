@@ -207,7 +207,6 @@ object Files {
     const val AI_CHAT_STYLE_SHEET: String = CSS_SCENE_PATH + "ai_chat.css"
     const val SETTINGS_STYLE_SHEET: String = CSS_SCENE_PATH + "settings.css"
     const val CHARTS_COLORS_STYLE_SHEET: String = CSS_COMPONENT_PATH + "charts.css"
-    const val TABLE_VIEW_STYLE_SHEET: String = CSS_COMPONENT_PATH + "table-view.css"
 
     const val COMMON_STYLE_SHEET: String = CSS_COMMON_PATH + "common-styles.css"
     const val TIMELINE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "timeline-chart.css"

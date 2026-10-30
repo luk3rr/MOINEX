@@ -5,7 +5,6 @@
 ch-qos-logback-logback-classic = "1.5.32"
 com-diffplug-spotless-spotless-maven-plugin = "2.44.4"
 com-h2database-h2 = "2.3.232"
-com-jfoenix-jfoenix = "9.0.10"
 io-github-mkpaz-atlantafx-base = "3.0.0"
 com-opencsv-opencsv = "5.9"
 net-minidev-json-smart = "2.5.2"
@@ -42,7 +41,6 @@ org-jetbrains-kotlinx-kotlinx-coroutines-javafx = "1.9.0"
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback-logback-classic" }
 com-diffplug-spotless-spotless-maven-plugin = { module = "com.diffplug.spotless:spotless-maven-plugin", version.ref = "com-diffplug-spotless-spotless-maven-plugin" }
 com-h2database-h2 = { module = "com.h2database:h2", version.ref = "com-h2database-h2" }
-com-jfoenix-jfoenix = { module = "com.jfoenix:jfoenix", version.ref = "com-jfoenix-jfoenix" }
 io-github-mkpaz-atlantafx-base = { module = "io.github.mkpaz:atlantafx-base", version.ref = "io-github-mkpaz-atlantafx-base" }
 com-opencsv-opencsv = { module = "com.opencsv:opencsv", version.ref = "com-opencsv-opencsv" }
 net-minidev-json-smart = { module = "net.minidev:json-smart", version.ref = "net-minidev-json-smart" }

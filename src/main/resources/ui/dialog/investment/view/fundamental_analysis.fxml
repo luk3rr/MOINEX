@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -108,7 +108,7 @@
                                           <Font size="10.0" />
                                        </font>
                                     </Label>
-                                    <ComboBox fx:id="periodComboBox" prefWidth="150.0" stylesheets="@../../../../css/component/combo-box.css" />
+                                    <ComboBox fx:id="periodComboBox" prefWidth="150.0" />
                                  </children>
                               </VBox>
                            </children>
@@ -117,7 +117,7 @@
                                     <!-- Action Buttons -->
                         <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
                            <children>
-                              <JFXButton fx:id="refreshButton" onAction="#handleRefresh" stylesheets="@../../../../css/component/buttons.css" text="%fundamentalAnalysis.button.refresh">
+                              <Button fx:id="refreshButton" onAction="#handleRefresh" text="%fundamentalAnalysis.button.refresh">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -125,7 +125,7 @@
                                        </image>
                                     </ImageView>
                                  </graphic>
-                              </JFXButton>
+                              </Button>
                            </children>
                         </HBox>
                      </children>
@@ -152,7 +152,7 @@
             <HBox alignment="CENTER" spacing="10.0">
                <children>
 
-                        <JFXButton onAction="#handleClose" stylesheets="@../../../../css/component/buttons.css" text="%fundamentalAnalysis.button.close" />
+                        <Button onAction="#handleClose" text="%fundamentalAnalysis.button.close" />
                </children>
             </HBox>
          </children>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
@@ -39,7 +39,7 @@
          </GridPane>
          <HBox alignment="CENTER" prefHeight="44.0" prefWidth="419.0" spacing="5.0">
             <children>
-               <JFXButton onAction="#handleBackOneMonth">
+               <Button onAction="#handleBackOneMonth">
                   <graphic>
                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                         <image>
@@ -47,7 +47,7 @@
                         </image>
                      </ImageView>
                   </graphic>
-               </JFXButton>
+               </Button>
                <Region prefWidth="20.0" />
                <Label fx:id="currentMonth" text="MM/YY">
                   <font>
@@ -55,7 +55,7 @@
                   </font>
                </Label>
                <Region prefWidth="20.0" />
-               <JFXButton onAction="#handleForwardOneMonth">
+               <Button onAction="#handleForwardOneMonth">
                   <graphic>
                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                         <image>
@@ -63,12 +63,12 @@
                         </image>
                      </ImageView>
                   </graphic>
-               </JFXButton>
+               </Button>
             </children>
          </HBox>
          <HBox alignment="CENTER" prefHeight="44.0" prefWidth="419.0" spacing="5.0">
             <children>
-               <JFXButton onAction="#handleAddEvent" stylesheets="@../../css/component/buttons.css" text="%common.calendar.addEvent">
+               <Button onAction="#handleAddEvent" text="%common.calendar.addEvent">
                   <graphic>
                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                         <image>
@@ -76,7 +76,7 @@
                         </image>
                      </ImageView>
                   </graphic>
-               </JFXButton>
+               </Button>
             </children>
          </HBox>
       </children>

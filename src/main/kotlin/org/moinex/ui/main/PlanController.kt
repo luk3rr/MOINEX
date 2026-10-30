@@ -8,12 +8,12 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.chart.PieChart
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
@@ -64,10 +64,10 @@ class PlanController(
     private lateinit var pieChartAnchorPane: AnchorPane
 
     @FXML
-    private lateinit var budgetGroupPrevButton: JFXButton
+    private lateinit var budgetGroupPrevButton: Button
 
     @FXML
-    private lateinit var budgetGroupNextButton: JFXButton
+    private lateinit var budgetGroupNextButton: Button
 
     @FXML
     private lateinit var budgetGroupPane1: AnchorPane

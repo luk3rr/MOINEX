@@ -36,7 +36,7 @@
   -fx-spacing: 20px;
 }
 
-#sidebar JFXButton {
+#sidebar Button {
   -fx-background-color: transparent;
   -fx-text-fill: theme-on-sidebar;
   -fx-font-size: 14px;
@@ -49,12 +49,12 @@
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
 }
 
-#sidebar JFXButton:hover {
+#sidebar Button:hover {
   -fx-background-color: theme-bg-sidebar-hover;
 }
 
 /*
-#sidebar JFXButton ImageView {
+#sidebar Button ImageView {
   -fx-fit-height: 40px;
   -fx-fit-width: 40px;
   -fx-margin-right: 10px;
@@ -66,7 +66,7 @@
   -fx-text-fill: theme-on-sidebar;
 }
 
-#sidebar JFXButton .VBox {
+#sidebar Button .VBox {
   -fx-margin-top: 10px;
 }
 

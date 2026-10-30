@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
@@ -82,9 +82,9 @@
 
       <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
          <children>
-            <JFXButton minWidth="110.0" onAction="#handleCancel" stylesheets="@../../../../css/component/buttons.css" text="%dialog.button.cancel" />
-            <JFXButton minWidth="110.0" onAction="#handleDelete" stylesheets="@../../../../css/component/buttons.css" text="%dialog.button.delete" />
-            <JFXButton minWidth="110.0" onAction="#handleEdit" stylesheets="@../../../../css/component/buttons.css" text="%dialog.button.edit" />
+            <Button minWidth="110.0" onAction="#handleCancel" text="%dialog.button.cancel" />
+            <Button minWidth="110.0" onAction="#handleDelete" text="%dialog.button.delete" />
+            <Button minWidth="110.0" onAction="#handleEdit" text="%dialog.button.edit" />
          </children>
       </HBox>
    </children>

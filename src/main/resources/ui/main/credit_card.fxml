@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -29,7 +29,7 @@
                                     <AnchorPane fx:id="totalDebts" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                        <children>
                                           <Label fx:id="totalDebtsTitle" styleClass="title" text="%creditCard.totalDebts.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                          <ComboBox fx:id="totalDebtsYearFilterComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                          <ComboBox fx:id="totalDebtsYearFilterComboBox" minWidth="150.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                           <VBox fx:id="totalDebtsInfoVBox" alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0" />
                                        </children>
                                     </AnchorPane>
@@ -55,7 +55,7 @@
                <children>
                   <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <JFXButton fx:id="AddDebtButton" onAction="#handleAddDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.button.addDebt">
+                        <Button fx:id="AddDebtButton" onAction="#handleAddDebt" text="%creditCard.button.addDebt">
                            <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -63,8 +63,8 @@
                                  </image>
                               </ImageView>
                            </graphic>
-                        </JFXButton>
-                        <JFXButton fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" stylesheets="@../../css/component/buttons.css" text="%creditCard.button.addCreditCard">
+                        </Button>
+                        <Button fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" text="%creditCard.button.addCreditCard">
                            <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -72,9 +72,9 @@
                                  </image>
                               </ImageView>
                            </graphic>
-                        </JFXButton>
+                        </Button>
                         <Region HBox.hgrow="ALWAYS" />
-                        <JFXButton onAction="#handleRecurringTransactions" stylesheets="@../../css/component/buttons.css" text="%transaction.button.periodicTransaction">
+                        <Button onAction="#handleRecurringTransactions" text="%transaction.button.periodicTransaction">
                            <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -82,8 +82,8 @@
                                  </image>
                               </ImageView>
                            </graphic>
-                        </JFXButton>
-                        <JFXButton onAction="#handleViewArchivedCreditCards" stylesheets="@../../css/component/buttons.css" text="%creditCard.button.creditCardArchive">
+                        </Button>
+                        <Button onAction="#handleViewArchivedCreditCards" text="%creditCard.button.creditCardArchive">
                            <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -91,7 +91,7 @@
                                  </image>
                               </ImageView>
                            </graphic>
-                        </JFXButton>
+                        </Button>
                      </children>
                   </HBox>
                </children>
@@ -113,7 +113,7 @@
                                                    <children>
                                                       <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                          <children>
-                                                            <JFXButton onAction="#handleEditDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.edit">
+                                                            <Button onAction="#handleEditDebt" text="%creditCard.debtsList.button.edit">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -121,8 +121,8 @@
                                                                      </image>
                                                                   </ImageView>
                                                                </graphic>
-                                                            </JFXButton>
-                                                            <JFXButton onAction="#handleRefundDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.refund">
+                                                            </Button>
+                                                            <Button onAction="#handleRefundDebt" text="%creditCard.debtsList.button.refund">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -130,8 +130,8 @@
                                                                      </image>
                                                                   </ImageView>
                                                                </graphic>
-                                                            </JFXButton>
-                                                            <JFXButton onAction="#handleDeleteDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.delete">
+                                                            </Button>
+                                                            <Button onAction="#handleDeleteDebt" text="%creditCard.debtsList.button.delete">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -139,8 +139,8 @@
                                                                      </image>
                                                                   </ImageView>
                                                                </graphic>
-                                                            </JFXButton>
-                                                            <JFXButton onAction="#handleMaterializeDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.materialize">
+                                                            </Button>
+                                                            <Button onAction="#handleMaterializeDebt" text="%creditCard.debtsList.button.materialize">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -148,7 +148,7 @@
                                                                      </image>
                                                                   </ImageView>
                                                                </graphic>
-                                                            </JFXButton>
+                                                            </Button>
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -161,8 +161,8 @@
                                                    <children>
                                                       <HBox alignment="CENTER_RIGHT" spacing="5.0">
                                                          <children>
-                                                            <ComboBox fx:id="debtsListMonthFilterComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
-                                                            <ComboBox fx:id="debtsListYearFilterComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
+                                                            <ComboBox fx:id="debtsListMonthFilterComboBox" minWidth="150.0" />
+                                                            <ComboBox fx:id="debtsListYearFilterComboBox" minWidth="150.0" />
                                                          </children>
                                                       </HBox>
                                                       <HBox alignment="CENTER_RIGHT" spacing="5.0" VBox.vgrow="ALWAYS">
@@ -181,14 +181,14 @@
                                           </AnchorPane>
                                        </children>
                                     </HBox>
-                                    <TableView fx:id="debtsTableView" minWidth="300.0" stylesheets="@../../css/component/table-view.css" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="debtsTableView" minWidth="300.0" VBox.vgrow="ALWAYS">
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
                                     <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="NEVER">
                                        <children>
-                                          <JFXButton onAction="#handleTablePrevMonth">
+                                          <Button onAction="#handleTablePrevMonth">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -196,7 +196,7 @@
                                                    </image>
                                                 </ImageView>
                                              </graphic>
-                                          </JFXButton>
+                                          </Button>
                                           <Region prefWidth="20.0" />
                                           <Label fx:id="invoiceMonth" alignment="CENTER" prefWidth="60.0" text="MM/YY" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                              <font>
@@ -204,7 +204,7 @@
                                              </font>
                                           </Label>
                                           <Region prefWidth="20.0" />
-                                          <JFXButton onAction="#handleTableNextMonth">
+                                          <Button onAction="#handleTableNextMonth">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -212,7 +212,7 @@
                                                    </image>
                                                 </ImageView>
                                              </graphic>
-                                          </JFXButton>
+                                          </Button>
                                        </children>
                                     </HBox>
                                  </children>
@@ -222,7 +222,7 @@
                         <AnchorPane fx:id="creditCards" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
                            <children>
                               <Label fx:id="creditCardsTitle" styleClass="title" text="%creditCard.creditCards.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                              <JFXButton fx:id="crcPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
+                              <Button fx:id="crcPrevButton" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -230,8 +230,8 @@
                                        </image>
                                     </ImageView>
                                  </graphic>
-                              </JFXButton>
-                              <JFXButton fx:id="crcNextButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="0.0">
+                              </Button>
+                              <Button fx:id="crcNextButton" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -239,7 +239,7 @@
                                        </image>
                                     </ImageView>
                                  </graphic>
-                              </JFXButton>
+                              </Button>
                               <HBox alignment="CENTER" fillHeight="false" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                  <children>
                                     <AnchorPane fx:id="crcPane1" minHeight="200.0" minWidth="400.0" HBox.hgrow="ALWAYS" />

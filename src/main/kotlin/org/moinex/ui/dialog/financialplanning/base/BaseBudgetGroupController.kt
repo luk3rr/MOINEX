@@ -8,8 +8,8 @@
 
 package org.moinex.ui.dialog.financialplanning.base
 
-import com.jfoenix.controls.JFXButton
 import javafx.fxml.FXML
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.ListView
 import javafx.scene.control.TextField
@@ -45,10 +45,10 @@ abstract class BaseBudgetGroupController(
     protected lateinit var selectedCategoriesListView: ListView<Category>
 
     @FXML
-    protected lateinit var addCategoryButton: JFXButton
+    protected lateinit var addCategoryButton: Button
 
     @FXML
-    protected lateinit var removeCategoryButton: JFXButton
+    protected lateinit var removeCategoryButton: Button
 
     protected var onSaveCallback: Consumer<BudgetGroup>? = null
 

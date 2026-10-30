@@ -1,11 +1,11 @@
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.fxml.FXML
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
@@ -48,7 +48,7 @@ class FIRECalculatorController(
     private lateinit var currentAgeField: TextField
 
     @FXML
-    private lateinit var calculateButton: JFXButton
+    private lateinit var calculateButton: Button
 
     @FXML
     private lateinit var fireTargetLabel: Label

@@ -26,12 +26,14 @@ import org.moinex.service.ThemeService
 import org.moinex.ui.dialog.wallettransaction.create.AddExpenseController
 import org.moinex.ui.main.MainController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Component
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Development tool that opens each screen of [CapturePlan] in both themes and saves one PNG per screen and theme.
@@ -76,12 +78,12 @@ class ScreenshotRunner(
         stage: Stage,
         directory: File,
     ) {
-        val mainController = springContext.getBean(MainController::class.java)
+        val mainController = springContext.getBean<MainController>()
 
         stage.isMaximized = false
         stage.width = CapturePlan.WINDOW_WIDTH
         stage.height = CapturePlan.WINDOW_HEIGHT
-        delay(WINDOW_SETTLE_MILLIS)
+        delay(WINDOW_SETTLE_MILLIS.milliseconds)
 
         for (theme in CapturePlan.themes) {
             preferencesService.theme = theme
@@ -109,11 +111,11 @@ class ScreenshotRunner(
                 scene = Scene(StackPane(Label("probe")))
                 show()
             }
-        delay(WINDOW_SETTLE_MILLIS)
+        delay(WINDOW_SETTLE_MILLIS.milliseconds)
         val lightApplied = probe.scene.stylesheets.any { it.endsWith("tokens.light.css") }
 
         themeService.toggleAndApply()
-        delay(WINDOW_SETTLE_MILLIS)
+        delay(WINDOW_SETTLE_MILLIS.milliseconds)
         val darkApplied =
             probe.scene.stylesheets.any { it.endsWith("tokens.dark.css") } &&
                 probe.scene.stylesheets.none { it.endsWith("tokens.light.css") }
@@ -136,18 +138,18 @@ class ScreenshotRunner(
         when (target.kind) {
             CaptureKind.SCREEN -> {
                 mainController.loadContent(target.fxml, target.styleSheet!!)
-                delay(target.settleMillis)
+                delay(target.settleMillis.milliseconds)
                 writePng(snapshot(stage), file)
             }
 
             CaptureKind.NOTIFICATIONS -> {
                 mainController.loadContent(target.fxml, target.styleSheet!!)
-                delay(target.settleMillis)
+                delay(target.settleMillis.milliseconds)
                 mainController.openNotificationPanel()
-                delay(NOTIFICATIONS_SETTLE_MILLIS)
+                delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
                 writePng(snapshot(stage), file)
                 mainController.closeNotificationPanel()
-                delay(NOTIFICATIONS_SETTLE_MILLIS)
+                delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
             }
 
             CaptureKind.DIALOG -> captureAddExpenseDialog(stage, target, file)
@@ -163,7 +165,7 @@ class ScreenshotRunner(
         file: File,
     ) {
         FxUtils.launchOnFxThread {
-            delay(target.settleMillis)
+            delay(target.settleMillis.milliseconds)
             val dialog =
                 Window
                     .getWindows()
@@ -194,7 +196,7 @@ class ScreenshotRunner(
         file: File,
     ) {
         FxUtils.launchOnFxThread {
-            delay(target.settleMillis)
+            delay(target.settleMillis.milliseconds)
             val alert =
                 Window
                     .getWindows()

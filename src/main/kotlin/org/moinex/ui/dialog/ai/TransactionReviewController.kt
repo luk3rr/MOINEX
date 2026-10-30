@@ -24,7 +24,6 @@ import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
 import javafx.util.converter.IntegerStringConverter
-import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isEqual
@@ -260,9 +259,6 @@ class TransactionReviewController(
     private fun newTableView(): TableView<TransactionReviewRow> =
         TableView<TransactionReviewRow>().apply {
             isEditable = true
-            stylesheets.add(
-                TransactionReviewController::class.java.getResource(Files.TABLE_VIEW_STYLE_SHEET)!!.toExternalForm(),
-            )
             setRowFactory {
                 TableRow<TransactionReviewRow>().apply {
                     itemProperty().addListener { _, _, row ->

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
@@ -23,7 +23,7 @@
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="crcComboBox" minWidth="130.0" stylesheets="@../../../css/component/combo-box.css" VBox.vgrow="ALWAYS" />
+                  <ComboBox fx:id="crcComboBox" minWidth="130.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
             <HBox alignment="CENTER" spacing="20.0">
@@ -103,7 +103,7 @@
                                     <Font size="10.0" />
                                  </font>
                               </Label>
-                              <JFXButton minWidth="80.0" onAction="#handleOpenCalculator" stylesheets="@../../../css/component/buttons.css">
+                              <Button minWidth="80.0" onAction="#handleOpenCalculator">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -111,7 +111,7 @@
                                        </image>
                                     </ImageView>
                                  </graphic>
-                              </JFXButton>
+                              </Button>
                            </children>
                         </VBox>
                      </children>
@@ -169,7 +169,7 @@
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="categoryComboBox" minWidth="130.0" stylesheets="@../../../css/component/combo-box.css" />
+                  <ComboBox fx:id="categoryComboBox" minWidth="130.0" />
                </children>
             </VBox>
          </children>
@@ -181,7 +181,7 @@
                   <Font size="10.0" />
                </font>
             </Label>
-            <DatePicker fx:id="purchaseDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../../css/component/data-picker.css" />
+            <DatePicker fx:id="purchaseDatePicker" prefWidth="150.0" showWeekNumbers="true" />
          </children>
       </VBox>
       <VBox alignment="CENTER">
@@ -193,16 +193,16 @@
             </Label>
             <HBox alignment="CENTER" spacing="5.0">
                <children>
-                  <ComboBox fx:id="invoiceMonthComboBox" minWidth="130.0" stylesheets="@../../../css/component/combo-box.css" />
-                  <ComboBox fx:id="invoiceYearComboBox" minWidth="130.0" stylesheets="@../../../css/component/combo-box.css" />
+                  <ComboBox fx:id="invoiceMonthComboBox" minWidth="130.0" />
+                  <ComboBox fx:id="invoiceYearComboBox" minWidth="130.0" />
                </children>
             </HBox>
          </children>
       </VBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
+            <Button minWidth="80.0" onAction="#handleCancel" text="%dialog.button.cancel" />
+            <Button minWidth="80.0" onAction="#handleSave" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

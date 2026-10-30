@@ -8,13 +8,13 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.Parent
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
@@ -67,16 +67,16 @@ class GoalController(
     private lateinit var accomplishedPane2: AnchorPane
 
     @FXML
-    private lateinit var inProgressPrevButton: JFXButton
+    private lateinit var inProgressPrevButton: Button
 
     @FXML
-    private lateinit var inProgressNextButton: JFXButton
+    private lateinit var inProgressNextButton: Button
 
     @FXML
-    private lateinit var accomplishedPrevButton: JFXButton
+    private lateinit var accomplishedPrevButton: Button
 
     @FXML
-    private lateinit var accomplishedNextButton: JFXButton
+    private lateinit var accomplishedNextButton: Button
 
     @FXML
     private lateinit var goalTableView: TableView<Goal>

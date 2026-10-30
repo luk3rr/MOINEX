@@ -1,7 +1,7 @@
 /*
  * Filename: progress-bar.css
- * Created on: October 23, 2024
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ * Progress bars: the default bar uses the accent color; the green, yellow and red variants are semantic.
+ * Colors come from the theme tokens.
  */
 
 .progress-bar {
@@ -12,57 +12,26 @@
 }
 
 .progress-bar > .bar {
-  -fx-background-color: linear-gradient(
-    to bottom,
-    derive(orange, -7%),
-    derive(orange, 0%),
-    derive(orange, -3%),
-    derive(orange, -9%)
-  );
+  -fx-background-color: theme-accent;
   -fx-background-insets: 0 0 0 0;
   -fx-background-radius: 0;
   -fx-padding: 0em;
 }
 
 .progress-bar.progress-bar-green > .bar {
-  -fx-background-color: linear-gradient(
-          to bottom,
-          derive(#28a745, -7%),
-          derive(#28a745, 0%),
-          derive(#28a745, -3%),
-          derive(#28a745, -9%)
-  );
+  -fx-background-color: theme-positive;
 }
 
 .progress-bar.progress-bar-yellow > .bar {
-  -fx-background-color: linear-gradient(
-          to bottom,
-          derive(#ffc107, -7%),
-          derive(#ffc107, 0%),
-          derive(#ffc107, -3%),
-          derive(#ffc107, -9%)
-  );
+  -fx-background-color: theme-warning;
 }
 
 .progress-bar.progress-bar-red > .bar {
-  -fx-background-color: linear-gradient(
-          to bottom,
-          derive(#dc3545, -7%),
-          derive(#dc3545, 0%),
-          derive(#dc3545, -3%),
-          derive(#dc3545, -9%)
-  );
-}
-
-.progress-bar {
-  -fx-indeterminate-bar-length: 60;
-  -fx-indeterminate-bar-escape: true;
-  -fx-indeterminate-bar-flip: true;
-  -fx-indeterminate-bar-animation-time: 2;
+  -fx-background-color: theme-negative;
 }
 
 .progress-bar:indeterminate > .bar {
-  -fx-background-color: linear-gradient(to left, transparent, orange);
+  -fx-background-color: linear-gradient(to left, transparent, theme-accent);
 }
 
 .progress-bar > .track {

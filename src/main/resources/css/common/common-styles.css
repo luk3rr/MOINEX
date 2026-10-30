@@ -4,6 +4,39 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
+/* ── Shared page styles (contract: design.md § 2.8) ──────── */
+.card {
+  -fx-background-color: theme-bg-card;
+  -fx-background-radius: 12;
+  -fx-border-color: theme-border;
+  -fx-border-radius: 12;
+  -fx-border-width: 1;
+  -fx-padding: 14 16;
+}
+
+.page-title {
+  -fx-font-size: 22px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-primary;
+}
+
+.card-title {
+  -fx-font-size: 15px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-primary;
+}
+
+.card-subtitle {
+  -fx-font-size: 12px;
+  -fx-text-fill: theme-text-secondary;
+}
+
+.value-large {
+  -fx-font-size: 26px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-primary;
+}
+
 /* ── Balance labels ──────────────────────────────────────── */
 .positive-balance {
   -fx-text-fill: theme-positive;

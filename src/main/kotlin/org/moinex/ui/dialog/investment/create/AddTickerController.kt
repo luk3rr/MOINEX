@@ -8,9 +8,9 @@
 
 package org.moinex.ui.dialog.investment.create
 
-import com.jfoenix.controls.JFXButton
 import jakarta.persistence.EntityExistsException
 import javafx.fxml.FXML
+import javafx.scene.control.Button
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
@@ -30,7 +30,7 @@ class AddTickerController(
     preferencesService: PreferencesService,
 ) : BaseTickerManagement(tickerService, preferencesService) {
     @FXML
-    private lateinit var yahooLookupButton: JFXButton
+    private lateinit var yahooLookupButton: Button
 
     @FXML
     override fun initialize() {

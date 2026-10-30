@@ -23,10 +23,10 @@
                </padding>
                <children>
                   <Label text="%settings.language" />
-                  <ComboBox fx:id="languageComboBox" prefWidth="240.0" stylesheets="@../../css/component/combo-box.css" />
+                  <ComboBox fx:id="languageComboBox" prefWidth="240.0" />
                   <Separator prefWidth="520.0" />
                   <Label text="%settings.theme" />
-                  <ComboBox fx:id="themeComboBox" prefWidth="240.0" stylesheets="@../../css/component/combo-box.css" />
+                  <ComboBox fx:id="themeComboBox" prefWidth="240.0" />
                   <Separator prefWidth="520.0" />
                   <Label text="%settings.database.location" />
                   <HBox spacing="10.0" alignment="CENTER_LEFT">
@@ -50,7 +50,7 @@
                   <Label text="%settings.ai.provider" />
                   <HBox spacing="10.0" alignment="CENTER_LEFT">
                      <children>
-                        <ComboBox fx:id="aiProviderComboBox" prefWidth="240.0" stylesheets="@../../css/component/combo-box.css" />
+                        <ComboBox fx:id="aiProviderComboBox" prefWidth="240.0" />
                         <Label fx:id="aiKeyStatusLabel" styleClass="ai-key-status" />
                      </children>
                   </HBox>

@@ -1,7 +1,6 @@
 /*
  * Filename: menu-button.css
- * Created on: October  5, 2024
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ * Icon-only menu buttons: no background, border or arrow.
  */
 
 .menu-button {
@@ -13,18 +12,4 @@
 .menu-button .arrow {
     -fx-background-color: transparent;
     -fx-shape: "";
-}
-
-.menu-item {
-    -fx-background-color: transparent;
-    -fx-background-radius: 20;
-}
-
-.menu-item .label{
-    -fx-text-fill: theme-text-primary;
-}
-
-.menu-item:hover {
-    -fx-background-color: theme-bg-hover;
-    -fx-background-radius: 20;
 }

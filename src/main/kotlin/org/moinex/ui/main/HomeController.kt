@@ -8,7 +8,6 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.animation.Interpolator
 import javafx.animation.RotateTransition
 import javafx.beans.property.SimpleObjectProperty
@@ -21,6 +20,7 @@ import javafx.scene.chart.BarChart
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
+import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.OverrunStyle
@@ -99,10 +99,10 @@ class HomeController(
     private val bondService: BondService,
 ) {
     @FXML
-    private lateinit var walletPrevButton: JFXButton
+    private lateinit var walletPrevButton: Button
 
     @FXML
-    private lateinit var walletNextButton: JFXButton
+    private lateinit var walletNextButton: Button
 
     @FXML
     private lateinit var walletView1: AnchorPane
@@ -123,19 +123,19 @@ class HomeController(
     private lateinit var graphView: AnchorPane
 
     @FXML
-    private lateinit var graphPrevButton: JFXButton
+    private lateinit var graphPrevButton: Button
 
     @FXML
-    private lateinit var graphNextButton: JFXButton
+    private lateinit var graphNextButton: Button
 
     @FXML
     private lateinit var graphTitle: Label
 
     @FXML
-    private lateinit var creditCardPrevButton: JFXButton
+    private lateinit var creditCardPrevButton: Button
 
     @FXML
-    private lateinit var creditCardNextButton: JFXButton
+    private lateinit var creditCardNextButton: Button
 
     @FXML
     private lateinit var moneyFlowBarChart: BarChart<String, Number>
@@ -147,7 +147,7 @@ class HomeController(
     private lateinit var transactionsTableView: TableView<WalletTransaction>
 
     @FXML
-    private lateinit var recalculateNetWorthButton: JFXButton
+    private lateinit var recalculateNetWorthButton: Button
 
     @FXML
     private lateinit var recalculateNetWorthButtonIcon: ImageView

@@ -28,11 +28,11 @@
 }
 
 .default-color0.chart-bar {
-  -fx-bar-fill: #ef4444;
+  -fx-bar-fill: theme-negative;
 }
 
 .default-color1.chart-bar {
-  -fx-bar-fill: #22c55e;
+  -fx-bar-fill: theme-positive;
 }
 
 .chart-plot-background {

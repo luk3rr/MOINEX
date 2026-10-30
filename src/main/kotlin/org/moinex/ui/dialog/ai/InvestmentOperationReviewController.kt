@@ -23,7 +23,6 @@ import javafx.scene.control.cell.ComboBoxTableCell
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.stage.Stage
 import javafx.util.Callback
-import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -270,11 +269,6 @@ class InvestmentOperationReviewController(
     private fun newTableView(): TableView<InvestmentOperationReviewRow> =
         TableView<InvestmentOperationReviewRow>().apply {
             isEditable = true
-            stylesheets.add(
-                InvestmentOperationReviewController::class.java
-                    .getResource(Files.TABLE_VIEW_STYLE_SHEET)!!
-                    .toExternalForm(),
-            )
             setRowFactory {
                 TableRow<InvestmentOperationReviewRow>().apply {
                     itemProperty().addListener { _, _, row ->

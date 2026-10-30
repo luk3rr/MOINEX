@@ -8,11 +8,11 @@
 
 package org.moinex.ui.dialog.financialplanning.base
 
-import com.jfoenix.controls.JFXButton
 import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
+import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
@@ -70,10 +70,10 @@ abstract class BasePlanManagement(
     protected lateinit var pane3: AnchorPane
 
     @FXML
-    protected lateinit var prevButton: JFXButton
+    protected lateinit var prevButton: Button
 
     @FXML
-    protected lateinit var nextButton: JFXButton
+    protected lateinit var nextButton: Button
 
     protected var budgetGroups = mutableListOf<BudgetGroup>()
     protected var paneCurrentPage = 0
