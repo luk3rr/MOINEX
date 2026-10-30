@@ -13,6 +13,8 @@ object Styles {
     // Icon color styles from base.css
     const val ICON_POSITIVE: String = "icon-positive"
     const val ICON_NEGATIVE: String = "icon-negative"
+    const val FIELD_ERROR: String = "field-error"
+    const val FIELD_INVALID: String = "field-invalid"
 
     // Shared page styles from common-styles.css
     const val CARD: String = "card"

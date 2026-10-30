@@ -20,6 +20,8 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -75,6 +77,8 @@ abstract class BaseTransferManagement(
 
     protected lateinit var suggestionsHandler: SuggestionsHandlerHelper<Transfer>
 
+    protected val validation = FieldValidation(preferencesService::translate)
+
     protected var wallets: List<Wallet> = emptyList()
     protected var categories: List<Category> = emptyList()
 
@@ -108,6 +112,18 @@ abstract class BaseTransferManagement(
             updateReceiverWalletBalance()
             updateReceiverWalletAfterBalance()
         }
+
+        configureValidation()
+        DialogForm.install(descriptionField, descriptionField, ::handleSave, ::handleCancel)
+    }
+
+    protected open fun configureValidation() {
+        validation.required(senderWalletComboBox)
+        validation.required(receiverWalletComboBox)
+        validation.required(transferValueField)
+        validation.positiveNumber(transferValueField)
+        validation.required(descriptionField)
+        validation.required(transferDatePicker)
     }
 
     @FXML

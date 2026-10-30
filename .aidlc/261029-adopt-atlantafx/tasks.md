@@ -161,14 +161,14 @@ Covers: US-6; FR-12. Depende de: UNIT-3.
 
 **Desvios:** o chat usa bolhas em `WebView` coloridas por Kotlin, não CSS do WebView; ficam em `ThemeColors`. A aprovação visual das capturas (T-5.7) fica para o seu teste da interface.
 
-### UNIT-6 Formulários e diálogos   Status: not started
+### UNIT-6 Formulários e diálogos   Status: in progress
 Covers: US-15; FR-10; NFR-7. Depende de: UNIT-3, UNIT-4.
-- [ ] T-6.1 Adicionar `io.github.mkpaz:atlantafx-validation:3.0.0` ao catálogo e ao build — covers FR-10, US-15 — files: gradle/libs.versions.toml, build.gradle.kts — test: `./gradlew compileKotlin`
-- [ ] T-6.2 `FieldValidation` com as regras `required`, `positiveNumber`, número e data inválidos, e testes unitários da lógica — covers FR-10, US-15 — files: common/ui/FieldValidation.kt, src/test/.../FieldValidationTest.kt — test: `./gradlew test --tests "*FieldValidationTest"`
-- [ ] T-6.3 `DialogForm.install` (foco inicial, Enter, Esc) e teste da regra "Enter não dispara em área de texto" — covers FR-10, US-15 — files: common/ui/DialogForm.kt, src/test/.../DialogFormTest.kt — test: `./gradlew test --tests "*DialogFormTest"`
-- [ ] T-6.4 CSS `field-error`, `field-invalid` e layout de uma coluna dos diálogos — covers FR-10, US-15 — files: css/common/common-styles.css — test: captura de um diálogo com erro
-- [ ] T-6.5 Chaves `dialog.validation.*` por acréscimo nas duas `.properties` e em `TranslationKeys.kt` — covers NFR-7, US-15 — files: i18n/messages_*.properties, common/constant/TranslationKeys.kt — test: revisão do diff das `.properties`
-- [ ] T-6.6 Piloto: `AddExpense`, `AddIncome` e `AddTransfer` migrados; confirmar A14 e A18 — covers FR-10, US-15 — files: ui/dialog/wallettransaction/create/ — test: abrir os três e provocar erro
+- [S] T-6.1 (dispensada: ver desvio) Adicionar `io.github.mkpaz:atlantafx-validation:3.0.0` ao catálogo e ao build — covers FR-10, US-15 — files: gradle/libs.versions.toml, build.gradle.kts — test: `./gradlew compileKotlin`
+- [x] T-6.2 `FieldValidation` com as regras `required`, `positiveNumber`, número e data inválidos, e testes unitários da lógica — covers FR-10, US-15 — files: common/ui/FieldValidation.kt, src/test/.../FieldValidationTest.kt — test: `./gradlew test --tests "*FieldValidationTest"`
+- [x] T-6.3 `DialogForm.install` (foco inicial, Enter, Esc) e teste da regra "Enter não dispara em área de texto" — covers FR-10, US-15 — files: common/ui/DialogForm.kt, src/test/.../DialogFormTest.kt — test: `./gradlew test --tests "*DialogFormTest"`
+- [x] T-6.4 CSS `field-error`, `field-invalid` e layout de uma coluna dos diálogos — covers FR-10, US-15 — files: css/common/common-styles.css — test: captura de um diálogo com erro
+- [x] T-6.5 Chaves `dialog.validation.*` por acréscimo nas duas `.properties` e em `TranslationKeys.kt` — covers NFR-7, US-15 — files: i18n/messages_*.properties, common/constant/TranslationKeys.kt — test: revisão do diff das `.properties`
+- [x] T-6.6 Piloto: `AddExpense`, `AddIncome` e `AddTransfer` migrados; confirmar A14 e A18 — covers FR-10, US-15 — files: ui/dialog/wallettransaction/create/ — test: abrir os três e provocar erro
 - [ ] T-6.7 Migrar `AddRecurringTransaction`, `AddWallet`, `ChangeWalletBalance` e `ChangeWalletType` — covers FR-10, US-15 — files: ui/dialog/wallettransaction/ — test: abrir cada um e provocar erro
 - [ ] T-6.8 Migrar `EditRecurringTransaction`, `EditTransaction`, `EditTransfer` e `RenameWallet` — covers FR-10, US-15 — files: ui/dialog/wallettransaction/ — test: abrir cada um e provocar erro
 - [ ] T-6.9 Migrar os diálogos de `creditcard`: `AddCreditCard`, `AddCreditCardCredit`, `AddCreditCardDebt`, `EditCreditCard` — covers FR-10, US-15 — files: ui/dialog/creditcard/ — test: abrir cada um e provocar erro
@@ -183,6 +183,10 @@ Covers: US-15; FR-10; NFR-7. Depende de: UNIT-3, UNIT-4.
 - [ ] T-6.18 Remover o `Alert` de campos vazios dos diálogos migrados e conferir que nenhuma regra de negócio mudou — covers FR-10, US-15 — files: ui/dialog/** — test: busca por `EMPTY_FIELDS` nos diálogos migrados
 - [ ] T-6.19 Capturas de diálogos com erro nos dois temas e checklist por domínio; confirmar o ADR-5 — covers NFR-3, US-15 — files: (saída local) — test: aprovação do usuário
 - [ ] T-6.20 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+
+**Andamento (2026-10-30):** infraestrutura e piloto prontos. `FieldValidation` (obrigatório, número, número positivo; rótulo de erro inline, `field-invalid`, foco no primeiro inválido, janela redimensiona) e `DialogForm` (foco inicial, Enter salva, Esc cancela) ligados nas bases `BaseWalletTransactionManagement` e `BaseTransferManagement`; `AddExpense`, `AddIncome` e `AddTransfer` migrados. Chaves `dialog.validation.*` acrescentadas (pt-BR com escapes `\u`).
+
+**Desvio (A14, ADR-5):** a validação é própria (reserva do ADR-5), sem `atlantafx-validation`: as regras são simples e a biblioteca não traria ganho. T-6.1 dispensada.
 
 ### UNIT-7 Busca global por Ctrl+S   Status: not started
 Covers: US-16; FR-11; NFR-7. Depende de: UNIT-2, UNIT-4.

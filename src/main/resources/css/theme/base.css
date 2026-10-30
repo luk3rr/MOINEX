@@ -87,3 +87,22 @@
     -fx-icon-size: 48px;
     -fx-font-size: 48px;
 }
+
+.field-error {
+    -fx-text-fill: theme-negative;
+    -fx-font-size: 11px;
+}
+
+.field-invalid,
+.field-invalid:focused,
+.text-field.field-invalid,
+.text-field.field-invalid:focused {
+    -color-input-border: theme-negative;
+    -color-input-border-focused: theme-negative;
+    -color-border-default: theme-negative;
+    -color-accent-emphasis: theme-negative;
+    -fx-border-color: theme-negative;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}

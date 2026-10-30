@@ -73,18 +73,7 @@ class AddTransferController(
         val transferDate = transferDatePicker.value
         val category = categoryComboBox.value
 
-        if (senderWt == null ||
-            receiverWt == null ||
-            transferValueString.isNullOrBlank() ||
-            description.isNullOrBlank() ||
-            transferDate == null
-        ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
-            return
-        }
+        if (!validation.validate()) return
 
         runCatching {
             val transferValue = transferValueString.toBigDecimal()

@@ -57,19 +57,7 @@ class AddExpenseController(
         val category = categoryComboBox.value
         val expenseDate = transactionDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            expenseValueString.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            expenseDate == null
-        ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
-            return
-        }
+        if (!validation.validate()) return
 
         runCatching {
             val expenseValue = expenseValueString.toBigDecimal()

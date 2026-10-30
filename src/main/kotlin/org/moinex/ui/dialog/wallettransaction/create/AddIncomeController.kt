@@ -51,19 +51,7 @@ class AddIncomeController(
         val category = categoryComboBox.value
         val incomeDate = transactionDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            incomeValueString.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            incomeDate == null
-        ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
-            return
-        }
+        if (!validation.validate()) return
 
         runCatching {
             val incomeValue = incomeValueString.toBigDecimal()

@@ -2124,4 +2124,9 @@ object TranslationKeys {
     const val AI_REVIEW_INV_TAB_STOCKS: String = "aireviewinv.tab.stocks"
     const val AI_REVIEW_INV_TAB_BONDS: String = "aireviewinv.tab.bonds"
     const val AI_REVIEW_INV_TAB_DIVIDENDS: String = "aireviewinv.tab.dividends"
+
+    const val DIALOG_VALIDATION_REQUIRED: String = "dialog.validation.required"
+    const val DIALOG_VALIDATION_INVALID_NUMBER: String = "dialog.validation.invalidNumber"
+    const val DIALOG_VALIDATION_POSITIVE: String = "dialog.validation.positive"
+    const val DIALOG_VALIDATION_INVALID_DATE: String = "dialog.validation.invalidDate"
 }

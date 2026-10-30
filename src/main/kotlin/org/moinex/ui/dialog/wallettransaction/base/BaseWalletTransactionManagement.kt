@@ -21,6 +21,8 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -82,6 +84,8 @@ abstract class BaseWalletTransactionManagement(
 
     private var transactionValueListener: ChangeListener<String>? = null
 
+    protected val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     protected abstract fun handleSave()
 
@@ -125,6 +129,19 @@ abstract class BaseWalletTransactionManagement(
             )
             walletAfterBalance()
         }
+
+        configureValidation()
+        DialogForm.install(descriptionField, descriptionField, ::handleSave, ::handleCancel)
+    }
+
+    protected open fun configureValidation() {
+        validation.required(walletComboBox)
+        validation.required(descriptionField)
+        validation.required(transactionValueField)
+        validation.positiveNumber(transactionValueField)
+        validation.required(statusComboBox)
+        validation.required(categoryComboBox)
+        validation.required(transactionDatePicker)
     }
 
     @FXML

@@ -7,11 +7,14 @@
 package org.moinex.app
 
 import javafx.application.Platform
+import javafx.event.Event
 import javafx.scene.Scene
 import javafx.scene.SnapshotParameters
 import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.image.PixelFormat
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import javafx.stage.Window
@@ -175,6 +178,8 @@ class ScreenshotRunner(
             if (dialog == null) {
                 logger.error("The dialog '{}' did not open; nothing captured", target.id)
             } else {
+                pressEnter(dialog)
+                delay(target.settleMillis.milliseconds)
                 writePng(snapshot(dialog), file)
                 dialog.close()
             }
@@ -187,6 +192,14 @@ class ScreenshotRunner(
             preferencesService.translate(TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE),
             springContext,
             { _: AddExpenseController -> },
+        )
+    }
+
+    private fun pressEnter(dialog: Stage) {
+        val target = dialog.scene.focusOwner ?: dialog.scene.root
+        Event.fireEvent(
+            target,
+            KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false),
         )
     }
 
