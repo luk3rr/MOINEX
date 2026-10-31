@@ -84,7 +84,8 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On 
 ## Internationalization (i18n)
 
 - Translations are in **pt-BR** (`messages_pt_BR.properties`) and `messages_en.properties` under `src/main/resources/i18n/`
-- **Never rewrite or convert the entire properties file.** Only append or edit the specific keys needed for the current task.
+- Both bundles are **UTF-8**. Write accents and symbols directly (`Início`, `↑↓`); do not use `\uXXXX` escapes. Keep `\n` and `\t` inside messages, since those are properties syntax, not encoding.
+- **Never rewrite or convert the entire properties file.** Only append or edit the specific keys needed for the current task. Exception: an explicit user request for a full-file change, such as the one-time UTF-8 conversion of `messages_pt_BR.properties`.
 - If editing a properties file fails (encoding issues, tool errors), **ask the user to add the keys manually** rather than attempting a full-file rewrite.
 
 ## CI
