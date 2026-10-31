@@ -46,9 +46,21 @@ CONFIG = {
         ],
         "recurring_transaction": [
             # id, amount, description, type, frequency, start_date, end_date, next_due_date, status, category_id, wallet_id
-            (1, 8500.00, 'Salário Mensal', 'INCOME', 'MONTHLY', (-11, 5), (120, 5), (0, 5), 'ACTIVE', 11, 1),
-            (2, 830.00, 'Compra Mensal Supermercado', 'EXPENSE', 'MONTHLY', (-11, 15), (120, 15), (0, 15), 'ACTIVE', 1, 1),
-            (3, 140.00, 'Mensalidade Academia', 'EXPENSE', 'MONTHLY', (-11, 10), (120, 10), (0, 10), 'ACTIVE', 4, 1)
+            (1, 8500.00, 'Salário Mensal', 'INCOME', 'MONTHLY', (-11, 5), (120, 5), (1, 5), 'ACTIVE', 11, 1),
+            (2, 830.00, 'Compra Mensal Supermercado', 'EXPENSE', 'MONTHLY', (-11, 15), (120, 15), (1, 15), 'ACTIVE', 1, 1),
+            (3, 140.00, 'Mensalidade Academia', 'EXPENSE', 'MONTHLY', (-11, 10), (120, 10), (1, 10), 'ACTIVE', 4, 1)
+        ],
+        # Mês atual, fixo para a demonstração: receita = despesas + investido (8500 = 3060 + 5440).
+        # As despesas incluem a fatura de 60 paga neste mês (credit_card_payment 21).
+        # As recorrências começam no mês seguinte para não somar ocorrências futuras ao mês atual.
+        "current_month_transactions": [
+            # wallet_id, category_id, type, status, amount, description, (month_offset, day_offset)
+            (1, 11, 'INCOME', 'CONFIRMED', 8500.00, 'Salário', (0, 5)),
+            (1, 6, 'EXPENSE', 'CONFIRMED', 2500.00, 'Aluguel', (0, 3)),
+            (1, 7, 'EXPENSE', 'CONFIRMED', 150.00, 'Pagamento de serviço de internet', (0, 7)),
+            (1, 1, 'EXPENSE', 'CONFIRMED', 180.00, 'Compra de alimentos no supermercado', (0, 12)),
+            (1, 1, 'EXPENSE', 'CONFIRMED', 120.00, 'Jantar em restaurante', (0, 18)),
+            (1, 2, 'EXPENSE', 'CONFIRMED', 50.00, 'Táxi para o aeroporto', (0, 21)),
         ],
         "credit_card": [
             # id, operator_id, name, billing_due_day, closing_day, max_debt, last_four_digits, default_billing_wallet_id
@@ -125,7 +137,6 @@ CONFIG = {
             {'month_offset': -3,  'target_income': 10000, 'target_expense': 2000},
             {'month_offset': -2,  'target_income': 8500, 'target_expense': 3000},
             {'month_offset': -1,  'target_income': 8800, 'target_expense': 3000},
-            {'month_offset': 0,   'target_income': 8500, 'target_expense': 3000},
         ],
         "ticker": [
             # id, name, symbol, type, current_quantity, current_unit_value, average_unit_value, average_unit_value_count, archived, last_update_offset
@@ -161,6 +172,7 @@ CONFIG = {
             (10, 6, 0.30, 3200.00, 5, (-1, 5), 'Compra adicional Ethereum'),
             (11, 7, 500.00, 0.38, 5, (-4, 18), 'Compra de Cardano'),
             (12, 8, 10.00, 270.00, 5, (-6, 22), 'Compra de IVVB11'),
+            (13, 2, 50.00, 60.00, 5, (0, 10), 'Compra adicional VALE3'),
         ],
         "ticker_sale": [
             # id, ticker_id, quantity, unit_price, average_cost, wallet_id, (month_offset, day_offset), description
@@ -174,6 +186,7 @@ CONFIG = {
             (4, 4, 'BUY', 1.00, 1666.67, 0.00, 0.00, None, 5, (-5, 8), 'Compra Tesouro Prefixado'),
             (5, 5, 'BUY', 1.00, 2500.00, 0.00, 0.00, None, 5, (-4, 12), 'Compra Tesouro IPCA+'),
             (6, 6, 'BUY', 2.00, 833.33, 2.50, 0.00, None, 5, (-3, 20), 'Aplicação em LCA'),
+            (7, 5, 'BUY', 1.00, 2440.00, 0.00, 0.00, None, 5, (0, 12), 'Aplicação em Tesouro IPCA+'),
         ]
     }
 }
@@ -261,7 +274,7 @@ def populate_initial_data(cursor, data):
         execute_query(cursor, "INSERT INTO credit_card_payment (id, wallet_id, debt_id, date, amount, installment) VALUES (?, ?, ?, ?, ?, ?);", params)
     print("Initial data inserted successfully.")
 
-def generate_wallet_transactions(rules, possibilities):
+def generate_wallet_transactions(rules, possibilities, fixed_transactions):
     """Gera transações de carteira dinamicamente com base em regras e possibilidades."""
     print("Generating dynamic wallet transactions...")
     possible_incomes = [t for t in possibilities if t[2] == 'INCOME']
@@ -286,6 +299,8 @@ def generate_wallet_transactions(rules, possibilities):
                 current_expense += transaction_template[4]
                 day = random.randint(1, 28)
                 generated_transactions_raw.append(transaction_template + ((month, day),))
+
+    generated_transactions_raw.extend(fixed_transactions)
 
     sorted_transactions = sorted(generated_transactions_raw, key=lambda x: x[6])
 
@@ -356,7 +371,7 @@ def populate_ticker_operations(cursor, data):
         # Create wallet transaction for the purchase
         total_amount = quantity * unit_price
         wt_params = (None, wallet_id, 9, 'EXPENSE', 'CONFIRMED', dynamic_date, total_amount, description)
-        execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", wt_params)
+        execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description, include_in_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0);", wt_params)
         
         # Get the wallet_transaction_id
         cursor.execute("SELECT last_insert_rowid();")
@@ -374,7 +389,7 @@ def populate_ticker_operations(cursor, data):
         # Create wallet transaction for the sale
         total_amount = quantity * unit_price
         wt_params = (None, wallet_id, 9, 'INCOME', 'CONFIRMED', dynamic_date, total_amount, description)
-        execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", wt_params)
+        execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description, include_in_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0);", wt_params)
         
         # Get the wallet_transaction_id
         cursor.execute("SELECT last_insert_rowid();")
@@ -398,7 +413,7 @@ def populate_bond_operations(cursor, data):
         total_amount = (quantity * unit_price) + (fees or 0.0)
         trans_type = 'EXPENSE' if operation_type == 'BUY' else 'INCOME'
         wt_params = (None, wallet_id, 9, trans_type, 'CONFIRMED', dynamic_date, total_amount, description)
-        execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", wt_params)
+        execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description, include_in_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0);", wt_params)
         
         # Get the wallet_transaction_id
         cursor.execute("SELECT last_insert_rowid();")
@@ -432,7 +447,8 @@ def main():
         # Gera as transações dinamicamente
         wallet_transactions = generate_wallet_transactions(
             CONFIG["initial_data"]["monthly_rules"],
-            CONFIG["initial_data"]["possible_transactions"]
+            CONFIG["initial_data"]["possible_transactions"],
+            CONFIG["initial_data"]["current_month_transactions"],
         )
         # Insere as transações geradas
         insert_wallet_transactions(cursor, wallet_transactions)
