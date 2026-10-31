@@ -123,6 +123,24 @@ class GoalController(
                 RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_EDIT_GOAL)) { handleEditGoal() },
                 RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_DELETE_GOAL)) { handleDeleteGoal() },
             ),
+            createRow = {
+                TableRow<Goal>().apply {
+                    itemProperty().addListener { _, _, newItem ->
+                        newItem?.let {
+                            val tooltip =
+                                Tooltip(
+                                    MessageFormat.format(
+                                        preferencesService.translate(
+                                            TranslationKeys.GOAL_TABLE_TOOLTIP_MOTIVATION,
+                                        ),
+                                        it.motivation,
+                                    ),
+                                )
+                            Tooltip.install(this, tooltip)
+                        }
+                    }
+                }
+            },
         )
         val searchWidth = statusSegment.widthProperty()
         goalSearchField.prefWidthProperty().bind(searchWidth)
@@ -565,25 +583,6 @@ class GoalController(
             monthsUntilTargetColumn,
             recommendedMonthlyDepositColumn,
         )
-
-        goalTableView.setRowFactory {
-            TableRow<Goal>().apply {
-                itemProperty().addListener { _, _, newItem ->
-                    newItem?.let {
-                        val tooltip =
-                            Tooltip(
-                                MessageFormat.format(
-                                    preferencesService.translate(
-                                        TranslationKeys.GOAL_TABLE_TOOLTIP_MOTIVATION,
-                                    ),
-                                    it.motivation,
-                                ),
-                            )
-                        Tooltip.install(this, tooltip)
-                    }
-                }
-            }
-        }
     }
 
     private fun createIdColumn(): TableColumn<Goal, Int> =

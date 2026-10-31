@@ -154,6 +154,22 @@ class CreditCardController(
                     handleMaterializeDebt()
                 },
             ),
+            createRow = {
+                object : TableRow<CreditCardDebtRowDTO>() {
+                    override fun updateItem(
+                        item: CreditCardDebtRowDTO?,
+                        empty: Boolean,
+                    ) {
+                        super.updateItem(item, empty)
+                        style =
+                            if (!empty && item is CreditCardDebtRowDTO.Projected) {
+                                PROJECTED_DEBT_STYLE
+                            } else {
+                                ""
+                            }
+                    }
+                }
+            },
         )
         val searchWidth = debtsFilterGroup.widthProperty()
         debtSearchField.prefWidthProperty().bind(searchWidth)
@@ -1209,23 +1225,6 @@ class CreditCardController(
                     SimpleStringProperty(status)
                 }
             }
-
-        debtsTableView.setRowFactory {
-            object : TableRow<CreditCardDebtRowDTO>() {
-                override fun updateItem(
-                    item: CreditCardDebtRowDTO?,
-                    empty: Boolean,
-                ) {
-                    super.updateItem(item, empty)
-                    style =
-                        if (!empty && item is CreditCardDebtRowDTO.Projected) {
-                            PROJECTED_DEBT_STYLE
-                        } else {
-                            ""
-                        }
-                }
-            }
-        }
 
         debtsTableView.columns.addAll(
             idColumn,

@@ -15,16 +15,18 @@ data class RowAction(
 
 /**
  * Opens the actions of a table row with a right click on it. The clicked row is selected first, so the handlers
- * that read the selected item work unchanged. Empty rows open nothing.
+ * that read the selected item work unchanged. Empty rows open nothing. [createRow] builds the row, so a table
+ * that also styles its rows passes its own row here; a second row factory would replace the menu.
  */
 object RowContextMenu {
     fun <T> install(
         table: TableView<T>,
         actions: List<RowAction>,
+        createRow: () -> TableRow<T> = { TableRow() },
     ) {
         table.setRowFactory {
-            object : TableRow<T>() {
-                private val menu =
+            createRow().apply {
+                val menu =
                     ContextMenu(
                         *actions
                             .map { action ->
@@ -37,13 +39,11 @@ object RowContextMenu {
                             }.toTypedArray(),
                     )
 
-                init {
-                    setOnContextMenuRequested { event ->
-                        if (!isEmpty) {
-                            menu.show(this, event.screenX, event.screenY)
-                        }
-                        event.consume()
+                setOnContextMenuRequested { event ->
+                    if (!isEmpty) {
+                        menu.show(this, event.screenX, event.screenY)
                     }
+                    event.consume()
                 }
             }
         }
