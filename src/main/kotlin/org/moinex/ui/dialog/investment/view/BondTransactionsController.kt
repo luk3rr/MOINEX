@@ -21,6 +21,8 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.OperationType
@@ -48,6 +50,15 @@ class BondTransactionsController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            operationTableView,
+            listOf(
+                RowAction(
+                    preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE),
+                ) { handleDeleteOperation() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEditOperation() },
+            ),
+        )
         loadOperationsFromDatabase()
         configureOperationTableView()
         updateOperationTableView()

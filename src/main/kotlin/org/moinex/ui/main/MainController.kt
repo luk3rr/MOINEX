@@ -49,14 +49,17 @@ import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
 import org.moinex.ui.common.NotificationToastOverlay
 import org.moinex.ui.common.search.GlobalSearch
+import org.moinex.ui.common.search.SearchAction
 import org.moinex.ui.common.search.SearchActionCatalog
 import org.moinex.ui.common.search.SearchEntry
+import org.moinex.ui.common.search.SearchGroup
 import org.moinex.ui.common.search.SearchHost
 import org.moinex.ui.common.search.SearchScreen
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.io.IOException
+import kotlin.math.abs
 
 @Controller
 class MainController(
@@ -135,6 +138,7 @@ class MainController(
     companion object {
         private val logger = LoggerFactory.getLogger(MainController::class.java)
         private const val NOTIFICATION_SCRIM_STYLE = "-fx-background-color: rgba(0,0,0,0.45);"
+        private const val DRAG_THRESHOLD = 4.0
     }
 
     @FXML
@@ -216,6 +220,7 @@ class MainController(
 
         setupNotificationDrawer()
         setupGlobalSearch()
+        setupScreenActionsButton()
 
         // Toast overlay must be added last to stay on top of everything (highest Z-order)
         toastOverlay = NotificationToastOverlay(rootPane)
@@ -271,7 +276,31 @@ class MainController(
         currentContent?.let { loadContent(it.key, it.value) }
     }
 
-    @FXML
+    private fun setupScreenActionsButton() {
+        var lastX = 0.0
+        var lastY = 0.0
+        var dragged = false
+        screenActionsButton.setOnMousePressed { event ->
+            lastX = event.sceneX
+            lastY = event.sceneY
+            dragged = false
+        }
+        screenActionsButton.setOnMouseDragged { event ->
+            val dx = event.sceneX - lastX
+            val dy = event.sceneY - lastY
+            if (!dragged && abs(dx) + abs(dy) < DRAG_THRESHOLD) return@setOnMouseDragged
+            dragged = true
+            val bounds = screenActionsButton.boundsInParent
+            screenActionsButton.translateX += dx.coerceIn(-bounds.minX, rootPane.width - bounds.maxX)
+            screenActionsButton.translateY += dy.coerceIn(-bounds.minY, rootPane.height - bounds.maxY)
+            lastX = event.sceneX
+            lastY = event.sceneY
+        }
+        screenActionsButton.setOnAction {
+            if (!dragged) handleOpenScreenActions()
+        }
+    }
+
     private fun handleOpenScreenActions() {
         val actions = currentScreenProvider?.screenActions().orEmpty()
         if (actions.isEmpty()) return
@@ -289,11 +318,22 @@ class MainController(
         globalSearch.open()
     }
 
+    private fun screenSearchActions(): List<SearchAction> =
+        currentScreenProvider?.screenActions().orEmpty().mapIndexed { index, action ->
+            SearchAction(
+                id = "screen.$index",
+                group = SearchGroup.SCREEN_ACTIONS,
+                icon = Icons.ADD,
+                label = action.label,
+                run = action.run,
+            )
+        }
+
     private fun setupGlobalSearch() {
         globalSearch =
             GlobalSearch(
                 rootPane,
-                { SearchActionCatalog(searchHost).actions() },
+                { SearchActionCatalog(searchHost).actions() + screenSearchActions() },
                 preferencesService::translate,
             )
         rootPane.sceneProperty().addListener { _, _, scene ->

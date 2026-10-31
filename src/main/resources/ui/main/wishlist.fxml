@@ -82,21 +82,6 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
-                                 <Button minWidth="100.0" onAction="#handleAdd" text="%wishlist.button.add">
-                                    <graphic>
-                                       <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
-                                    </graphic>
-                                 </Button>
-                                 <Button minWidth="120.0" onAction="#handleMarkAsPurchased" text="%wishlist.button.markPurchased">
-                                    <graphic>
-                                       <FontIcon iconLiteral="mdmz-shopping_cart" styleClass="app-icon, icon-size-20" />
-                                    </graphic>
-                                 </Button>
-                                 <Button minWidth="120.0" onAction="#handleMarkAsPending" text="%wishlist.button.markPending">
-                                    <graphic>
-                                       <FontIcon iconLiteral="mdal-hourglass_empty" styleClass="app-icon, icon-size-20" />
-                                    </graphic>
-                                 </Button>
                                     <Region HBox.hgrow="ALWAYS" />
                                     <HBox alignment="CENTER_LEFT" spacing="5.0">
                                        <children>

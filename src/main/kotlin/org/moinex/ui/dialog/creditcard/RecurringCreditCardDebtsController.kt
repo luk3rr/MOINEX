@@ -21,6 +21,8 @@ import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.RecurringCreditCardDebt
@@ -49,6 +51,13 @@ class RecurringCreditCardDebtsController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            recurringDebtsTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
         loadData()
         configureTableView()
         populateStatusComboBox()

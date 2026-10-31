@@ -23,6 +23,8 @@ import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.RecurringTransactionStatus
@@ -54,6 +56,13 @@ class RecurringTransactionController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            recurringTransactionTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
         loadRecurringTransactionsFromDatabase()
         configureTableView()
         populateRecurringTransactionStatusComboBox()

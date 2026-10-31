@@ -18,6 +18,8 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Bond
@@ -41,6 +43,13 @@ class ArchivedBondsController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            bondTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_UNARCHIVE)) { handleUnarchive() },
+            ),
+        )
         loadArchivedBondsFromDatabase()
         configureTableView()
         updateBondTableView()

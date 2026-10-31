@@ -19,6 +19,8 @@ import javafx.scene.control.TextField
 import javafx.scene.image.ImageView
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Ticker
@@ -43,6 +45,13 @@ class ArchivedTickersController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            tickerTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_UNARCHIVE)) { handleUnarchive() },
+            ),
+        )
         loadArchivedTickersFromDatabase()
         configureTableView()
         updateTickerTableView()

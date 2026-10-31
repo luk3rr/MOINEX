@@ -22,6 +22,8 @@ import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Transfer
@@ -57,6 +59,13 @@ class TransferController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            transfersTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
         loadTransfersFromDatabase()
         configureTableView()
         configureDatePickers()

@@ -154,7 +154,7 @@ class GlobalSearch(
             graphic =
                 HBox(
                     icon(item.icon, ICON_SIZE),
-                    Label(translate(item.titleKey)),
+                    Label(item.label ?: translate(item.titleKey)),
                     spacer,
                     Label(translate(item.group.titleKey)).apply { styleClass.add("search-group") },
                 ).apply {

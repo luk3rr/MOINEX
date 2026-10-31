@@ -57,8 +57,8 @@
         </AnchorPane>
         <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
             <children>
-                <Button fx:id="editButton" minWidth="110.0" onAction="#handleEditInterest" text="%bond.interestHistory.button.editInterest" />
-                <Button fx:id="resetButton" minWidth="110.0" onAction="#handleResetToAutomatic" text="%bond.interestHistory.button.resetToAutomatic" />
+                
+                
                 <Button fx:id="recalculateButton" minWidth="110.0" onAction="#handleRecalculateHistory" text="%bond.interestHistory.button.recalculateHistory" />
                 <Button fx:id="closeButton" minWidth="110.0" onAction="#handleClose" text="%bond.interestHistory.button.close" />
             </children>

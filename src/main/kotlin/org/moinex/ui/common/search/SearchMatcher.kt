@@ -26,8 +26,8 @@ object SearchMatcher {
 
         return actions
             .mapNotNull { action ->
-                val title = normalize(translate(action.titleKey))
-                val keywords = normalize(translate(action.keywordsKey))
+                val title = normalize(action.label ?: translate(action.titleKey))
+                val keywords = if (action.label == null) normalize(translate(action.keywordsKey)) else ""
                 val score =
                     when {
                         title.startsWith(q) -> 0

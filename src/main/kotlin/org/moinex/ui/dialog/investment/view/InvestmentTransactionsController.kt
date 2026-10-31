@@ -19,6 +19,8 @@ import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionStatus
@@ -70,6 +72,34 @@ class InvestmentTransactionsController(
 
     @FXML
     fun initialize() {
+        RowContextMenu.install(
+            purchaseTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
+        RowContextMenu.install(
+            saleTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
+        RowContextMenu.install(
+            dividendTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
+        RowContextMenu.install(
+            cryptoExchangeTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_EDIT)) { handleEdit() },
+            ),
+        )
         loadPurchasesFromDatabase()
         loadSalesFromDatabase()
         loadDividendsFromDatabase()

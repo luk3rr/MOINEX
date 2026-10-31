@@ -136,16 +136,11 @@
             <VBox HBox.hgrow="ALWAYS">
                <children>
                      <AnchorPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
-                  <HBox fx:id="footbarArea" alignment="CENTER_RIGHT" maxHeight="10.0" prefHeight="10.0" spacing="10.0">
+                  <HBox fx:id="footbarArea" alignment="CENTER_RIGHT" minHeight="40.0" prefHeight="40.0" spacing="10.0">
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
                      <children>
-                        <Button fx:id="screenActionsButton" onAction="#handleOpenScreenActions">
-                           <font>
-                              <Font size="9.0" />
-                           </font>
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-15" />
-                           </graphic>
-                        </Button>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button onAction="#handleOpenSearch" styleClass="search-hint-button" text="%main.search.hint">
                            <font>
@@ -196,5 +191,10 @@
             </VBox>
          </children>
       </HBox>
+      <Button fx:id="screenActionsButton" styleClass="floating-action-button" AnchorPane.bottomAnchor="64.0" AnchorPane.rightAnchor="24.0">
+         <graphic>
+            <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-24" />
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

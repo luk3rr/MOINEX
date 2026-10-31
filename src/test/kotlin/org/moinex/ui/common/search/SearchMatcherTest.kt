@@ -16,10 +16,20 @@ class SearchMatcherTest :
             )
         val translate: (String) -> String = { titles[it] ?: "" }
         val noop = {}
-        val wallets = SearchAction("screen.wallets", SearchGroup.SCREENS, "i", noop)
-        val expense = SearchAction("entry.expense", SearchGroup.ENTRIES, "i", noop)
-        val fire = SearchAction("tab.fire", SearchGroup.TABS, "i", noop)
+        val wallets = SearchAction("screen.wallets", SearchGroup.SCREENS, "i", run = noop)
+        val expense = SearchAction("entry.expense", SearchGroup.ENTRIES, "i", run = noop)
+        val fire = SearchAction("tab.fire", SearchGroup.TABS, "i", run = noop)
         val all = listOf(expense, fire, wallets)
+
+        Given("an action of the current screen, with its label already translated") {
+            val addWallet =
+                SearchAction("screen.0", SearchGroup.SCREEN_ACTIONS, "i", label = "Adicionar carteira", run = noop)
+
+            Then("it is found by its label, ignoring accents and case, without a translation key") {
+                SearchMatcher.rank("ADICIONAR", listOf(addWallet), translate) shouldBe listOf(addWallet)
+                SearchMatcher.rank("tabela", listOf(addWallet), translate) shouldBe emptyList()
+            }
+        }
 
         Given("a query") {
             Then("an empty query lists every action in group order") {

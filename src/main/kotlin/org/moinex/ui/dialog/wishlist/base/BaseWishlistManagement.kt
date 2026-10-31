@@ -22,6 +22,8 @@ import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.model.Category
 import org.moinex.model.dto.form.WishlistItemFormDTO
@@ -69,6 +71,14 @@ abstract class BaseWishlistManagement(
 
     @FXML
     protected open fun initialize() {
+        RowContextMenu.install(
+            linksTableView,
+            listOf(
+                RowAction(
+                    preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_REMOVE_LINK),
+                ) { handleRemoveLink() },
+            ),
+        )
         configureComboBoxes()
         configureTableView()
         configureListeners()

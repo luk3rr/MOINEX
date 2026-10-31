@@ -26,7 +26,7 @@
 
 #footbarArea {
   -fx-background-color: theme-bg-base;
-  -fx-padding: 0;
+  -fx-padding: 0 10px 0 10px;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
 }
 
@@ -131,3 +131,24 @@
   -fx-font-size: 11px;
   -fx-text-fill: theme-text-secondary;
 }
+
+.floating-action-button {
+  -fx-background-color: theme-accent;
+  -fx-background-radius: 26px;
+  -fx-min-width: 52px;
+  -fx-min-height: 52px;
+  -fx-max-width: 52px;
+  -fx-max-height: 52px;
+  -fx-padding: 0;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 12, 0, 0, 4);
+  -fx-cursor: move;
+}
+
+.floating-action-button .app-icon {
+  -fx-icon-color: theme-on-accent;
+}
+
+.floating-action-button:disabled {
+  -fx-opacity: 0.4;
+}
+

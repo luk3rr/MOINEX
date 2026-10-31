@@ -17,6 +17,8 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextInputDialog
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.NotificationType
@@ -73,6 +75,19 @@ class BondInterestHistoryController(
 
     @FXML
     private fun initialize() {
+        RowContextMenu.install(
+            historyTable,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_BUTTON_EDIT_INTEREST)) {
+                    handleEditInterest()
+                },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_BUTTON_RESET_TO_AUTOMATIC),
+                ) {
+                    handleResetToAutomatic()
+                },
+            ),
+        )
         if (!::bond.isInitialized) {
             return
         }

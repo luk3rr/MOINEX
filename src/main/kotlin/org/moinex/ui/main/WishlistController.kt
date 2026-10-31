@@ -129,6 +129,12 @@ class WishlistController(
                 ) { handleViewDetails() },
                 RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_EDIT)) { handleEdit() },
                 RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_DELETE)) { handleDelete() },
+                RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_MARK_PURCHASED)) {
+                    handleMarkAsPurchased()
+                },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_MARK_PENDING),
+                ) { handleMarkAsPending() },
             ),
         )
         configureFilters()
