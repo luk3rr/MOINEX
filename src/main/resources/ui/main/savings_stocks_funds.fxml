@@ -90,11 +90,6 @@
                            <children>
                               <Label fx:id="stocksFundsTabBottonPaneTitle" styleClass="title" text="%savings.stocksFunds.portfolio" />
                               <Region HBox.hgrow="ALWAYS" />
-                              <Button fx:id="updatePortfolioPricesButton" onAction="#handleUpdatePortfolioPrices" text="%savings.stocksFunds.button.updatePrices">
-                                 <graphic>
-                                    <FontIcon fx:id="updatePricesButtonIcon" iconLiteral="mdmz-sync" styleClass="app-icon, icon-size-20" />
-                                 </graphic>
-                              </Button>
                               <HBox fx:id="stocksFundsFilterGroup" alignment="BOTTOM_RIGHT" spacing="10.0">
                                  <children>
                                                          <VBox alignment="CENTER">
@@ -111,10 +106,16 @@
                               </HBox>
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_RIGHT" spacing="5.0">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
                            <children>
-                                                <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
-                                                <TextField fx:id="stocksFundsTabTickerSearchField" prefWidth="300.0" promptText="%savings.stocksFunds.searchPlaceholder" HBox.hgrow="ALWAYS" />
+                              <Button fx:id="updatePortfolioPricesButton" onAction="#handleUpdatePortfolioPrices" text="%savings.stocksFunds.button.updatePrices">
+                              <graphic>
+                                 <FontIcon fx:id="updatePricesButtonIcon" iconLiteral="mdmz-sync" styleClass="app-icon, icon-size-20" />
+                              </graphic>
+                              </Button>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
+                              <TextField fx:id="stocksFundsTabTickerSearchField" prefWidth="300.0" promptText="%savings.stocksFunds.searchPlaceholder" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
                         <TableView fx:id="stocksFundsTabTickerTable" VBox.vgrow="ALWAYS">
