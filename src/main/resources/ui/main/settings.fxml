@@ -22,54 +22,66 @@
                   <Insets top="40.0" right="40.0" bottom="40.0" left="40.0" />
                </padding>
                <children>
-                  <Label text="%settings.language" />
-                  <ComboBox fx:id="languageComboBox" prefWidth="240.0" />
-                  <Separator prefWidth="520.0" />
-                  <Label text="%settings.theme" />
-                  <ComboBox fx:id="themeComboBox" prefWidth="240.0" />
-                  <Separator prefWidth="520.0" />
-                  <Label text="%settings.database.location" />
-                  <HBox spacing="10.0" alignment="CENTER_LEFT">
-                     <children>
-                        <TextField fx:id="dbPathField" prefWidth="430.0" editable="false" />
-                        <Button text="%settings.database.change" onAction="#handleChangeDbPath" />
-                     </children>
-                  </HBox>
-                  <Label fx:id="restartRequiredLabel" text="%settings.database.restartRequired" visible="false" managed="false" style="-fx-text-fill: theme-warning;" />
-                  <Separator prefWidth="520.0" />
-                  <Label text="%settings.savingsRateTarget" />
-                  <HBox spacing="10.0" alignment="CENTER_LEFT">
-                     <children>
-                        <TextField fx:id="savingsRateTargetField" prefWidth="120.0" />
-                        <Label text="%settings.savingsRateTarget.hint" style="-fx-text-fill: theme-text-secondary;" />
-                     </children>
-                  </HBox>
-                  <Separator prefWidth="520.0" />
-                  <Label text="%settings.ai.sectionTitle" style="-fx-font-weight: bold;" />
-                  <Label text="%settings.ai.disclaimer" wrapText="true" maxWidth="520.0" styleClass="ai-disclaimer" />
-                  <Label text="%settings.ai.provider" />
-                  <HBox spacing="10.0" alignment="CENTER_LEFT">
-                     <children>
-                        <ComboBox fx:id="aiProviderComboBox" prefWidth="240.0" />
-                        <Label fx:id="aiKeyStatusLabel" styleClass="ai-key-status" />
-                     </children>
-                  </HBox>
-                  <Label text="%settings.ai.apiKey" />
-                  <PasswordField fx:id="aiApiKeyField" prefWidth="360.0" />
-                  <Label text="%settings.ai.model" />
-                  <HBox spacing="10.0" alignment="CENTER_LEFT">
-                     <children>
-                        <TextField fx:id="aiModelField" prefWidth="240.0" />
-                        <Label text="%settings.ai.model.hint" wrapText="true" maxWidth="280.0" style="-fx-text-fill: theme-text-secondary;" />
-                     </children>
-                  </HBox>
-                  <HBox spacing="10.0" alignment="CENTER_LEFT">
-                     <children>
-                        <Button fx:id="aiTestConnectionButton" text="%settings.ai.testConnection" onAction="#handleTestAiConnection" />
-                        <Button fx:id="aiSaveButton" text="%settings.ai.save" onAction="#handleSaveAiSettings" />
-                        <Button fx:id="aiClearButton" text="%settings.ai.clear" onAction="#handleClearAiKey" />
-                     </children>
-                  </HBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
+                      <Label text="%settings.language" />
+                      <ComboBox fx:id="languageComboBox" prefWidth="240.0" />
+                      <Label text="%settings.theme" />
+                      <ComboBox fx:id="themeComboBox" prefWidth="240.0" />
+                      </children>
+                  </VBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
+                      <Label text="%settings.database.location" />
+                      <HBox spacing="10.0" alignment="CENTER_LEFT">
+                         <children>
+                            <TextField fx:id="dbPathField" prefWidth="430.0" editable="false" />
+                            <Button text="%settings.database.change" onAction="#handleChangeDbPath" />
+                         </children>
+                      </HBox>
+                      <Label fx:id="restartRequiredLabel" text="%settings.database.restartRequired" visible="false" managed="false" style="-fx-text-fill: theme-warning;" />
+                      </children>
+                  </VBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
+                      <Label text="%settings.savingsRateTarget" />
+                      <HBox spacing="10.0" alignment="CENTER_LEFT">
+                         <children>
+                            <TextField fx:id="savingsRateTargetField" prefWidth="120.0" />
+                            <Label text="%settings.savingsRateTarget.hint" style="-fx-text-fill: theme-text-secondary;" />
+                         </children>
+                      </HBox>
+                      </children>
+                  </VBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
+                      <Label text="%settings.ai.sectionTitle" style="-fx-font-weight: bold;" />
+                      <Label text="%settings.ai.disclaimer" wrapText="true" maxWidth="520.0" styleClass="ai-disclaimer" />
+                      <Label text="%settings.ai.provider" />
+                      <HBox spacing="10.0" alignment="CENTER_LEFT">
+                         <children>
+                            <ComboBox fx:id="aiProviderComboBox" prefWidth="240.0" />
+                            <Label fx:id="aiKeyStatusLabel" styleClass="ai-key-status" />
+                         </children>
+                      </HBox>
+                      <Label text="%settings.ai.apiKey" />
+                      <PasswordField fx:id="aiApiKeyField" prefWidth="360.0" />
+                      <Label text="%settings.ai.model" />
+                      <HBox spacing="10.0" alignment="CENTER_LEFT">
+                         <children>
+                            <TextField fx:id="aiModelField" prefWidth="240.0" />
+                            <Label text="%settings.ai.model.hint" wrapText="true" maxWidth="280.0" style="-fx-text-fill: theme-text-secondary;" />
+                         </children>
+                      </HBox>
+                      <HBox spacing="10.0" alignment="CENTER_LEFT">
+                         <children>
+                            <Button fx:id="aiTestConnectionButton" text="%settings.ai.testConnection" onAction="#handleTestAiConnection" />
+                            <Button fx:id="aiSaveButton" text="%settings.ai.save" onAction="#handleSaveAiSettings" />
+                            <Button fx:id="aiClearButton" text="%settings.ai.clear" onAction="#handleClearAiKey" />
+                         </children>
+                      </HBox>
+                      </children>
+                  </VBox>
                </children>
             </VBox>
          </content>

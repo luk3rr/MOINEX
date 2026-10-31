@@ -32,6 +32,8 @@ class NotificationCenterController(
         val isEmpty = items.isEmpty()
         emptyLabel.isVisible = isEmpty
         emptyLabel.isManaged = isEmpty
+        notificationList.isVisible = !isEmpty
+        notificationList.isManaged = !isEmpty
     }
 
     @FXML
