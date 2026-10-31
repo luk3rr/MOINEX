@@ -19,7 +19,7 @@ TESTS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run jar build test coverage lint format clean pre-commit install-hooks install uninstall
+.PHONY: help run demo jar build test coverage lint format clean pre-commit install-hooks install uninstall
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -27,6 +27,9 @@ help: ## Show this help
 
 run: ## Run the application
 	$(GRADLE) bootRun $(GRADLE_FLAGS)
+
+demo: jar ## Open the app on a temporary database with mock data (real data untouched)
+	bash scripts/demo.sh
 
 jar: ## Package to build/libs/moinex.jar
 	$(GRADLE) bootJar $(GRADLE_FLAGS)
