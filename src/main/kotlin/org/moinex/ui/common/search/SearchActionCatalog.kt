@@ -6,6 +6,12 @@ import org.moinex.common.ui.Icons
  * What the search needs from the main window to run its actions.
  */
 interface SearchHost {
+    fun runScreenAction(
+        screen: SearchScreen,
+        tabIndex: Int?,
+        index: Int,
+    )
+
     fun showScreen(
         screen: SearchScreen,
         tabIndex: Int? = null,
@@ -68,6 +74,18 @@ class SearchActionCatalog(
             SearchAction("app.calculator", SearchGroup.APP, Icons.CALCULATOR) { host.openCalculator() },
             SearchAction("app.notifications", SearchGroup.APP, Icons.NOTIFICATION) { host.toggleNotifications() },
         )
+
+    fun screenActions(translate: (String) -> String): List<SearchAction> =
+        ScreenActionEntries.all.map { entry ->
+            SearchAction(
+                id = "screen.${entry.screen}.${entry.tab}.${entry.index}",
+                group = SearchGroup.SCREEN_ACTIONS,
+                icon = Icons.ADD,
+                label = translate(entry.labelKey),
+                context = entry.contextKeys.joinToString(" · ") { translate(it) },
+                run = { host.runScreenAction(entry.screen, entry.tab, entry.index) },
+            )
+        }
 
     private fun screen(
         id: String,

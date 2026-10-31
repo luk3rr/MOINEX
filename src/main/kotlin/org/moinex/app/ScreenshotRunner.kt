@@ -54,6 +54,7 @@ class ScreenshotRunner(
         private val logger = LoggerFactory.getLogger(ScreenshotRunner::class.java)
         private const val WINDOW_SETTLE_MILLIS = 800L
         private const val NOTIFICATIONS_SETTLE_MILLIS = 1500L
+        private const val SEARCH_CAPTURE_QUERY = "Adicionar"
         private const val REFUSED_EXIT_CODE = 2
 
         fun isEnabled(): Boolean = System.getProperty(CapturePlan.PROPERTY_CAPTURE_DIR) != null
@@ -162,6 +163,7 @@ class ScreenshotRunner(
                     stage.scene.root,
                     KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.S, false, true, false, false),
                 )
+                mainController.setGlobalSearchQuery(SEARCH_CAPTURE_QUERY)
                 delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
                 writePng(snapshot(stage), file)
                 Event.fireEvent(

@@ -96,6 +96,10 @@ class GlobalSearch(
         }
     }
 
+    fun setQuery(text: String) {
+        input.text = text
+    }
+
     fun toggle() {
         if (isOpen) close() else open()
     }
@@ -154,7 +158,12 @@ class GlobalSearch(
             graphic =
                 HBox(
                     icon(item.icon, ICON_SIZE),
-                    Label(item.label ?: translate(item.titleKey)),
+                    VBox(Label(item.label ?: translate(item.titleKey))).apply {
+                        alignment = Pos.CENTER_LEFT
+                        item.context?.let { context ->
+                            children.add(Label(context).apply { styleClass.add("search-context") })
+                        }
+                    },
                     spacer,
                     Label(translate(item.group.titleKey)).apply { styleClass.add("search-group") },
                 ).apply {

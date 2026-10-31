@@ -152,3 +152,8 @@
   -fx-opacity: 0.4;
 }
 
+.search-context {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-text-secondary;
+}
+

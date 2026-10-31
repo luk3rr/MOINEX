@@ -19,6 +19,7 @@ data class SearchAction(
     val group: SearchGroup,
     val icon: String,
     val label: String? = null,
+    val context: String? = null,
     val run: () -> Unit,
 ) {
     val titleKey: String get() = "search.action.$id"

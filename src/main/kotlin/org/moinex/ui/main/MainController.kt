@@ -52,7 +52,6 @@ import org.moinex.ui.common.search.GlobalSearch
 import org.moinex.ui.common.search.SearchAction
 import org.moinex.ui.common.search.SearchActionCatalog
 import org.moinex.ui.common.search.SearchEntry
-import org.moinex.ui.common.search.SearchGroup
 import org.moinex.ui.common.search.SearchHost
 import org.moinex.ui.common.search.SearchScreen
 import org.slf4j.LoggerFactory
@@ -324,26 +323,22 @@ class MainController(
         screenActionsButton.isManaged = visible
     }
 
-    private fun screenSearchActions(): List<SearchAction> =
-        currentScreenProvider?.screenActions().orEmpty().mapIndexed { index, action ->
-            SearchAction(
-                id = "screen.$index",
-                group = SearchGroup.SCREEN_ACTIONS,
-                icon = Icons.ADD,
-                label =
-                    listOf(currentScreenProvider?.screenContext(), action.label)
-                        .filterNotNull()
-                        .filter { it.isNotEmpty() }
-                        .joinToString(" · "),
-                run = action.run,
-            )
-        }
+    fun setGlobalSearchQuery(text: String) {
+        globalSearch.setQuery(text)
+    }
+
+    private fun selectTab(index: Int) {
+        (contentArea.lookup(".tab-pane") as? TabPane)?.selectionModel?.select(index)
+    }
+
+    private fun searchScreenActions(): List<SearchAction> =
+        SearchActionCatalog(searchHost).screenActions(preferencesService::translate)
 
     private fun setupGlobalSearch() {
         globalSearch =
             GlobalSearch(
                 rootPane,
-                { SearchActionCatalog(searchHost).actions() + screenSearchActions() },
+                { SearchActionCatalog(searchHost).actions() + searchScreenActions() },
                 preferencesService::translate,
             )
         rootPane.sceneProperty().addListener { _, _, scene ->
@@ -365,11 +360,7 @@ class MainController(
                 val (fxml, css, button) = screenTarget(screen)
                 loadContent(fxml, css)
                 updateSelectedButton(button)
-                tabIndex?.let { index ->
-                    Platform.runLater {
-                        (contentArea.lookup(".tab-pane") as? TabPane)?.selectionModel?.select(index)
-                    }
-                }
+                tabIndex?.let { index -> Platform.runLater { selectTab(index) } }
             }
 
             override fun openEntry(entry: SearchEntry) {
@@ -392,6 +383,26 @@ class MainController(
                     { _: Any -> },
                     listOf(Runnable { currentContent?.let { loadContent(it.key, it.value) } }),
                 )
+            }
+
+            override fun runScreenAction(
+                screen: SearchScreen,
+                tabIndex: Int?,
+                index: Int,
+            ) {
+                val (fxml, css, button) = screenTarget(screen)
+                loadContent(fxml, css)
+                updateSelectedButton(button)
+                Platform.runLater {
+                    tabIndex?.let { selectTab(it) }
+                    Platform.runLater {
+                        currentScreenProvider
+                            ?.screenActions()
+                            ?.getOrNull(index)
+                            ?.run
+                            ?.invoke()
+                    }
+                }
             }
 
             override fun toggleTheme() = themeService.toggleAndApply()

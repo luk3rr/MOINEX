@@ -23,6 +23,12 @@ class SearchActionCatalogTest :
                 override fun openCalculator() = Unit
 
                 override fun toggleNotifications() = Unit
+
+                override fun runScreenAction(
+                    screen: SearchScreen,
+                    tabIndex: Int?,
+                    index: Int,
+                ) = Unit
             }
         val actions = SearchActionCatalog(host).actions()
 
@@ -37,6 +43,16 @@ class SearchActionCatalogTest :
             Then("it has 23 actions with unique ids") {
                 actions.size shouldBe 23
                 actions.map { it.id }.toSet().size shouldBe 23
+            }
+
+            Then("every screen action of the global search has its labels in both languages") {
+                listOf("messages_en", "messages_pt_BR").forEach { name ->
+                    val props = bundle(name)
+                    val keys =
+                        ScreenActionEntries.all.flatMap { entry -> listOf(entry.labelKey) + entry.contextKeys }
+                    keys.filter { props.getProperty(it).isNullOrBlank() }.shouldBeEmpty()
+                }
+                SearchActionCatalog(host).screenActions { it }.size shouldBe ScreenActionEntries.all.size
             }
 
             Then("every action and group has a title in both languages") {
