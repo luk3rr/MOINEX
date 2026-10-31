@@ -146,7 +146,7 @@
                               </AnchorPane>
                            </children>
                         </VBox>
-                        <VBox maxWidth="350.0" minWidth="120.0" prefWidth="180.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                        <VBox maxWidth="350.0" minWidth="200.0" prefWidth="230.0" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
                               <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
