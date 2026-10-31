@@ -135,3 +135,20 @@
 .button.period-nav:disabled {
   -fx-opacity: 0.35;
 }
+
+/* ── Text action: a discreet button with no border, for secondary actions in a card ── */
+.button.text-action {
+  -fx-background-color: transparent;
+  -fx-background-insets: 0;
+  -fx-background-radius: 6px;
+  -fx-padding: 2px 8px;
+}
+
+.button.text-action:hover {
+  -fx-background-color: theme-bg-card-alt;
+}
+
+.button.text-action:disabled {
+  -fx-opacity: 0.35;
+}
+

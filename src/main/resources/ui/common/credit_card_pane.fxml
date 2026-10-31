@@ -154,7 +154,7 @@
                                                 <Label fx:id="invoiceMonthLabel" text="\$ 0.00" />
                                              </children>
                                           </HBox>
-                                          <Button alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="%common.creditCard.registerPayment" textAlignment="RIGHT">
+                                          <Button styleClass="text-action" alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="%common.creditCard.registerPayment" textAlignment="RIGHT">
                                              <graphic>
                                                 <FontIcon iconLiteral="mdal-check" styleClass="app-icon, icon-size-15" />
                                              </graphic>
