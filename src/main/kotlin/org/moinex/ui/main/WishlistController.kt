@@ -114,9 +114,11 @@ class WishlistController(
     }
 
     @FXML
+    override fun screenContext(): String = preferencesService.translate(TranslationKeys.GOALS_PLANS_TAB_WISHLIST)
+
     override fun screenActions(): List<RowAction> =
         listOf(
-            RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_ADD)) { handleAdd() },
+            RowAction(preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_ADD_TITLE)) { handleAdd() },
         )
 
     fun initialize() {

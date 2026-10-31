@@ -10,4 +10,9 @@ interface ScreenActionProvider {
      * Calls [callback] whenever the actions may have changed, for example when the selected tab changes.
      */
     fun onActionsChanged(callback: () -> Unit) {}
+
+    /**
+     * Name of the screen, or of the tab shown by it, to tell its actions apart in the global search.
+     */
+    fun screenContext(): String = ""
 }

@@ -330,7 +330,11 @@ class MainController(
                 id = "screen.$index",
                 group = SearchGroup.SCREEN_ACTIONS,
                 icon = Icons.ADD,
-                label = action.label,
+                label =
+                    listOf(currentScreenProvider?.screenContext(), action.label)
+                        .filterNotNull()
+                        .filter { it.isNotEmpty() }
+                        .joinToString(" · "),
                 run = action.run,
             )
         }

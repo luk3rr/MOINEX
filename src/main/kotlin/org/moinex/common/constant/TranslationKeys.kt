@@ -2145,4 +2145,5 @@ object TranslationKeys {
     const val SAVINGS_BONDS_BUTTON_DELETE: String = "savings.bonds.button.delete"
     const val SAVINGS_BONDS_BUTTON_BUY_BOND: String = "savings.bonds.button.buyBond"
     const val SAVINGS_BONDS_BUTTON_SELL_BOND: String = "savings.bonds.button.sellBond"
+    const val GOALS_PLANS_TAB_WISHLIST: String = "goalsPlans.tab.wishlist"
 }

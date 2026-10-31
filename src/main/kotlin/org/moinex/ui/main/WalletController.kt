@@ -75,6 +75,8 @@ class WalletController(
     private val preferencesService: PreferencesService,
     private val chartFactory: ChartFactory,
 ) : ScreenActionProvider {
+    override fun screenContext(): String = preferencesService.translate(TranslationKeys.MAIN_WALLET)
+
     override fun screenActions(): List<RowAction> =
         listOf(
             RowAction(preferencesService.translate(TranslationKeys.WALLET_BUTTON_ADD_WALLET)) { handleAddWallet() },

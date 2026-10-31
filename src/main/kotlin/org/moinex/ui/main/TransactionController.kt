@@ -122,6 +122,8 @@ class TransactionController(
     }
 
     @FXML
+    override fun screenContext(): String = preferencesService.translate(TranslationKeys.MAIN_TRANSACTION)
+
     override fun screenActions(): List<RowAction> =
         listOf(
             RowAction(

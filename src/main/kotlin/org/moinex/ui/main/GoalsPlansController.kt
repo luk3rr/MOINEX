@@ -12,6 +12,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.UIUtils
@@ -32,21 +33,23 @@ class GoalsPlansController(
     private var wishlistController: Any? = null
 
     override fun onActionsChanged(callback: () -> Unit) {
-        goalsTab.tabPane
-            ?.selectionModel
-            ?.selectedItemProperty()
-            ?.addListener { _, _, _ -> callback() }
+        tabPane.selectionModel.selectedItemProperty().addListener { _, _, _ -> callback() }
     }
 
-    override fun screenActions(): List<RowAction> {
-        val provider =
-            when {
-                goalsTab.isSelected -> goalController
-                wishlistTab.isSelected -> wishlistController
-                else -> null
-            } as? ScreenActionProvider
-        return provider?.screenActions().orEmpty()
-    }
+    private fun activeProvider(): ScreenActionProvider? =
+        when (tabPane.selectionModel.selectedItem) {
+            goalsTab -> goalController
+            wishlistTab -> wishlistController
+            else -> null
+        } as? ScreenActionProvider
+
+    override fun screenActions(): List<RowAction> = activeProvider()?.screenActions().orEmpty()
+
+    override fun screenContext(): String =
+        listOfNotNull(
+            preferencesService.translate(TranslationKeys.MAIN_GOALS_AND_PLANS),
+            activeProvider()?.screenContext()?.takeIf { it.isNotEmpty() },
+        ).joinToString(" · ")
 
     @FXML
     private lateinit var goalsTab: Tab

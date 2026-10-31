@@ -12,6 +12,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.UIUtils
@@ -45,21 +46,23 @@ class SavingsController(
     private var bondsController: Any? = null
 
     override fun onActionsChanged(callback: () -> Unit) {
-        stocksFundsTab.tabPane
-            ?.selectionModel
-            ?.selectedItemProperty()
-            ?.addListener { _, _, _ -> callback() }
+        tabPane.selectionModel.selectedItemProperty().addListener { _, _, _ -> callback() }
     }
 
-    override fun screenActions(): List<RowAction> {
-        val provider =
-            when {
-                stocksFundsTab.isSelected -> stocksFundsController
-                bondsTab.isSelected -> bondsController
-                else -> null
-            } as? ScreenActionProvider
-        return provider?.screenActions().orEmpty()
-    }
+    private fun activeProvider(): ScreenActionProvider? =
+        when (tabPane.selectionModel.selectedItem) {
+            stocksFundsTab -> stocksFundsController
+            bondsTab -> bondsController
+            else -> null
+        } as? ScreenActionProvider
+
+    override fun screenActions(): List<RowAction> = activeProvider()?.screenActions().orEmpty()
+
+    override fun screenContext(): String =
+        listOfNotNull(
+            preferencesService.translate(TranslationKeys.MAIN_SAVINGS),
+            activeProvider()?.screenContext()?.takeIf { it.isNotEmpty() },
+        ).joinToString(" · ")
 
     @FXML
     fun initialize() {

@@ -106,6 +106,8 @@ class GoalController(
     }
 
     @FXML
+    override fun screenContext(): String = preferencesService.translate(TranslationKeys.GOALS_PLANS_TAB_GOALS)
+
     override fun screenActions(): List<RowAction> =
         listOf(
             RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_ADD_GOAL)) { handleAddGoal() },

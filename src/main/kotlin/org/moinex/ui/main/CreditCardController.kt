@@ -121,6 +121,8 @@ class CreditCardController(
     }
 
     @FXML
+    override fun screenContext(): String = preferencesService.translate(TranslationKeys.MAIN_CREDIT_CARD)
+
     override fun screenActions(): List<RowAction> =
         listOf(
             RowAction(preferencesService.translate(TranslationKeys.CREDIT_CARD_BUTTON_ADD_DEBT)) { handleAddDebt() },

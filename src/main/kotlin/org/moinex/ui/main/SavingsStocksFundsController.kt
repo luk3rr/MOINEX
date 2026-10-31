@@ -113,6 +113,8 @@ class SavingsStocksFundsController(
     private var updatePricesRotation: RotateTransition? = null
 
     @FXML
+    override fun screenContext(): String = preferencesService.translate(TranslationKeys.SAVINGS_TAB_STOCKS_FUNDS)
+
     override fun screenActions(): List<RowAction> =
         listOf(
             RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_REGISTER_TICKER)) {
