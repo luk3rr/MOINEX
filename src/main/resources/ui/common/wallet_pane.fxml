@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane fx:id="root" minHeight="125.0" minWidth="250.0" stylesheets="@../../css/scene/pane.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.WalletPaneController">
@@ -17,7 +19,10 @@
          <children>
             <HBox fx:id="header" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <FontIcon fx:id="walletIcon" iconLiteral="mdal-help_outline" styleClass="app-icon, icon-size-40" />
+                  <ImageView fx:id="walletIcon" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                     <image>
+                        <Image url="@../../icon/common/default.png" />
+                     </image></ImageView>
                   <VBox alignment="CENTER" prefWidth="200.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label fx:id="walletName" text="Name" />

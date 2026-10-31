@@ -11,6 +11,7 @@ object Styles {
     const val PROGRESS_BAR_GREEN_COLOR_STYLE: String = "progress-bar-green"
 
     // Icon color styles from base.css
+    const val COLORED_ICON: String = "colored-icon"
     const val ICON_POSITIVE: String = "icon-positive"
     const val ICON_NEGATIVE: String = "icon-negative"
     const val FIELD_ERROR: String = "field-error"

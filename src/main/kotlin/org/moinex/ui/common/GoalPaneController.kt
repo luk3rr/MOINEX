@@ -12,17 +12,18 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.control.MenuItem
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isZero
-import org.moinex.common.ui.IconMapper
-import org.moinex.common.ui.Icons
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
@@ -60,7 +61,7 @@ class GoalPaneController(
     private lateinit var infosVBox: VBox
 
     @FXML
-    private lateinit var goalIcon: FontIcon
+    private lateinit var goalIcon: ImageView
 
     @FXML
     private lateinit var goalName: Label
@@ -123,8 +124,15 @@ class GoalPaneController(
         goalName.text = currentGoal.name
         goalMotivation.text = currentGoal.motivation
 
-        goalIcon.iconLiteral =
-            if (currentGoal.isCompleted()) Icons.TROPHY else IconMapper.walletTypeLiteral(currentGoal.type.icon)
+        if (currentGoal.isCompleted()) {
+            goalIcon.image = Image(Files.TROPHY_ICON)
+            goalIcon.effect = null
+            if (Styles.COLORED_ICON !in goalIcon.styleClass) goalIcon.styleClass.add(Styles.COLORED_ICON)
+        } else {
+            goalIcon.image = Image(Files.WALLET_TYPE_ICONS_PATH + currentGoal.type.icon)
+            goalIcon.styleClass.remove(Styles.COLORED_ICON)
+            goalIcon.applyIconTheme(preferencesService.isDarkMode())
+        }
 
         goalTargetAmount.text = UIUtils.formatCurrency(currentGoal.targetBalance)
         goalTargetDate.text = UIUtils.formatDateForDisplay(currentGoal.targetDate)

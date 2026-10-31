@@ -10,6 +10,8 @@ object Files {
 
     // Paths
     const val CRC_OPERATOR_ICONS_PATH: String = "/icon/crc_operator/"
+    const val WALLET_TYPE_ICONS_PATH: String = "/icon/wallet_type/"
+    const val TROPHY_ICON: String = "/icon/common/trophy.png"
     const val APP_ICONS_PATH: String = "/icon/app/"
 
     const val UI_MAIN_PATH: String = "/ui/main/"

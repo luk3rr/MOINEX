@@ -18,6 +18,7 @@ import javafx.scene.control.TableView
 import javafx.scene.image.ImageView
 import javafx.stage.Window
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.ui.TableColumns
 import org.springframework.stereotype.Service
@@ -48,7 +49,6 @@ class ThemeService(
     private var installed = false
 
     companion object {
-        private const val BYPASS_THEME_CHANGE_KEY_WORD = "colored-icon"
     }
 
     /**
@@ -136,7 +136,7 @@ class ThemeService(
         node: Node,
         isDarkMode: Boolean,
     ) {
-        if (node is ImageView && !node.styleClass.contains(BYPASS_THEME_CHANGE_KEY_WORD)) {
+        if (node is ImageView && !node.styleClass.contains(Styles.COLORED_ICON)) {
             node.applyIconTheme(isDarkMode)
         }
 

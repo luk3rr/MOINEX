@@ -47,13 +47,12 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.setAnchorPaneConstraints
-import org.moinex.common.ui.IconMapper
-import org.moinex.common.ui.icon
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -714,6 +713,7 @@ class HomeController(
             ImageView(Files.CRC_OPERATOR_ICONS_PATH + creditCard.operator.icon).apply {
                 fitHeight = Constants.CRC_OPERATOR_ICONS_SIZE.toDouble()
                 fitWidth = Constants.CRC_OPERATOR_ICONS_SIZE.toDouble()
+                applyIconTheme(preferencesService.isDarkMode())
             }
 
         val iconVBox =
@@ -784,7 +784,12 @@ class HomeController(
                 }
             }
 
-        val icon = icon(IconMapper.walletTypeLiteral(wallet.type.icon), Constants.WALLET_TYPE_ICONS_SIZE)
+        val icon =
+            ImageView(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon).apply {
+                fitHeight = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
+                fitWidth = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
+                applyIconTheme(preferencesService.isDarkMode())
+            }
 
         val iconVBox =
             VBox().apply {
