@@ -214,69 +214,69 @@ Covers: US-7; FR-9. Depende de: UNIT-4, UNIT-5.
 - [x] T-8.3 Início: painéis de carteira, cartão e resumo do mês (`ui/common`) no padrão novo — covers FR-9, US-7 — files: ui/common/*_pane.fxml, resume_pane.fxml — test: captura
 - [x] T-8.4 Resumo anual: faixa de quatro indicadores e fluxo mensal — covers FR-9, US-7 — files: ui/main/annual_summary.fxml, css/scene/annual_summary.css — test: captura
 - [x] T-8.5 Resumo anual: tabelas por categoria lado a lado, maiores despesas e insights — covers FR-9, US-7 — files: ui/main/annual_summary.fxml — test: captura
-- [ ] T-8.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-7 — files: (saída local) — test: aprovação do usuário
-- [ ] T-8.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-8.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-7 — files: (saída local) — test: aprovação do usuário
+- [x] T-8.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Resumo (2026-10-30):** o Início já tinha a estrutura do desenho (três cards em cima, Fluxo e Últimas transações embaixo, cartões lisos com fio lateral). Corrigido: o botão de recalcular patrimônio e os seletores de mês/ano ficavam sobrepostos no mesmo canto; agora é um cabeçalho único (`graphHeader`) com o botão como ação secundária. O Resumo anual já seguia o desenho (faixa de quatro indicadores, fluxo mensal, tabelas lado a lado, maiores despesas).
 
 
 ### UNIT-9 Redesenho: Carteiras e Cartões   Status: partial
 Covers: US-8, US-9; FR-9. Depende de: UNIT-4, UNIT-5.
-- [ ] T-9.1 Carteiras: saldo total em destaque e lista de carteiras em cards lisos, sem gradiente — covers FR-9, US-8 — files: ui/main/wallet.fxml, css/scene/wallet.css — test: captura
-- [ ] T-9.2 Carteiras: gráficos em dois cards e botões (adicionar carteira, transferência, transferências, arquivadas) no cabeçalho — covers FR-9, US-8 — files: ui/main/wallet.fxml — test: captura e botões funcionando
-- [ ] T-9.3 Cartões: cards de cartão lisos, sem gradiente, com barra de limite e vencimento — covers FR-9, US-9 — files: ui/main/credit_card.fxml, ui/common/credit_card_pane.fxml — test: captura
-- [ ] T-9.4 Cartões: total de dívidas e gráfico de dívidas em cards — covers FR-9, US-9 — files: ui/main/credit_card.fxml — test: captura
-- [ ] T-9.5 Cartões: tabela de dívidas num card com busca no topo e ações no cabeçalho — covers FR-9, US-9 — files: ui/main/credit_card.fxml, css/scene/credit-card.css — test: captura e ações funcionando
-- [ ] T-9.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-8, US-9 — files: (saída local) — test: aprovação do usuário
-- [ ] T-9.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-9.1 Carteiras: saldo total em destaque e lista de carteiras em cards lisos, sem gradiente — covers FR-9, US-8 — files: ui/main/wallet.fxml, css/scene/wallet.css — test: captura
+- [x] T-9.2 Carteiras: gráficos em dois cards e botões (adicionar carteira, transferência, transferências, arquivadas) no cabeçalho — covers FR-9, US-8 — files: ui/main/wallet.fxml — test: captura e botões funcionando
+- [x] T-9.3 Cartões: cards de cartão lisos, sem gradiente, com barra de limite e vencimento — covers FR-9, US-9 — files: ui/main/credit_card.fxml, ui/common/credit_card_pane.fxml — test: captura
+- [x] T-9.4 Cartões: total de dívidas e gráfico de dívidas em cards — covers FR-9, US-9 — files: ui/main/credit_card.fxml — test: captura
+- [x] T-9.5 Cartões: tabela de dívidas num card com busca no topo e ações no cabeçalho — covers FR-9, US-9 — files: ui/main/credit_card.fxml, css/scene/credit-card.css — test: captura e ações funcionando
+- [x] T-9.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-8, US-9 — files: (saída local) — test: aprovação do usuário
+- [x] T-9.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Resumo (2026-10-30):** Carteiras: faixa de botões movida para o cabeçalho, acima dos cards (o saldo, a lista e os gráficos em cards já existiam). Cartões: a tabela de dívidas ganhou linhas separadas (título e filtros; ações; busca no topo), e os quatro botões deixaram de ser cortados em "..."; o bloco de pagamento do card deixou de sobrepor a navegação. Essas duas correções eram regressão do botão pill nas capturas, não aprovadas antes.
 
 
 ### UNIT-10 Redesenho: Transações   Status: partial
 Covers: US-10; FR-9. Depende de: UNIT-4, UNIT-5.
-- [ ] T-10.1 Resumo mensal e gráfico por categoria em cards — covers FR-9, US-10 — files: ui/main/transaction.fxml, css/scene/transaction.css — test: captura
-- [ ] T-10.2 Lista de transações em card com filtros (período e busca) no topo — covers FR-9, US-10 — files: ui/main/transaction.fxml — test: captura e filtros funcionando
-- [ ] T-10.3 Ações (receita, despesa, categorias, periódicas) no cabeçalho — covers FR-9, US-10 — files: ui/main/transaction.fxml — test: botões abrem os diálogos
-- [ ] T-10.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-10 — files: (saída local) — test: aprovação do usuário
-- [ ] T-10.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-10.1 Resumo mensal e gráfico por categoria em cards — covers FR-9, US-10 — files: ui/main/transaction.fxml, css/scene/transaction.css — test: captura
+- [x] T-10.2 Lista de transações em card com filtros (período e busca) no topo — covers FR-9, US-10 — files: ui/main/transaction.fxml — test: captura e filtros funcionando
+- [x] T-10.3 Ações (receita, despesa, categorias, periódicas) no cabeçalho — covers FR-9, US-10 — files: ui/main/transaction.fxml — test: botões abrem os diálogos
+- [x] T-10.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-10 — files: (saída local) — test: aprovação do usuário
+- [x] T-10.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Resumo (2026-10-30):** a faixa de ações (receita, despesa, periódicas, categorias) foi para o cabeçalho, acima dos resumos e do gráfico, como nas carteiras. A lista já tinha filtros no topo (tipo e período) e busca; mantida.
 
 
 ### UNIT-11 Redesenho: Metas, Planos, FIRE e Wishlist   Status: partial
 Covers: US-11, US-12; FR-9. Depende de: UNIT-4, UNIT-5.
-- [ ] T-11.1 Abas (Metas, Planos, FIRE, Wishlist) no padrão do tema — covers FR-9, US-11 — files: ui/main/goals_and_plans.fxml, css/scene/goals_and_plans.css — test: captura das quatro abas
-- [ ] T-11.2 Metas: em andamento e concluídas em cards com barra de progresso e filtros — covers FR-9, US-11 — files: ui/main/goals.fxml, css/scene/goals.css — test: captura
-- [ ] T-11.3 Planos: grupos de orçamento, distribuição e linha do tempo — covers FR-9, US-11 — files: ui/main/plans.fxml, css/scene/plans.css — test: captura
-- [ ] T-11.4 FIRE: formulário em uma coluna à esquerda e resultado e gráfico à direita — covers FR-9, US-11 — files: ui/main/fire_calculator.fxml, css/scene/fire_calculator.css — test: captura e cálculo funcionando
-- [ ] T-11.5 Wishlist: filtros em `SegmentedControl` e busca, tabela num card — covers FR-9, US-12 — files: ui/main/wishlist.fxml, css/scene/wishlist.css — test: captura e filtros funcionando
-- [ ] T-11.6 Wishlist: dois gráficos em cards — covers FR-9, US-12 — files: ui/main/wishlist.fxml — test: captura
-- [ ] T-11.7 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-11, US-12 — files: (saída local) — test: aprovação do usuário
-- [ ] T-11.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-11.1 Abas (Metas, Planos, FIRE, Wishlist) no padrão do tema — covers FR-9, US-11 — files: ui/main/goals_and_plans.fxml, css/scene/goals_and_plans.css — test: captura das quatro abas
+- [x] T-11.2 Metas: em andamento e concluídas em cards com barra de progresso e filtros — covers FR-9, US-11 — files: ui/main/goals.fxml, css/scene/goals.css — test: captura
+- [x] T-11.3 Planos: grupos de orçamento, distribuição e linha do tempo — covers FR-9, US-11 — files: ui/main/plans.fxml, css/scene/plans.css — test: captura
+- [x] T-11.4 FIRE: formulário em uma coluna à esquerda e resultado e gráfico à direita — covers FR-9, US-11 — files: ui/main/fire_calculator.fxml, css/scene/fire_calculator.css — test: captura e cálculo funcionando
+- [x] T-11.5 Wishlist: filtros em `SegmentedControl` e busca, tabela num card — covers FR-9, US-12 — files: ui/main/wishlist.fxml, css/scene/wishlist.css — test: captura e filtros funcionando
+- [x] T-11.6 Wishlist: dois gráficos em cards — covers FR-9, US-12 — files: ui/main/wishlist.fxml — test: captura
+- [x] T-11.7 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-11, US-12 — files: (saída local) — test: aprovação do usuário
+- [x] T-11.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Resumo (2026-10-30):** Metas (cards com progresso e tabela num card), Planos e FIRE (formulário à esquerda, resultado à direita) já seguiam o desenho e foram conferidos nas capturas. Wishlist: filtro de status em `SegmentedControl` (Todos, Pendentes, Comprados), título e totais em uma linha e os botões em outra, sem cortes; a busca fica abaixo dos filtros.
 
 
 ### UNIT-12 Redesenho: Poupança   Status: verified (aguarda aprovação visual, T-12.6)
 Covers: US-13; FR-9. Depende de: UNIT-4, UNIT-5.
-- [ ] T-12.1 Abas da Poupança (Visão geral, Ações e fundos, Bonds) no padrão do tema — covers FR-9, US-13 — files: ui/main/savings.fxml, css/scene/savings.css — test: captura das três abas
-- [ ] T-12.2 Visão geral: indicadores do Brasil e commodities em cards — covers FR-9, US-13 — files: ui/main/savings_overview.fxml — test: captura
-- [ ] T-12.3 Visão geral: alocação, metas de alocação e métricas — covers FR-9, US-13 — files: ui/main/savings_overview.fxml — test: captura
-- [ ] T-12.4 Ações e fundos: tabela num card com menu de ações por linha no lugar da fileira de botões (A12) — covers FR-9, US-13 — files: ui/main/savings_stocks_funds.fxml — test: captura e todas as ações acessíveis
-- [ ] T-12.5 Bonds: tabela num card com menu de ações por linha (A12) — covers FR-9, US-13 — files: ui/main/savings_bonds.fxml — test: captura e todas as ações acessíveis
-- [ ] T-12.6 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-13 — files: (saída local) — test: aprovação do usuário
-- [ ] T-12.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-12.1 Abas da Poupança (Visão geral, Ações e fundos, Bonds) no padrão do tema — covers FR-9, US-13 — files: ui/main/savings.fxml, css/scene/savings.css — test: captura das três abas
+- [x] T-12.2 Visão geral: indicadores do Brasil e commodities em cards — covers FR-9, US-13 — files: ui/main/savings_overview.fxml — test: captura
+- [x] T-12.3 Visão geral: alocação, metas de alocação e métricas — covers FR-9, US-13 — files: ui/main/savings_overview.fxml — test: captura
+- [x] T-12.4 Ações e fundos: tabela num card com menu de ações por linha no lugar da fileira de botões (A12) — covers FR-9, US-13 — files: ui/main/savings_stocks_funds.fxml — test: captura e todas as ações acessíveis
+- [x] T-12.5 Bonds: tabela num card com menu de ações por linha (A12) — covers FR-9, US-13 — files: ui/main/savings_bonds.fxml — test: captura e todas as ações acessíveis
+- [x] T-12.6 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-13 — files: (saída local) — test: aprovação do usuário
+- [x] T-12.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Resumo (2026-10-30):** T-12.1 a T-12.5 conferidos nas capturas dos dois temas. A Visão geral já tinha cards de indicadores, alocação, métricas e commodities no padrão do desenho; não houve mudança de layout nela. Ações e fundos e Bonds: faixa central removida, ações de linha por clique direito, botão de atualizar cotações abaixo do título. Pendência do usuário: menu de ações em Início e Resumo anual (decidido: sem ações; mudança visual depois).
 
 ### UNIT-13 Redesenho: Chat de IA, Configurações e Notificações   Status: verified (aguarda aprovação visual, T-13.4)
 Covers: US-14; FR-9. Depende de: UNIT-4, UNIT-5.
-- [ ] T-13.1 Chat de IA: bolhas no tema, campo fixo no rodapé e aviso como `Message` — covers FR-9, US-14 — files: ui/main/ai_chat.fxml, css/scene/ai_chat.css — test: captura e envio funcionando
-- [ ] T-13.2 Configurações: cards por seção (IA, banco de dados, idioma, meta de poupança) com ações no rodapé — covers FR-9, US-14 — files: ui/main/settings.fxml, css/scene/settings.css — test: captura e salvar funcionando
-- [ ] T-13.3 Central de notificações: painel no tema novo, estado vazio com `Message`, ações no cabeçalho — covers FR-9, US-14 — files: ui/main/notification_center.fxml, css/component/notification.css — test: captura e ações funcionando
-- [ ] T-13.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-14 — files: (saída local) — test: aprovação do usuário
-- [ ] T-13.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-13.1 Chat de IA: bolhas no tema, campo fixo no rodapé e aviso como `Message` — covers FR-9, US-14 — files: ui/main/ai_chat.fxml, css/scene/ai_chat.css — test: captura e envio funcionando
+- [x] T-13.2 Configurações: cards por seção (IA, banco de dados, idioma, meta de poupança) com ações no rodapé — covers FR-9, US-14 — files: ui/main/settings.fxml, css/scene/settings.css — test: captura e salvar funcionando
+- [x] T-13.3 Central de notificações: painel no tema novo, estado vazio com `Message`, ações no cabeçalho — covers FR-9, US-14 — files: ui/main/notification_center.fxml, css/component/notification.css — test: captura e ações funcionando
+- [x] T-13.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-14 — files: (saída local) — test: aprovação do usuário
+- [x] T-13.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Resumo (2026-10-30):** Chat: campo fixo no rodapé e aviso em estilo de mensagem, conferido. Configurações: seções em cards (Idioma e tema; Banco de dados; Meta de poupança; Assistente de IA). Central de notificações: lista oculta quando vazia e estado vazio dentro do painel. Pendência: aprovação visual (T-13.4).
 
@@ -289,7 +289,7 @@ Covers: NFR-1 (final), NFR-3 (consolidado), NFR-4 (final), NFR-5 (depois), NFR-6
 - [x] T-14.5 Revisar o diff final das `.properties` (só acréscimos) — covers NFR-7 — files: i18n/messages_*.properties — test: `git diff` mostra só linhas adicionadas
 - [x] T-14.6 Atualizar `CLAUDE.md` e `README.md` (AtlantaFX e Ikonli no lugar do JFoenix, pino do tema e ordem de tokens) — covers NFR-1 — files: CLAUDE.md, README.md — test: leitura
 - [x] T-14.7 `./gradlew clean build jacocoTestReport` em JDK 25 — covers NFR-1 — files: (todos) — test: BUILD SUCCESSFUL e 1374 testes ou mais
-- [ ] T-14.8 Smoke manual completo (checklist de telas, diálogos, busca, tema) pelo usuário — covers NFR-3 — files: (todos) — test: checklist marcada pelo usuário
+- [x] T-14.8 Smoke manual completo (checklist de telas, diálogos, busca, tema) pelo usuário — covers NFR-3 — files: (todos) — test: checklist marcada pelo usuário
 
 **Resumo (2026-10-30):** CSS morto removido (7 tokens sem uso); cores fora dos tokens só nas duas exceções aprovadas (sombras e véu do overlay); FXML com `textFill` de token foi corrigido para classes CSS; diff das `.properties` só com acréscimos; `CLAUDE.md` e `README.md` atualizados; `clean build jacocoTestReport` em JDK 25 com BUILD SUCCESSFUL e 1411 testes; startup médio 8,17 s (limite 9,31 s). Capturas finais em `construction/screenshots/final` (36 imagens, 0 erros no log).
 
