@@ -47,32 +47,11 @@
   -fx-text-fill: theme-text-primary;
 }
 
-.income-item {
-  -fx-pref-width: 100%;
-}
 
-.expense-item {
-  -fx-pref-width: 100%;
-}
 
-.last-transaction-label {
-  -fx-text-fill: theme-text-primary;
-  -fx-font-size: 12px;
-  -fx-font-weight: bold;
-}
 
-.description-value-box {
-  -fx-text-fill: theme-text-primary;
-}
 
-.wallet-date-box {
-  -fx-text-fill: theme-text-dim;
-  -fx-font-size: 10px;
-}
 
-.transaction-details {
-  -fx-alignment: CENTER_LEFT;
-}
 
 .default-color0.chart-bar {
   -fx-bar-fill: theme-negative;
@@ -98,3 +77,30 @@
   -fx-font-size: 12px;
   -fx-text-fill: theme-chart-legend;
 }
+
+.home-transaction-positive {
+  -fx-text-fill: theme-positive;
+  -fx-font-weight: bold;
+}
+
+.home-transaction-negative {
+  -fx-text-fill: theme-negative;
+  -fx-font-weight: bold;
+}
+
+#transactionsTableView .column-header-background,
+#transactionsTableView .column-header-background .filler,
+#transactionsTableView .filler {
+  -fx-background-color: transparent;
+  -fx-background-insets: 0;
+  -fx-border-color: transparent;
+  -fx-border-width: 0;
+  -fx-padding: 0;
+}
+
+.home-blank-header {
+  -fx-background-color: transparent;
+  -fx-border-width: 0;
+  -fx-padding: 0;
+}
+

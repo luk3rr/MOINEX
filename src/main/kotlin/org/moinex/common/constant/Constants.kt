@@ -33,16 +33,9 @@ object Constants {
     // Icons sizes
     const val WALLET_TYPE_ICONS_SIZE: Int = 42 // 42x42 px
     const val CRC_OPERATOR_ICONS_SIZE: Int = 42 // 42x42 px
-    const val HOME_LAST_TRANSACTIONS_ICON_SIZE: Int = 32 // 32x32 px
 
     // Home scene constant
     const val HOME_LAST_TRANSACTIONS_SIZE: Int = 15
-    const val HOME_LAST_TRANSACTIONS_DESCRIPTION_LABEL_WIDTH: Int = 290
-    const val HOME_LAST_TRANSACTIONS_VALUE_LABEL_WIDTH: Int = 70
-    const val HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH: Int = 80
-    const val HOME_LAST_TRANSACTIONS_WALLET_LABEL_WIDTH: Int = 100
-    const val HOME_LAST_TRANSACTIONS_CATEGORY_LABEL_WIDTH: Int = 100
-    const val HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH: Int = 90
     const val HOME_PANES_ITEMS_PER_PAGE: Int = 2
 
     const val EPSILON: Double = 1e-6

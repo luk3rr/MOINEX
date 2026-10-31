@@ -36,8 +36,6 @@ object Styles {
     const val NEUTRAL_BALANCE_STYLE: String = "neutral-balance"
 
     // Home pane styles
-    const val HOME_LAST_TRANSACTIONS_INCOME_ITEM_STYLE: String = "income-item"
-    const val HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE: String = "expense-item"
 
     const val HOME_CREDIT_CARD_ITEM_STYLE: String = "credit-card-item"
 

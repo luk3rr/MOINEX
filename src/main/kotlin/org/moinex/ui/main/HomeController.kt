@@ -10,6 +10,7 @@ package org.moinex.ui.main
 
 import javafx.animation.Interpolator
 import javafx.animation.RotateTransition
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -22,7 +23,9 @@ import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
+import javafx.scene.control.ContentDisplay
 import javafx.scene.control.Label
+import javafx.scene.control.Labeled
 import javafx.scene.control.OverrunStyle
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
@@ -50,7 +53,6 @@ import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.IconMapper
-import org.moinex.common.ui.Icons
 import org.moinex.common.ui.icon
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
@@ -183,6 +185,12 @@ class HomeController(
     companion object {
         private val logger = LoggerFactory.getLogger(HomeController::class.java)
         private const val FIRST_PAGE_INDEX = 0
+        private const val SIGN_TEXT_GAP = 8.0
+        private const val AMOUNT_COLUMN_WIDTH = 120.0
+        private const val DATE_COLUMN_WIDTH = 100.0
+        private const val POSITIVE_STYLE = "home-transaction-positive"
+        private const val NEGATIVE_STYLE = "home-transaction-negative"
+        private const val BLANK_HEADER_STYLE = "home-blank-header"
         private const val GRAPH_PAGES = 3
         private const val MONEY_FLOW_PAGE_INDEX = 0
         private const val SANKEY_PAGE_INDEX = 1
@@ -419,100 +427,88 @@ class HomeController(
 
     private fun updateDisplayLastTransactions() {
         transactionsTableView.columns.clear()
+        transactionsTableView.columns.addAll(
+            transactionColumn(
+                header = preferencesService.translate(TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_DESCRIPTION),
+                width = null,
+                position = Pos.CENTER_LEFT,
+                textOf = { it.description.orEmpty() },
+                styleOf = { null },
+                signed = true,
+            ),
+            transactionColumn(
+                header = preferencesService.translate(TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_AMOUNT),
+                width = AMOUNT_COLUMN_WIDTH,
+                position = Pos.CENTER_RIGHT,
+                textOf = { UIUtils.formatCurrency(it.amount) },
+                styleOf = { if (it.type == WalletTransactionType.INCOME) POSITIVE_STYLE else NEGATIVE_STYLE },
+            ),
+            transactionColumn(
+                header = preferencesService.translate(TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_DATE),
+                width = DATE_COLUMN_WIDTH,
+                position = Pos.CENTER_LEFT,
+                textOf = { UIUtils.formatDateForDisplay(it.date) },
+                styleOf = { null },
+            ),
+        )
+        transactionsTableView.items = FXCollections.observableArrayList(transactions)
+        Platform.runLater { hideBlankTransactionHeaders() }
+    }
 
-        val transactionColumn =
-            TableColumn<WalletTransaction, WalletTransaction>(
-                MessageFormat.format(
-                    preferencesService.translate(TranslationKeys.HOME_TRANSACTIONS_TABLE_TITLE),
-                    Constants.HOME_LAST_TRANSACTIONS_SIZE,
-                ),
-            )
+    private fun hideBlankTransactionHeaders() {
+        transactionsTableView.lookupAll(".column-header").forEach { header ->
+            val label = header.lookup(".label") as? Labeled
+            if (label == null || label.text.isNullOrEmpty()) {
+                header.styleClass.add(BLANK_HEADER_STYLE)
+            }
+        }
+    }
 
-        transactionColumn.setCellValueFactory { SimpleObjectProperty(it.value) }
-
-        transactionColumn.setCellFactory {
+    private fun transactionColumn(
+        header: String,
+        width: Double?,
+        position: Pos,
+        textOf: (WalletTransaction) -> String,
+        styleOf: (WalletTransaction) -> String?,
+        signed: Boolean = false,
+    ): TableColumn<WalletTransaction, WalletTransaction> {
+        val column = TableColumn<WalletTransaction, WalletTransaction>(header)
+        column.isSortable = false
+        width?.let {
+            column.minWidth = it
+            column.maxWidth = it
+        }
+        column.setCellValueFactory { SimpleObjectProperty(it.value) }
+        column.setCellFactory {
             object : TableCell<WalletTransaction, WalletTransaction>() {
                 override fun updateItem(
                     transaction: WalletTransaction?,
                     empty: Boolean,
                 ) {
                     super.updateItem(transaction, empty)
+                    styleClass.removeAll(POSITIVE_STYLE, NEGATIVE_STYLE)
+                    if (empty || transaction == null) {
+                        text = null
+                        return
+                    }
+                    text = textOf(transaction)
+                    alignment = position
+                    styleOf(transaction)?.let { styleClass.add(it) }
                     graphic =
-                        if (empty || transaction == null) {
-                            null
+                        if (signed) {
+                            val income = transaction.type == WalletTransactionType.INCOME
+                            Label(if (income) "+" else "\u2212").apply {
+                                styleClass.add(if (income) POSITIVE_STYLE else NEGATIVE_STYLE)
+                            }
                         } else {
-                            createTransactionCell(transaction)
+                            null
                         }
+                    contentDisplay = if (graphic == null) ContentDisplay.TEXT_ONLY else ContentDisplay.LEFT
+                    graphicTextGap = SIGN_TEXT_GAP
                 }
             }
         }
-
-        transactionsTableView.columns.add(transactionColumn)
-        transactionsTableView.items = FXCollections.observableArrayList(transactions)
-    }
-
-    private fun createTransactionCell(transaction: WalletTransaction): HBox {
-        val isIncome = transaction.type == WalletTransactionType.INCOME
-        val icon =
-            icon(
-                if (isIncome) Icons.INCOME else Icons.EXPENSE,
-                Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE,
-            ).apply {
-                styleClass.add(if (isIncome) Styles.ICON_POSITIVE else Styles.ICON_NEGATIVE)
-            }
-
-        val descriptionLabel =
-            Label(transaction.description).apply {
-                minWidth = Constants.HOME_LAST_TRANSACTIONS_DESCRIPTION_LABEL_WIDTH.toDouble()
-            }
-
-        val valueLabel =
-            Label(UIUtils.formatCurrency(transaction.amount)).apply {
-                minWidth = Constants.HOME_LAST_TRANSACTIONS_VALUE_LABEL_WIDTH.toDouble()
-            }
-
-        val walletLabel =
-            Label(transaction.wallet.name).apply {
-                minWidth = Constants.HOME_LAST_TRANSACTIONS_WALLET_LABEL_WIDTH.toDouble()
-            }
-
-        val dateLabel =
-            Label(UIUtils.formatDateForDisplay(transaction.date)).apply {
-                minWidth = Constants.HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH.toDouble()
-            }
-
-        val transactionStatusLabel =
-            Label(UIUtils.translateTransactionStatus(transaction.status)).apply {
-                minWidth = Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH.toDouble()
-            }
-
-        val transactionCategoryLabel =
-            Label(transaction.category.name).apply {
-                minWidth = Constants.HOME_LAST_TRANSACTIONS_CATEGORY_LABEL_WIDTH.toDouble()
-            }
-
-        val descriptionValueBox =
-            HBox(descriptionLabel, valueLabel).apply {
-                alignment = Pos.CENTER_LEFT
-            }
-
-        val walletCategoryStatusDateBox =
-            HBox(walletLabel, transactionCategoryLabel, transactionStatusLabel, dateLabel).apply {
-                alignment = Pos.CENTER_LEFT
-            }
-
-        val vbox = VBox(5.0, descriptionValueBox, walletCategoryStatusDateBox)
-
-        return HBox(10.0, icon, vbox).apply {
-            alignment = Pos.CENTER_LEFT
-            styleClass.add(
-                if (transaction.type == WalletTransactionType.INCOME) {
-                    Styles.HOME_LAST_TRANSACTIONS_INCOME_ITEM_STYLE
-                } else {
-                    Styles.HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE
-                },
-            )
-        }
+        return column
     }
 
     private fun updateMoneyFlowBarChart() {
