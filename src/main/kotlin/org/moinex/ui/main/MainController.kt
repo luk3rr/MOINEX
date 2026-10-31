@@ -318,6 +318,12 @@ class MainController(
         globalSearch.open()
     }
 
+    private fun updateScreenActionsButton() {
+        val visible = currentScreenProvider?.screenActions()?.isNotEmpty() == true
+        screenActionsButton.isVisible = visible
+        screenActionsButton.isManaged = visible
+    }
+
     private fun screenSearchActions(): List<SearchAction> =
         currentScreenProvider?.screenActions().orEmpty().mapIndexed { index, action ->
             SearchAction(
@@ -431,7 +437,8 @@ class MainController(
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
             currentScreenProvider = loader.getController<Any>() as? ScreenActionProvider
-            screenActionsButton.isDisable = currentScreenProvider == null
+            currentScreenProvider?.onActionsChanged { updateScreenActionsButton() }
+            updateScreenActionsButton()
 
             newContent.stylesheets.add(
                 javaClass.getResource(styleSheet)!!.toExternalForm(),

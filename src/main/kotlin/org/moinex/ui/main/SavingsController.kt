@@ -44,6 +44,13 @@ class SavingsController(
     private var stocksFundsController: Any? = null
     private var bondsController: Any? = null
 
+    override fun onActionsChanged(callback: () -> Unit) {
+        stocksFundsTab.tabPane
+            ?.selectionModel
+            ?.selectedItemProperty()
+            ?.addListener { _, _, _ -> callback() }
+    }
+
     override fun screenActions(): List<RowAction> {
         val provider =
             when {

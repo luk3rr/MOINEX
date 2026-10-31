@@ -5,4 +5,9 @@ package org.moinex.common.ui
  */
 interface ScreenActionProvider {
     fun screenActions(): List<RowAction>
+
+    /**
+     * Calls [callback] whenever the actions may have changed, for example when the selected tab changes.
+     */
+    fun onActionsChanged(callback: () -> Unit) {}
 }

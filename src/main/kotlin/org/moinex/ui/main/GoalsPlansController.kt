@@ -31,6 +31,13 @@ class GoalsPlansController(
     private var goalController: Any? = null
     private var wishlistController: Any? = null
 
+    override fun onActionsChanged(callback: () -> Unit) {
+        goalsTab.tabPane
+            ?.selectionModel
+            ?.selectedItemProperty()
+            ?.addListener { _, _, _ -> callback() }
+    }
+
     override fun screenActions(): List<RowAction> {
         val provider =
             when {
