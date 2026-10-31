@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import atlantafx.base.controls.SegmentedControl?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -82,7 +83,7 @@
                                           <Label fx:id="moneyFlowTitle" styleClass="title" text="%transaction.moneyFlowByCategory.title" HBox.hgrow="ALWAYS" />
                                           <AnchorPane HBox.hgrow="ALWAYS">
                                              <children>
-                                                <ComboBox fx:id="moneyFlowComboBox" minWidth="150.0" AnchorPane.rightAnchor="0.0" />
+                                                <SegmentedControl fx:id="moneyFlowSegment" styleClass="filter-segment" AnchorPane.rightAnchor="0.0" />
                                              </children>
                                           </AnchorPane>
                                        </children>
@@ -119,7 +120,7 @@
                                                                               <Font size="10.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <ComboBox fx:id="transactionsTypeComboBox" minWidth="150.0" />
+                                                                        <SegmentedControl fx:id="transactionsTypeSegment" styleClass="filter-segment" />
                                                                      </children>
                                                                   </VBox>
                                                                   <VBox alignment="CENTER">

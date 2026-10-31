@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
+<?import atlantafx.base.controls.SegmentedControl?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -106,7 +107,7 @@
                                              <children>
                                                 <VBox alignment="BOTTOM_RIGHT" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
-                                                      <HBox fx:id="goalsFilterGroup" alignment="CENTER_RIGHT" maxWidth="200.0" spacing="10.0">
+                                                      <HBox fx:id="goalsFilterGroup" alignment="CENTER_RIGHT" spacing="10.0">
                                                          <children>
                                                             <VBox alignment="CENTER">
                                                                <children>
@@ -115,7 +116,7 @@
                                                                         <Font size="10.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <ComboBox fx:id="statusComboBox" minWidth="200.0" prefWidth="200.0" maxWidth="200.0" />
+                                                                  <SegmentedControl fx:id="statusSegment" styleClass="filter-segment" minHeight="40.0" prefHeight="40.0" />
                                                                </children>
                                                             </VBox>
                                                          </children>

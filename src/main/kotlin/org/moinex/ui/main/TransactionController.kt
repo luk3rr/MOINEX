@@ -8,6 +8,7 @@
 
 package org.moinex.ui.main
 
+import atlantafx.base.controls.SegmentedControl
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
@@ -38,6 +39,7 @@ import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.ui.ScreenActionProvider
+import org.moinex.common.ui.SegmentedFilter
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -92,10 +94,14 @@ class TransactionController(
     private lateinit var yearResumeComboBox: ComboBox<Year>
 
     @FXML
-    private lateinit var moneyFlowComboBox: ComboBox<WalletTransactionType>
+    private lateinit var moneyFlowSegment: SegmentedControl
+
+    private lateinit var moneyFlowFilter: SegmentedFilter<WalletTransactionType>
 
     @FXML
-    private lateinit var transactionsTypeComboBox: ComboBox<WalletTransactionType?>
+    private lateinit var transactionsTypeSegment: SegmentedControl
+
+    private lateinit var transactionsTypeFilter: SegmentedFilter<WalletTransactionType?>
 
     @FXML
     private lateinit var transactionsEndDatePicker: DatePicker
@@ -160,7 +166,7 @@ class TransactionController(
 
         populateMonthYearResumeComboBoxes()
         populateYearComboBox()
-        populateTransactionTypeComboBox()
+        populateTransactionTypeFilters()
 
         UIUtils.setDatePickerFormat(transactionsStartDatePicker)
         UIUtils.setDatePickerFormat(transactionsEndDatePicker)
@@ -170,8 +176,6 @@ class TransactionController(
         monthYearResumeYearComboBox.value = Year.of(currentDate.year)
         monthYearResumeMonthComboBox.value = currentDate.month
         yearResumeComboBox.value = Year.of(currentDate.year)
-        moneyFlowComboBox.value = WalletTransactionType.EXPENSE
-        transactionsTypeComboBox.value = null
 
         val startDate = currentDate.minusDays(DAYS_BEFORE_OFFSET.toLong())
         val lastDayOfMonth =
@@ -190,8 +194,8 @@ class TransactionController(
         monthYearResumeYearComboBox.setOnAction { updateMonthYearResume() }
         monthYearResumeMonthComboBox.setOnAction { updateMonthYearResume() }
         yearResumeComboBox.setOnAction { updateYearResume() }
-        moneyFlowComboBox.setOnAction { updateMoneyFlow() }
-        transactionsTypeComboBox.setOnAction { updateTransactionTableView() }
+        moneyFlowFilter.onChange { updateMoneyFlow() }
+        transactionsTypeFilter.onChange { updateTransactionTableView() }
         transactionsStartDatePicker.setOnAction { updateTransactionTableView() }
         transactionsEndDatePicker.setOnAction { updateTransactionTableView() }
         transactionsSearchField.textProperty().addListener { _, _, _ -> updateTransactionTableView() }
@@ -426,7 +430,7 @@ class TransactionController(
 
     private fun updateTransactionTableView() {
         val similarTextOrId = transactionsSearchField.text.lowercase()
-        val selectedWalletTransactionType = transactionsTypeComboBox.value
+        val selectedWalletTransactionType = transactionsTypeFilter.value
 
         val startDate = transactionsStartDatePicker.value.atStartOfDay()
         val endDate = transactionsEndDatePicker.value.atEndOfDay()
@@ -469,7 +473,7 @@ class TransactionController(
     }
 
     private fun updateMoneyFlow() {
-        val selectedWalletTransactionType = moneyFlowComboBox.value
+        val selectedWalletTransactionType = moneyFlowFilter.value
 
         val categoryAxis = CategoryAxis()
         val numberAxis = NumberAxis()
@@ -693,61 +697,29 @@ class TransactionController(
             }
     }
 
-    private fun populateTransactionTypeComboBox() {
-        val walletTransactionTypes =
-            FXCollections.observableArrayList(WalletTransactionType.entries)
-
-        moneyFlowComboBox.items = walletTransactionTypes
-
-        val walletTransactionTypesWithNull =
-            FXCollections.observableArrayList(
-                WalletTransactionType.entries,
+    private fun populateTransactionTypeFilters() {
+        moneyFlowFilter =
+            SegmentedFilter(
+                moneyFlowSegment,
+                listOf(
+                    preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_EXPENSES) to
+                        WalletTransactionType.EXPENSE,
+                    preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOMES) to
+                        WalletTransactionType.INCOME,
+                ),
             )
-        walletTransactionTypesWithNull.addFirst(null)
 
-        transactionsTypeComboBox.items = walletTransactionTypesWithNull
-
-        moneyFlowComboBox.converter =
-            object : StringConverter<WalletTransactionType>() {
-                override fun toString(walletTransactionType: WalletTransactionType?): String =
-                    when (walletTransactionType) {
-                        null -> ""
-                        WalletTransactionType.EXPENSE ->
-                            preferencesService.translate(
-                                TranslationKeys.TRANSACTION_TYPE_EXPENSES,
-                            )
-
-                        WalletTransactionType.INCOME ->
-                            preferencesService.translate(
-                                TranslationKeys.TRANSACTION_TYPE_INCOMES,
-                            )
-                    }
-
-                override fun fromString(string: String): WalletTransactionType? = null
-            }
-
-        transactionsTypeComboBox.converter =
-            object : StringConverter<WalletTransactionType?>() {
-                override fun toString(walletTransactionType: WalletTransactionType?): String =
-                    when (walletTransactionType) {
-                        null ->
-                            preferencesService.translate(
-                                TranslationKeys.TRANSACTION_FILTER_ALL,
-                            )
-
-                        WalletTransactionType.EXPENSE ->
-                            preferencesService.translate(
-                                TranslationKeys.TRANSACTION_TYPE_EXPENSES,
-                            )
-
-                        WalletTransactionType.INCOME ->
-                            preferencesService.translate(
-                                TranslationKeys.TRANSACTION_TYPE_INCOMES,
-                            )
-                    }
-
-                override fun fromString(string: String): WalletTransactionType? = null
-            }
+        transactionsTypeFilter =
+            SegmentedFilter(
+                transactionsTypeSegment,
+                listOf(
+                    preferencesService.translate(TranslationKeys.TRANSACTION_FILTER_ALL) to null,
+                    preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_EXPENSES) to
+                        WalletTransactionType.EXPENSE,
+                    preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOMES) to
+                        WalletTransactionType.INCOME,
+                ),
+            )
     }
 
     private fun populateMonthYearResumeComboBoxes() {

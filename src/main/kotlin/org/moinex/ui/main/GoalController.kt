@@ -8,6 +8,7 @@
 
 package org.moinex.ui.main
 
+import atlantafx.base.controls.SegmentedControl
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
@@ -15,7 +16,6 @@ import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.Button
-import javafx.scene.control.ComboBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
@@ -31,6 +31,7 @@ import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.ui.ScreenActionProvider
+import org.moinex.common.ui.SegmentedFilter
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.goal.Goal
@@ -86,7 +87,9 @@ class GoalController(
     private lateinit var goalTableView: TableView<Goal>
 
     @FXML
-    private lateinit var statusComboBox: ComboBox<String>
+    private lateinit var statusSegment: SegmentedControl
+
+    private lateinit var statusFilter: SegmentedFilter<String>
 
     @FXML
     private lateinit var goalSearchField: TextField
@@ -126,7 +129,7 @@ class GoalController(
         goalSearchField.prefWidthProperty().bind(searchWidth)
         goalSearchField.minWidthProperty().bind(searchWidth)
         goalSearchField.maxWidthProperty().bind(searchWidth)
-        populateStatusComboBox()
+        populateStatusFilter()
         configureTableView()
         loadGoalsFromDatabase()
 
@@ -134,7 +137,7 @@ class GoalController(
         updateDisplayAccomplishedGoals()
         updateGoalTableView()
 
-        statusComboBox.setOnAction { updateGoalTableView() }
+        statusFilter.onChange { updateGoalTableView() }
         goalSearchField.textProperty().addListener { _, _, _ -> updateGoalTableView() }
 
         setButtonsActions()
@@ -450,7 +453,7 @@ class GoalController(
 
     private fun updateGoalTableView() {
         val searchText = goalSearchField.text
-        val selectedGoalStatus = statusComboBox.selectionModel.selectedItem
+        val selectedGoalStatus = statusFilter.value
 
         goalTableView.items.clear()
 
@@ -744,13 +747,14 @@ class GoalController(
             }
         }
 
-    private fun populateStatusComboBox() {
-        statusComboBox.items.addAll(
-            preferencesService.translate(TranslationKeys.GOAL_FILTER_ALL),
-            preferencesService.translate(TranslationKeys.GOAL_FILTER_ACTIVE),
-            preferencesService.translate(TranslationKeys.GOAL_FILTER_COMPLETED),
-            preferencesService.translate(TranslationKeys.GOAL_FILTER_ARCHIVED),
-        )
-        statusComboBox.selectionModel.selectFirst()
+    private fun populateStatusFilter() {
+        val statuses =
+            listOf(
+                TranslationKeys.GOAL_FILTER_ALL,
+                TranslationKeys.GOAL_FILTER_ACTIVE,
+                TranslationKeys.GOAL_FILTER_COMPLETED,
+                TranslationKeys.GOAL_FILTER_ARCHIVED,
+            ).map { key -> preferencesService.translate(key) }
+        statusFilter = SegmentedFilter(statusSegment, statuses.map { it to it })
     }
 }
