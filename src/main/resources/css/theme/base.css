@@ -119,3 +119,19 @@
 .filter-control {
   -fx-pref-height: 34px;
 }
+
+/* ── Period navigation: arrows that frame a label (e.g. ‹ Oct/26 ›) ──────── */
+.button.period-nav {
+  -fx-background-color: transparent;
+  -fx-background-insets: 0;
+  -fx-background-radius: 6px;
+  -fx-padding: 4px 10px;
+}
+
+.button.period-nav:hover {
+  -fx-background-color: theme-bg-card-alt;
+}
+
+.button.period-nav:disabled {
+  -fx-opacity: 0.35;
+}

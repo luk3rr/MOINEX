@@ -5,6 +5,8 @@
  */
 
 .ai-disclaimer {
+  -fx-border-color: transparent transparent transparent theme-warning;
+  -fx-border-width: 0 0 0 3px;
   -fx-font-size: 11px;
   -fx-text-fill: theme-badge-warning-text;
   -fx-background-color: theme-badge-warning-bg;

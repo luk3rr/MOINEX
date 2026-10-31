@@ -87,7 +87,7 @@
                                     </TableView>
                                     <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="NEVER">
                                        <children>
-                                          <Button onAction="#handleTablePrevMonth">
+                                          <Button styleClass="period-nav" onAction="#handleTablePrevMonth">
                                              <graphic>
                                                 <FontIcon iconLiteral="mdal-arrow_back" styleClass="app-icon, icon-size-20" />
                                              </graphic>
@@ -99,7 +99,7 @@
                                              </font>
                                           </Label>
                                           <Region prefWidth="20.0" />
-                                          <Button onAction="#handleTableNextMonth">
+                                          <Button styleClass="period-nav" onAction="#handleTableNextMonth">
                                              <graphic>
                                                 <FontIcon iconLiteral="mdal-arrow_forward" styleClass="app-icon, icon-size-20" />
                                              </graphic>

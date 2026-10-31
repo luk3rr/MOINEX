@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -56,7 +57,11 @@
                   <VBox styleClass="card" spacing="10.0">
                       <children>
                       <Label text="%settings.ai.sectionTitle" style="-fx-font-weight: bold;" />
-                      <Label text="%settings.ai.disclaimer" wrapText="true" maxWidth="520.0" styleClass="ai-disclaimer" />
+                      <Label text="%settings.ai.disclaimer" wrapText="true" maxWidth="520.0" styleClass="ai-disclaimer">
+   <graphic>
+      <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-16" />
+   </graphic>
+</Label>
                       <Label text="%settings.ai.provider" />
                       <HBox spacing="10.0" alignment="CENTER_LEFT">
                          <children>
