@@ -30,8 +30,8 @@ buildNumber.properties
 
 # AI-DLC: versioned knowledge and plans, local logs
 !.aidlc/**/*.md
-.aidlc/**/state.md
 .aidlc/**/audit.md
+.aidlc/**/mockups/
 .aidlc/**/archive/
 .aidlc/**/screenshots/
 

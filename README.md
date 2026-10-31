@@ -14,30 +14,12 @@ MOINEX é uma aplicação de gestão financeira pessoal que permite aos utilizad
 suas transações financeiras. A aplicação possibilita a categorização de receitas e despesas, o cálculo de balanços
 mensais e a exibição de gráficos, proporcionando uma visão clara da saúde financeira de forma intuitiva.
 
-![Main Screen](./docs/img/screenshots/home.png)
-
-### Mais Capturas de Tela
-
-<details>
-<summary>Clique para ver mais imagens da aplicação</summary>
-
-#### Carteiras
-![Wallet](./docs/img/screenshots/wallet.png)
-
-#### Cartão de Crédito
-![Credit Card](./docs/img/screenshots/credit_card.png)
-
-#### Gestão de Transações
-![Transactions](./docs/img/screenshots/transactions.png)
-
-#### Metas
-![Goals](./docs/img/screenshots/goals.png)
-
-#### Investimentos
-![Savings](./docs/img/screenshots/savings.png)
-
-
-</details>
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/img/screenshots/home-dark.png">
+  <img src="./docs/img/screenshots/home-light.png" alt="Tela inicial do Moinex" width="800">
+</picture>
+</p>
 
 ## Funcionalidades Principais
 
