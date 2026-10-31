@@ -136,6 +136,14 @@ tasks.withType<Test> {
 			.coerceAtLeast(1)
 }
 
+tasks.named<ProcessResources>("processResources") {
+	val appVersion = project.version.toString()
+	inputs.property("appVersion", appVersion)
+	filesMatching("version.properties") {
+		expand("appVersion" to appVersion)
+	}
+}
+
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 	archiveFileName.set("moinex.jar")
 	mainClass.set("org.moinex.app.AppKt")

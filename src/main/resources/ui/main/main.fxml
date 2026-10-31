@@ -142,11 +142,12 @@
             <VBox HBox.hgrow="ALWAYS">
                <children>
                      <AnchorPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
-                  <HBox fx:id="footbarArea" alignment="CENTER_RIGHT" minHeight="40.0" prefHeight="40.0" spacing="10.0">
+                  <HBox fx:id="footbarArea" alignment="CENTER_RIGHT" minHeight="32.0" prefHeight="32.0" spacing="10.0">
                      <VBox.margin>
-                        <Insets bottom="10.0" />
+                        <Insets bottom="4.0" />
                      </VBox.margin>
                      <children>
+                        <Label fx:id="versionLabel" styleClass="footer-version" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button onAction="#handleOpenSearch" styleClass="search-hint-button" text="%main.search.hint">
                            <font>

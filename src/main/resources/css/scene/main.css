@@ -157,3 +157,9 @@
   -fx-text-fill: theme-text-secondary;
 }
 
+.footer-version {
+  -fx-font-size: 10px;
+  -fx-text-fill: theme-text-secondary;
+  -fx-opacity: 0.7;
+}
+

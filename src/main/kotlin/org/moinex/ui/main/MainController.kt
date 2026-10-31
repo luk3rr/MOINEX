@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.io.IOException
+import java.util.Properties
 import kotlin.math.abs
 
 @Controller
@@ -118,6 +119,9 @@ class MainController(
     @FXML
     private lateinit var unreadBadge: Label
 
+    @FXML
+    private lateinit var versionLabel: Label
+
     private var currentContent: Pair<String, String>? = null
     private var isMenuExpanded = false
     private var isNotificationPanelOpen = false
@@ -140,8 +144,15 @@ class MainController(
         private const val DRAG_THRESHOLD = 4.0
     }
 
+    private fun loadAppVersion(): String =
+        javaClass.getResourceAsStream("/version.properties")?.use { stream ->
+            Properties().apply { load(stream) }.getProperty("app.version")
+        } ?: ""
+
     @FXML
     fun initialize() {
+        versionLabel.text = "v${loadAppVersion()}"
+
         sidebarButtons =
             arrayOf(
                 menuButton,
