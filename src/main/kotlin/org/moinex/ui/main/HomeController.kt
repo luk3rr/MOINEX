@@ -191,6 +191,10 @@ class HomeController(
 
     @FXML
     fun initialize() {
+        recalculateNetWorthButton.managedProperty().bind(recalculateNetWorthButton.visibleProperty())
+        sankeyMonthComboBox.managedProperty().bind(sankeyMonthComboBox.visibleProperty())
+        sankeyYearComboBox.managedProperty().bind(sankeyYearComboBox.visibleProperty())
+        sankeyNavigator.managedProperty().bind(sankeyNavigator.visibleProperty())
         loadWalletsFromDatabase()
         loadCreditCardsFromDatabase()
         loadLastTransactionsFromDatabase()

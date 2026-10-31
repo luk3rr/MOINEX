@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import atlantafx.base.controls.SegmentedControl?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableView?>
@@ -30,7 +31,7 @@
                   <DatePicker fx:id="startDatePicker" />
                   <Label text="%annualSummary.endDate" />
                   <DatePicker fx:id="endDatePicker" />
-                  <ComboBox fx:id="modeComboBox" minWidth="150.0" />
+                  <SegmentedControl fx:id="modeSegment" styleClass="filter-segment" />
                </children>
             </HBox>
             <HBox minHeight="70.0" spacing="10.0">

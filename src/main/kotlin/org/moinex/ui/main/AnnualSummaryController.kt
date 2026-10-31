@@ -6,6 +6,7 @@
 
 package org.moinex.ui.main
 
+import atlantafx.base.controls.SegmentedControl
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -15,7 +16,6 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
-import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TableColumn
@@ -27,6 +27,7 @@ import javafx.util.StringConverter
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.SegmentedFilter
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.AnnualSummaryDTO
@@ -57,7 +58,9 @@ class AnnualSummaryController(
     private lateinit var endDatePicker: DatePicker
 
     @FXML
-    private lateinit var modeComboBox: ComboBox<String>
+    private lateinit var modeSegment: SegmentedControl
+
+    private lateinit var modeFilter: SegmentedFilter<SpendAccountingMode>
 
     @FXML
     private lateinit var totalIncomeLabel: Label
@@ -111,13 +114,16 @@ class AnnualSummaryController(
         endDatePicker.value = LocalDate.now()
         startDatePicker.value = LocalDate.now().minusMonths(11).withDayOfMonth(1)
 
-        modeComboBox.items =
-            FXCollections.observableArrayList(
-                preferencesService.translate(TranslationKeys.ANNUAL_SUMMARY_MODE_ACCRUAL),
-                preferencesService.translate(TranslationKeys.ANNUAL_SUMMARY_MODE_CASH_FLOW),
+        modeFilter =
+            SegmentedFilter(
+                modeSegment,
+                listOf(
+                    translate(TranslationKeys.ANNUAL_SUMMARY_MODE_ACCRUAL) to SpendAccountingMode.ACCRUAL,
+                    translate(TranslationKeys.ANNUAL_SUMMARY_MODE_CASH_FLOW) to SpendAccountingMode.CASH_FLOW,
+                ),
             )
-        modeComboBox.selectionModel.select(1)
-        UIUtils.addTooltipToNode(modeComboBox, translate(TranslationKeys.ANNUAL_SUMMARY_MODE_TOOLTIP))
+        modeFilter.value = SpendAccountingMode.CASH_FLOW
+        UIUtils.addTooltipToNode(modeSegment, translate(TranslationKeys.ANNUAL_SUMMARY_MODE_TOOLTIP))
 
         setupCategoryTable(expenseCategoryTable)
         setupCategoryTable(incomeCategoryTable)
@@ -125,7 +131,7 @@ class AnnualSummaryController(
 
         startDatePicker.valueProperty().addListener { _, _, _ -> updateView() }
         endDatePicker.valueProperty().addListener { _, _, _ -> updateView() }
-        modeComboBox.selectionModel.selectedIndexProperty().addListener { _, _, _ -> updateView() }
+        modeFilter.onChange { updateView() }
 
         chartPrevButton.setOnAction { showChart(currentChartIndex - 1) }
         chartNextButton.setOnAction { showChart(currentChartIndex + 1) }
@@ -154,12 +160,7 @@ class AnnualSummaryController(
         val end = endDatePicker.value ?: return
         if (end.isBefore(start)) return
 
-        val mode =
-            if (modeComboBox.selectionModel.selectedIndex == 1) {
-                SpendAccountingMode.CASH_FLOW
-            } else {
-                SpendAccountingMode.ACCRUAL
-            }
+        val mode = modeFilter.value
 
         val summary = annualSummaryService.buildSummary(start, end, mode)
 

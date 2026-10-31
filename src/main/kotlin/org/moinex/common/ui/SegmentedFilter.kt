@@ -18,7 +18,6 @@ class SegmentedFilter<T>(
         control.segments.setAll(labels)
         labels.forEach { it.toggleGroup = control.toggleGroup }
         control.toggleGroup.selectToggle(labels.first())
-        Platform.runLater { control.toggleGroup.selectToggle(labels.first()) }
     }
 
     var value: T
@@ -27,9 +26,14 @@ class SegmentedFilter<T>(
             return options[if (index < 0) 0 else index].second
         }
         set(newValue) {
-            val index = options.indexOfFirst { it.second == newValue }
-            if (index >= 0) control.toggleGroup.selectToggle(labels[index])
+            select(newValue)
+            Platform.runLater { select(newValue) }
         }
+
+    private fun select(newValue: T) {
+        val index = options.indexOfFirst { it.second == newValue }
+        if (index >= 0) control.toggleGroup.selectToggle(labels[index])
+    }
 
     fun onChange(action: () -> Unit) {
         control.toggleGroup.selectedToggleProperty().addListener { _, _, _ -> action() }
