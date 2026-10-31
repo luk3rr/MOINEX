@@ -15,7 +15,7 @@
 }
 
 #homeButton:hover {
-  -fx-background-color: theme-bg-sidebar-hover;
+  -fx-background-color: theme-bg-nav-hover;
 }
 
 #contentArea {
@@ -31,14 +31,14 @@
 }
 
 #sidebar {
-  -fx-background-color: theme-bg-sidebar;
+  -fx-background-color: theme-bg-nav;
   -fx-padding: 10px;
   -fx-spacing: 20px;
 }
 
 #sidebar Button {
   -fx-background-color: transparent;
-  -fx-text-fill: theme-on-sidebar;
+  -fx-text-fill: theme-on-nav;
   -fx-font-size: 14px;
   -fx-font-weight: bold;
   -fx-padding: 10px 15px;
@@ -50,7 +50,7 @@
 }
 
 #sidebar Button:hover {
-  -fx-background-color: theme-bg-sidebar-hover;
+  -fx-background-color: theme-bg-nav-hover;
 }
 
 /*
@@ -62,12 +62,12 @@
 */
 
 #sidebar .app-icon {
-  -fx-icon-color: theme-on-sidebar;
+  -fx-icon-color: theme-on-nav;
 }
 
 #sidebar .sidebar-button-selected {
-  -fx-background-color: theme-bg-sidebar-hover;
-  -fx-text-fill: theme-on-sidebar;
+  -fx-background-color: theme-bg-nav-hover;
+  -fx-text-fill: theme-on-nav;
 }
 
 #sidebar Button .VBox {

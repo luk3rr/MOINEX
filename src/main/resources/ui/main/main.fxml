@@ -3,6 +3,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -85,7 +87,11 @@
                   </Button>
                   <Button fx:id="savingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.savings" wrapText="true">
                      <graphic>
-                        <FontIcon iconLiteral="mdmz-money" styleClass="app-icon, icon-size-35" />
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
+                           <image>
+                              <Image url="@../../icon/sidebar/savings.png" />
+                           </image>
+                        </ImageView>
                      </graphic>
                      <VBox.margin>
                         <Insets />

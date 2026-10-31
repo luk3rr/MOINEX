@@ -15,6 +15,9 @@
     theme-bg-disabled:      #f5f5f5;
     theme-bg-sidebar:       #1abc9c;
     theme-bg-sidebar-hover: #48c9b0;
+    theme-bg-nav:           #1abc9c;
+    theme-bg-nav-hover:     #48c9b0;
+    theme-on-nav:           #1F2328;
     theme-bg-pane:          #E6E7E8;
 
     /* ── Text ────────────────────────────────────────────── */

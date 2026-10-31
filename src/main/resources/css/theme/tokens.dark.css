@@ -24,6 +24,9 @@
     theme-bg-disabled:      #44475A;
     theme-bg-sidebar:       #0a614e;
     theme-bg-sidebar-hover: #106e5b;
+    theme-bg-nav:           #40A66A;
+    theme-bg-nav-hover:     #52B77C;
+    theme-on-nav:           #1F2328;
     theme-bg-pane:          #383a52;   /* pane cards — visually distinct from base  */
 
     /* ── Text ────────────────────────────────────────────── */
