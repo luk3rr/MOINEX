@@ -115,7 +115,6 @@ class CreditCardController(
     private var crcPaneCurrentPage = 0
 
     companion object {
-        private const val SEARCH_ICON_SPACE = 25.0
         private val logger = LoggerFactory.getLogger(CreditCardController::class.java)
         private const val PROJECTED_DEBT_STYLE = "-fx-opacity: 0.75; -fx-font-style: italic;"
     }
@@ -156,7 +155,7 @@ class CreditCardController(
                 },
             ),
         )
-        val searchWidth = debtsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        val searchWidth = debtsFilterGroup.widthProperty()
         debtSearchField.prefWidthProperty().bind(searchWidth)
         debtSearchField.minWidthProperty().bind(searchWidth)
         debtSearchField.maxWidthProperty().bind(searchWidth)

@@ -102,7 +102,6 @@ class GoalController(
     private var accomplishedCurrentPage = 0
 
     companion object {
-        private const val SEARCH_ICON_SPACE = 25.0
         private val logger = LoggerFactory.getLogger(GoalController::class.java)
         private const val IN_PROGRESS_ITEMS_PER_PAGE = 2
         private const val ACCOMPLISHED_ITEMS_PER_PAGE = 2
@@ -125,7 +124,7 @@ class GoalController(
                 RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_DELETE_GOAL)) { handleDeleteGoal() },
             ),
         )
-        val searchWidth = goalsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        val searchWidth = statusSegment.widthProperty()
         goalSearchField.prefWidthProperty().bind(searchWidth)
         goalSearchField.minWidthProperty().bind(searchWidth)
         goalSearchField.maxWidthProperty().bind(searchWidth)

@@ -14,10 +14,12 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Labeled
+import javafx.scene.control.TableView
 import javafx.scene.image.ImageView
 import javafx.stage.Window
 import org.moinex.common.constant.Files
 import org.moinex.common.extension.applyIconTheme
+import org.moinex.common.ui.TableColumns
 import org.springframework.stereotype.Service
 import java.lang.ref.WeakReference
 
@@ -136,6 +138,10 @@ class ThemeService(
     ) {
         if (node is ImageView && !node.styleClass.contains(BYPASS_THEME_CHANGE_KEY_WORD)) {
             node.applyIconTheme(isDarkMode)
+        }
+
+        if (node is TableView<*>) {
+            TableColumns.centerIdHeaders(node)
         }
 
         // Labeled covers Button, MenuButton, Label, CheckBox, etc. whose graphic

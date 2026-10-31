@@ -7,6 +7,7 @@ Reaproveita `.aidlc/codekb/MOINEX/` (commit d38e3ee1 = HEAD, human-reviewed em 2
 **Baseline**: `./gradlew test` com `JAVA_HOME` = JDK 21: 1374 testes, 0 falhas, ~1 min. [src: .aidlc/codekb/MOINEX/quality-and-risks.md]
 
 **Pontos de build que a mudança toca** (lidos em 2026-10-29)
+
 | Item | Hoje | Observação |
 |---|---|---|
 | JDK | 21 (`sourceCompatibility`/`release` = 21, Kotlin `jvmTarget` = 21) | JDK 25 já instalado na máquina, é o `java` padrão | [src: build.gradle.kts:101-104,125,183] |

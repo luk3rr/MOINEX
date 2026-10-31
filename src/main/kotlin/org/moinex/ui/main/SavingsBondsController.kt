@@ -121,7 +121,7 @@ class SavingsBondsController(
                 },
             ),
         )
-        val searchWidth = bondsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        val searchWidth = bondsFilterGroup.widthProperty()
         bondsTabBondSearchField.prefWidthProperty().bind(searchWidth)
         bondsTabBondSearchField.minWidthProperty().bind(searchWidth)
         bondsTabBondSearchField.maxWidthProperty().bind(searchWidth)
@@ -492,6 +492,5 @@ class SavingsBondsController(
     }
 
     companion object {
-        private const val SEARCH_ICON_SPACE = 25.0
     }
 }

@@ -123,7 +123,6 @@ class TransactionController(
 
     companion object {
         private val logger = LoggerFactory.getLogger(TransactionController::class.java)
-        private const val SEARCH_ICON_SPACE = 25.0
         private const val DAYS_BEFORE_OFFSET = 30
     }
 
@@ -159,7 +158,7 @@ class TransactionController(
                 },
             ),
         )
-        val searchWidth = transactionsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        val searchWidth = transactionsFilterGroup.widthProperty()
         transactionsSearchField.prefWidthProperty().bind(searchWidth)
         transactionsSearchField.minWidthProperty().bind(searchWidth)
         transactionsSearchField.maxWidthProperty().bind(searchWidth)

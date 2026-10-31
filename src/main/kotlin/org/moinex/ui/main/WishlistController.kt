@@ -110,7 +110,6 @@ class WishlistController(
     companion object {
         const val WISHLIST_TIMELINE_CHART_STYLE_CLASS: String = "wishlist-timeline-chart"
         private const val STATUS_PENDING_INDEX = 1
-        private const val SEARCH_ICON_SPACE = 25.0
     }
 
     @FXML
@@ -576,7 +575,7 @@ class WishlistController(
         }
 
     private fun configureFilters() {
-        val searchWidth = filterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        val searchWidth = filterGroup.widthProperty()
         searchField.prefWidthProperty().bind(searchWidth)
         searchField.minWidthProperty().bind(searchWidth)
         searchField.maxWidthProperty().bind(searchWidth)

@@ -157,7 +157,7 @@ class SavingsStocksFundsController(
                 },
             ),
         )
-        val searchWidth = stocksFundsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        val searchWidth = stocksFundsFilterGroup.widthProperty()
         stocksFundsTabTickerSearchField.prefWidthProperty().bind(searchWidth)
         stocksFundsTabTickerSearchField.minWidthProperty().bind(searchWidth)
         stocksFundsTabTickerSearchField.maxWidthProperty().bind(searchWidth)
@@ -692,6 +692,5 @@ class SavingsStocksFundsController(
     }
 
     companion object {
-        private const val SEARCH_ICON_SPACE = 25.0
     }
 }
