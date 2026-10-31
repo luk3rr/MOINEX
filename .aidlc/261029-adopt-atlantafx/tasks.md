@@ -258,7 +258,7 @@ Covers: US-11, US-12; FR-9. Depende de: UNIT-4, UNIT-5.
 **Resumo (2026-10-30):** Metas (cards com progresso e tabela num card), Planos e FIRE (formulário à esquerda, resultado à direita) já seguiam o desenho e foram conferidos nas capturas. Wishlist: filtro de status em `SegmentedControl` (Todos, Pendentes, Comprados), título e totais em uma linha e os botões em outra, sem cortes; a busca fica abaixo dos filtros.
 
 
-### UNIT-12 Redesenho: Poupança   Status: partial
+### UNIT-12 Redesenho: Poupança   Status: verified (aguarda aprovação visual, T-12.6)
 Covers: US-13; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-12.1 Abas da Poupança (Visão geral, Ações e fundos, Bonds) no padrão do tema — covers FR-9, US-13 — files: ui/main/savings.fxml, css/scene/savings.css — test: captura das três abas
 - [ ] T-12.2 Visão geral: indicadores do Brasil e commodities em cards — covers FR-9, US-13 — files: ui/main/savings_overview.fxml — test: captura
@@ -268,9 +268,9 @@ Covers: US-13; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-12.6 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-13 — files: (saída local) — test: aprovação do usuário
 - [ ] T-12.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+**Resumo (2026-10-30):** T-12.1 a T-12.5 conferidos nas capturas dos dois temas. A Visão geral já tinha cards de indicadores, alocação, métricas e commodities no padrão do desenho; não houve mudança de layout nela. Ações e fundos e Bonds: faixa central removida, ações de linha por clique direito, botão de atualizar cotações abaixo do título. Pendência do usuário: menu de ações em Início e Resumo anual (decidido: sem ações; mudança visual depois).
 
-### UNIT-13 Redesenho: Chat de IA, Configurações e Notificações   Status: partial
+### UNIT-13 Redesenho: Chat de IA, Configurações e Notificações   Status: verified (aguarda aprovação visual, T-13.4)
 Covers: US-14; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-13.1 Chat de IA: bolhas no tema, campo fixo no rodapé e aviso como `Message` — covers FR-9, US-14 — files: ui/main/ai_chat.fxml, css/scene/ai_chat.css — test: captura e envio funcionando
 - [ ] T-13.2 Configurações: cards por seção (IA, banco de dados, idioma, meta de poupança) com ações no rodapé — covers FR-9, US-14 — files: ui/main/settings.fxml, css/scene/settings.css — test: captura e salvar funcionando
@@ -278,7 +278,7 @@ Covers: US-14; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-13.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-14 — files: (saída local) — test: aprovação do usuário
 - [ ] T-13.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+**Resumo (2026-10-30):** Chat: campo fixo no rodapé e aviso em estilo de mensagem, conferido. Configurações: seções em cards (Idioma e tema; Banco de dados; Meta de poupança; Assistente de IA). Central de notificações: lista oculta quando vazia e estado vazio dentro do painel. Pendência: aprovação visual (T-13.4).
 
 ### UNIT-14 Fechamento   Status: verified (exceto T-14.4 e T-14.8, aprovação do usuário)
 Covers: NFR-1 (final), NFR-3 (consolidado), NFR-4 (final), NFR-5 (depois), NFR-6. Depende de: UNIT-6, UNIT-7, UNIT-8 a UNIT-13.
