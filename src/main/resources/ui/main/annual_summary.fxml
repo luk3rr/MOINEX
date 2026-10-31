@@ -89,7 +89,7 @@
                   </VBox>
                </children>
             </HBox>
-            <HBox minHeight="260.0" prefHeight="300.0" spacing="10.0">
+            <HBox minHeight="220.0" prefHeight="300.0" spacing="10.0">
                <children>
                   <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                      <children>
@@ -128,7 +128,7 @@
                   </AnchorPane>
                </children>
             </HBox>
-            <HBox minHeight="260.0" prefHeight="280.0" spacing="10.0" VBox.vgrow="ALWAYS">
+            <HBox minHeight="220.0" prefHeight="280.0" spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
                   <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                      <children>
@@ -144,7 +144,7 @@
                   </AnchorPane>
                </children>
             </HBox>
-            <AnchorPane minHeight="260.0" prefHeight="280.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+            <AnchorPane minHeight="150.0" prefHeight="280.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                <children>
                   <Label styleClass="title" text="%annualSummary.topExpenses" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                   <TableView fx:id="topExpensesTable" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="45.0" />
