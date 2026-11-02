@@ -1,3 +1,9 @@
+/*
+ * Filename: SegmentedFilter.kt
+ * Created on: October 30, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.ui
 
 import atlantafx.base.controls.SegmentedControl
@@ -28,7 +34,31 @@ class SegmentedFilter<T>(
         set(newValue) {
             select(newValue)
             Platform.runLater { select(newValue) }
+            selectAgainWhenShown(newValue)
         }
+
+    /**
+     * The control builds its segments when it is first shown and that selects the first one again, which for a control
+     * inside a tab that is not selected yet happens long after the value was set. The value is selected once more then.
+     */
+    private fun selectAgainWhenShown(newValue: T) {
+        if (control.skin != null) return
+
+        val listener =
+            object : javafx.beans.value.ChangeListener<javafx.scene.control.Skin<*>?> {
+                override fun changed(
+                    observable: javafx.beans.value.ObservableValue<out javafx.scene.control.Skin<*>?>,
+                    oldValue: javafx.scene.control.Skin<*>?,
+                    skin: javafx.scene.control.Skin<*>?,
+                ) {
+                    if (skin == null) return
+
+                    control.skinProperty().removeListener(this)
+                    Platform.runLater { select(newValue) }
+                }
+            }
+        control.skinProperty().addListener(listener)
+    }
 
     private fun select(newValue: T) {
         val index = options.indexOfFirst { it.second == newValue }

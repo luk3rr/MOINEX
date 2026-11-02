@@ -1,3 +1,9 @@
+/*
+ * Filename: SearchModel.kt
+ * Created on: October 30, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.ui.common.search
 
 enum class SearchGroup(

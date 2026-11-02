@@ -1,3 +1,9 @@
+/*
+ * Filename: JsonExtesions.kt
+ * Created on: March 14, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.extension
 
 import org.json.JSONObject

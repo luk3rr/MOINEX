@@ -1,3 +1,9 @@
+/*
+ * Filename: NotificationRepository.kt
+ * Created on: April 26, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.repository
 
 import org.moinex.model.Notification

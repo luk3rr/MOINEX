@@ -1,18 +1,18 @@
 # Code KB — MOINEX
-- Repo path: /home/luk3rr/Projects/MOINEX   Remote: github.com/luk3rr/MOINEX
-- Analysed commit: 08bbf24f2029d5927de4cc58547784cb4252c73f (2026-10-29, delta pós v2.19.0)   Branch: main
+- Repo path: raiz do repositório   Remote: github.com/luk3rr/MOINEX
+- Analysed commit: c72d94af (2026-11-01, v2.20.2)   Branch: main
 - Depth: Comprehensive (todas as áreas)   Scope: src/main, src/test, resources, CI; exclui build/, .gradle/, .aidlc/
-- Last full pass: 2026-10-29   Last review with user: 2026-10-29 
+- Last full pass: 2026-10-29   Last delta: 2026-11-01 (working tree do intent fundamentals-and-portfolio-views, além de c72d94af)
 
 | File | Status | Confidence | Notes |
 |---|---|---|---|
-| overview.md | human-reviewed | medium | |
-| architecture.md | human-reviewed | medium-high | |
-| code-structure.md | human-reviewed | high | |
-| technology-stack.md | human-reviewed | high | versões do JFoenix e outras libs não conferidas |
-| data-model.md | human-reviewed | medium | relações do ER inferidas |
-| api.md | human-reviewed | medium | |
-| interactions.md | human-reviewed | medium-high | |
-| conventions.md | human-reviewed | medium-high | |
-| operations.md | human-reviewed | high | |
-| quality-and-risks.md | human-reviewed | medium-high | baseline: 1374 testes, 0 falhas |
+| overview.md | human-reviewed (2026-11-01) | medium | |
+| architecture.md | human-reviewed (2026-11-01) | medium-high | |
+| code-structure.md | draft (delta 2026-11-01, não revisado) | high | |
+| technology-stack.md | human-reviewed (2026-11-01) | high | JFoenix removido; versões não reconferidas além de AtlantaFX e Ikonli |
+| data-model.md | draft (delta 2026-11-01, não revisado) | medium | relações do ER inferidas |
+| api.md | draft (delta 2026-11-01, não revisado) | medium | |
+| interactions.md | draft (delta 2026-11-01, não revisado) | medium-high | |
+| conventions.md | human-reviewed (2026-11-01) | medium-high | |
+| operations.md | draft (delta 2026-11-01) | high | |
+| quality-and-risks.md | draft (delta 2026-11-01) | medium-high | baseline: 1551 testes, 0 falhas (2026-11-01) |

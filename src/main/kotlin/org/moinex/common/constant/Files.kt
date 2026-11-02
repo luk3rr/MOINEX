@@ -1,3 +1,9 @@
+/*
+ * Filename: Files.kt
+ * Created on: March 21, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.constant
 
 object Files {
@@ -80,6 +86,8 @@ object Files {
     const val ARCHIVED_BONDS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "archived_bonds.fxml"
     const val INVESTMENT_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "investment_transactions.fxml"
     const val FUNDAMENTAL_ANALYSIS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "fundamental_analysis.fxml"
+    const val TICKER_DETAIL_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "ticker_detail.fxml"
+    const val REBALANCE_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "rebalance.fxml"
 
     // UI wallettransaction package
     const val UI_DIALOG_WALLETTRANSACTION_PATH: String = UI_DIALOG_PATH + "wallettransaction/"
@@ -142,6 +150,7 @@ object Files {
     const val FIRE_CALCULATOR_FXML: String = UI_MAIN_PATH + "fire_calculator.fxml"
     const val SAVINGS_FXML: String = UI_MAIN_PATH + "savings.fxml"
     const val SAVINGS_OVERVIEW_FXML: String = UI_MAIN_PATH + "savings_overview.fxml"
+    const val SAVINGS_PERFORMANCE_FXML: String = UI_MAIN_PATH + "savings_performance.fxml"
     const val SAVINGS_STOCKS_FUNDS_FXML: String = UI_MAIN_PATH + "savings_stocks_funds.fxml"
     const val SAVINGS_BONDS_FXML: String = UI_MAIN_PATH + "savings_bonds.fxml"
     const val WISHLIST_FXML: String = UI_MAIN_PATH + "wishlist.fxml"
@@ -188,6 +197,7 @@ object Files {
     const val FIRE_CALCULATOR_STYLE_SHEET: String = CSS_SCENE_PATH + "fire_calculator.css"
     const val SAVINGS_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val SAVINGS_OVERVIEW_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
+    const val SAVINGS_PERFORMANCE_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val SAVINGS_STOCKS_FUNDS_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val SAVINGS_BONDS_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val WISHLIST_STYLE_SHEET: String = CSS_SCENE_PATH + "wishlist.css"
@@ -198,6 +208,9 @@ object Files {
 
     const val COMMON_STYLE_SHEET: String = CSS_COMMON_PATH + "common-styles.css"
     const val TIMELINE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "timeline-chart.css"
+    const val TICKER_PRICE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "ticker-price-chart.css"
+    const val BENCHMARK_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "benchmark-chart.css"
+    const val DIVIDEND_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "dividend-chart.css"
 
     // Notifications
     const val NOTIFICATION_CENTER_FXML: String = UI_MAIN_PATH + "notification_center.fxml"

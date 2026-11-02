@@ -152,3 +152,16 @@
   -fx-opacity: 0.35;
 }
 
+
+/* ── Info icon: the discreet "i" that holds a tooltip ──────────────────────── */
+.info-icon {
+  -fx-opacity: 0.55;
+}
+
+.info-icon:hover {
+  -fx-opacity: 1;
+}
+
+.titled-value-title {
+  -fx-font-weight: bold;
+}

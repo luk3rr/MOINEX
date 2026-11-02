@@ -29,3 +29,98 @@
 .transparent-scroll-pane {
     -fx-background-color: transparent;
 }
+
+/* Valuation and quality summary cards */
+.insight-card {
+    -fx-background-color: theme-bg-card;
+    -fx-border-color: theme-border;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.insight-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.insight-row-label {
+    -fx-text-fill: theme-text-secondary;
+}
+
+.insight-note {
+    -fx-text-fill: theme-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.insight-score {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.valuation-badge {
+    -fx-padding: 2 12 2 12;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-font-weight: bold;
+}
+
+.valuation-badge-cheap {
+    -fx-background-color: theme-positive-soft;
+    -fx-border-color: theme-positive-border;
+    -fx-text-fill: theme-positive;
+}
+
+.valuation-badge-expensive {
+    -fx-background-color: theme-negative-soft;
+    -fx-border-color: theme-negative-border;
+    -fx-text-fill: theme-negative;
+}
+
+.valuation-badge-fair {
+    -fx-background-color: theme-neutral-soft;
+    -fx-border-color: theme-neutral-border;
+    -fx-text-fill: theme-text-primary;
+}
+
+.valuation-badge-unavailable {
+    -fx-background-color: theme-neutral-soft;
+    -fx-border-color: theme-neutral-border;
+    -fx-text-fill: theme-warning;
+}
+
+/* Quality badge: same shape as the valuation one, colored by how good the score is */
+.quality-badge-weak {
+    -fx-background-color: theme-negative-soft;
+    -fx-border-color: theme-negative-border;
+    -fx-text-fill: theme-negative;
+}
+
+.quality-badge-regular {
+    -fx-background-color: theme-neutral-soft;
+    -fx-border-color: theme-warning;
+    -fx-text-fill: theme-warning;
+}
+
+.quality-badge-good {
+    -fx-background-color: theme-positive-soft;
+    -fx-border-color: theme-positive-border;
+    -fx-text-fill: theme-positive;
+}
+
+.quality-badge-excellent {
+    -fx-background-color: theme-positive;
+    -fx-border-color: theme-positive;
+    -fx-text-fill: theme-on-accent;
+}
+
+.insight-dimension-value {
+    -fx-font-weight: bold;
+}
+
+/* Metric cards look like the valuation and quality summary cards */
+.metric-card {
+    -fx-background-color: theme-bg-card;
+    -fx-background-radius: 6;
+    -fx-border-color: theme-border;
+    -fx-border-radius: 6;
+}

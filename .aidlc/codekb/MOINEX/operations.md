@@ -33,3 +33,7 @@ Tag anotada `vX.Y.Z`; `scripts/install.sh` lê as tags. Windows: workflow no Git
 
 ## Verificação proposta para o AI-DLC
 `./gradlew ktlintCheck test` (mesmo conteúdo do hook de pré-commit), mais verificação visual manual com `./gradlew bootRun`, porque não há testes de UI. [src: .githooks/pre-commit] [inferred]
+
+## Atualização 2026-11-01
+- `make demo` abre o app com dados fictícios em home temporário (`-Duser.home`), sem tocar em `~/.moinex`; `scripts/capture-screens.sh <dir>` gera PNG por tela e tema (`CAPTURE_ONLY`, `CAPTURE_LANGUAGE`). [src: Makefile:31] [src: scripts/demo.sh] [src: app/CapturePlan.kt]
+- O banco de uso real do usuário fica fora do repositório; somente leitura para qualquer trabalho do AI-DLC. [user]

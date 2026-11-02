@@ -1,0 +1,71 @@
+/* Interactive layer of the line charts: vertical line, dots, value box */
+
+.crosshair-line {
+    -fx-stroke: theme-text-secondary;
+    -fx-stroke-width: 1px;
+    -fx-stroke-dash-array: 4 3;
+}
+
+.crosshair-box {
+    -fx-background-color: theme-bg-card;
+    -fx-background-radius: 6;
+    -fx-border-color: theme-border;
+    -fx-border-radius: 6;
+    -fx-padding: 8 10 8 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0.2, 0, 2);
+}
+
+.crosshair-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: theme-text-primary;
+}
+
+.crosshair-label {
+    -fx-text-fill: theme-text-secondary;
+}
+
+.crosshair-value {
+    -fx-text-fill: theme-text-primary;
+    -fx-font-weight: bold;
+}
+
+.crosshair-note {
+    -fx-text-fill: theme-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.crosshair-dot {
+    -fx-stroke: theme-bg-card;
+    -fx-stroke-width: 2px;
+}
+
+/* One color per line; the same class paints the dot on the chart and the dot in the box */
+.crosshair-series-portfolio {
+    -fx-fill: theme-positive;
+    -fx-text-fill: theme-positive;
+}
+
+.crosshair-series-cdi {
+    -fx-fill: theme-accent-text;
+    -fx-text-fill: theme-accent-text;
+}
+
+.crosshair-series-ibovespa {
+    -fx-fill: theme-warning;
+    -fx-text-fill: theme-warning;
+}
+
+.crosshair-series-ipca {
+    -fx-fill: theme-chart-series-02;
+    -fx-text-fill: theme-chart-series-02;
+}
+
+.crosshair-series-price {
+    -fx-fill: theme-chart-series-02;
+    -fx-text-fill: theme-chart-series-02;
+}
+
+.crosshair-series-average {
+    -fx-fill: theme-warning;
+    -fx-text-fill: theme-warning;
+}

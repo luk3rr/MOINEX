@@ -18,6 +18,7 @@ import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.MarketIndicatorService
 import org.moinex.service.investment.MarketService
+import org.moinex.service.investment.PerformanceBenchmarkService
 import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
@@ -32,6 +33,7 @@ class AppStartupRunner(
     private val recurringTransactionService: RecurringTransactionService,
     private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val tickerPriceHistoryService: TickerPriceHistoryService,
+    private val performanceBenchmarkService: PerformanceBenchmarkService,
     private val tickerService: TickerService,
     private val investmentPerformanceService: InvestmentPerformanceService,
     private val marketIndicatorService: MarketIndicatorService,
@@ -107,6 +109,8 @@ class AppStartupRunner(
                 async {
                     runStep("Initializing price history") {
                         tickerPriceHistoryService.initializePriceHistory()
+                        tickerPriceHistoryService.syncDailyPriceHistory()
+                        performanceBenchmarkService.refreshBenchmarks()
                     }
                 }
 

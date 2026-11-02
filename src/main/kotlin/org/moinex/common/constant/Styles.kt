@@ -1,3 +1,9 @@
+/*
+ * Filename: Styles.kt
+ * Created on: March 21, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.constant
 
 object Styles {

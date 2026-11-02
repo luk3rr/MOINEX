@@ -7,6 +7,7 @@
 package org.moinex.app
 
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.service.PreferencesService
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -17,6 +18,12 @@ enum class CaptureKind {
     SEARCH,
     DIALOG,
     ALERT,
+    FUNDAMENTAL,
+    FUNDAMENTAL_FUND,
+    TICKER_DETAIL,
+    REBALANCE,
+    TAB,
+    BOND_HISTORY,
 }
 
 /**
@@ -30,6 +37,7 @@ data class CaptureTarget(
     val fxml: String,
     val styleSheet: String? = null,
     val settleMillis: Long = CapturePlan.DEFAULT_SETTLE_MILLIS,
+    val detail: String? = null,
 )
 
 /**
@@ -43,6 +51,9 @@ object CapturePlan {
     const val WINDOW_HEIGHT = 900.0
     const val DEFAULT_SETTLE_MILLIS = 2500L
     const val HEAVY_SETTLE_MILLIS = 4000L
+    const val SAVINGS_PERFORMANCE_TAB_INDEX = "1"
+    const val HOVER_SUFFIX = ":hover"
+    const val INCOME_TAB = ":income"
 
     val themes: List<String> = listOf(PreferencesService.THEME_LIGHT, PreferencesService.THEME_DARK)
 
@@ -77,6 +88,76 @@ object CapturePlan {
             CaptureTarget(16, "dialog-add-expense-error", CaptureKind.DIALOG, Files.ADD_EXPENSE_FXML),
             CaptureTarget(17, "search", CaptureKind.SEARCH, Files.HOME_FXML, Files.HOME_STYLE_SHEET),
             CaptureTarget(18, "alert-confirm", CaptureKind.ALERT, ""),
+            CaptureTarget(
+                19,
+                "fundamental-valuation",
+                CaptureKind.FUNDAMENTAL,
+                Files.FUNDAMENTAL_ANALYSIS_FXML,
+                detail = TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_VALUATION,
+            ),
+            CaptureTarget(
+                20,
+                "fundamental-growth",
+                CaptureKind.FUNDAMENTAL,
+                Files.FUNDAMENTAL_ANALYSIS_FXML,
+                detail = TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_GROWTH,
+            ),
+            CaptureTarget(
+                21,
+                "fundamental-profitability",
+                CaptureKind.FUNDAMENTAL,
+                Files.FUNDAMENTAL_ANALYSIS_FXML,
+                detail = TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_PROFITABILITY,
+            ),
+            CaptureTarget(
+                22,
+                "fundamental-fund-income",
+                CaptureKind.FUNDAMENTAL_FUND,
+                Files.FUNDAMENTAL_ANALYSIS_FXML,
+                detail = TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_INCOME,
+            ),
+            CaptureTarget(23, "ticker-detail", CaptureKind.TICKER_DETAIL, Files.TICKER_DETAIL_FXML),
+            screen(
+                24,
+                "savings-performance",
+                Files.SAVINGS_PERFORMANCE_FXML,
+                Files.SAVINGS_PERFORMANCE_STYLE_SHEET,
+                heavy = true,
+            ),
+            CaptureTarget(25, "rebalance-dialog", CaptureKind.REBALANCE, Files.REBALANCE_FXML),
+            CaptureTarget(
+                26,
+                "savings-performance-tab",
+                CaptureKind.TAB,
+                Files.SAVINGS_FXML,
+                Files.SAVINGS_STYLE_SHEET,
+                HEAVY_SETTLE_MILLIS,
+                detail = SAVINGS_PERFORMANCE_TAB_INDEX,
+            ),
+            CaptureTarget(
+                27,
+                "savings-performance-hover",
+                CaptureKind.TAB,
+                Files.SAVINGS_FXML,
+                Files.SAVINGS_STYLE_SHEET,
+                HEAVY_SETTLE_MILLIS,
+                detail = SAVINGS_PERFORMANCE_TAB_INDEX + HOVER_SUFFIX,
+            ),
+            CaptureTarget(
+                28,
+                "ticker-detail-hover",
+                CaptureKind.TICKER_DETAIL,
+                Files.TICKER_DETAIL_FXML,
+                detail = HOVER_SUFFIX,
+            ),
+            CaptureTarget(29, "bond-interest-history", CaptureKind.BOND_HISTORY, Files.BOND_INTEREST_HISTORY_FXML),
+            CaptureTarget(
+                30,
+                "ticker-detail-income",
+                CaptureKind.TICKER_DETAIL,
+                Files.TICKER_DETAIL_FXML,
+                detail = INCOME_TAB,
+            ),
         )
 
     /**

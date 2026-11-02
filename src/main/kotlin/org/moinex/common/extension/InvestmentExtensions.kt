@@ -1,3 +1,9 @@
+/*
+ * Filename: InvestmentExtensions.kt
+ * Created on: March 13, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.extension
 
 import org.moinex.model.dto.BondOperationStateDTO

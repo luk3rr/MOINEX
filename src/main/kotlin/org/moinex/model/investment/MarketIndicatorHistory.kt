@@ -43,11 +43,5 @@ class MarketIndicatorHistory(
     @Convert(converter = LocalDateTimeStringConverter::class)
     var createdAt: LocalDateTime,
 ) {
-    init {
-        require(rateValue >= BigDecimal.ZERO) {
-            "Rate value must be non-negative"
-        }
-    }
-
     override fun toString(): String = "MarketIndicatorHistory [id=$id, type=$indicatorType, date=$referenceDate]"
 }

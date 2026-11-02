@@ -1,3 +1,9 @@
+/*
+ * Filename: SearchActionCatalog.kt
+ * Created on: October 30, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.ui.common.search
 
 import org.moinex.common.ui.Icons
@@ -43,7 +49,7 @@ enum class SearchScreen {
 enum class SearchEntry { EXPENSE, INCOME, TRANSFER }
 
 /**
- * The 23 actions of the global search: screens, tabs, new entries and app commands.
+ * The 24 actions of the global search: screens, tabs, new entries and app commands.
  */
 class SearchActionCatalog(
     private val host: SearchHost,
@@ -64,6 +70,7 @@ class SearchActionCatalog(
             tab("tab.fire", Icons.PROFIT, SearchScreen.GOALS_PLANS, FIRE_TAB),
             tab("tab.wishlist", Icons.PURCHASED, SearchScreen.GOALS_PLANS, WISHLIST_TAB),
             tab("tab.savingsOverview", Icons.SIDEBAR_SAVINGS, SearchScreen.SAVINGS, OVERVIEW_TAB),
+            tab("tab.savingsPerformance", Icons.PROFIT, SearchScreen.SAVINGS, PERFORMANCE_TAB),
             tab("tab.stocksFunds", Icons.WALLET_TYPE_BROKER, SearchScreen.SAVINGS, STOCKS_FUNDS_TAB),
             tab("tab.bonds", Icons.COIN, SearchScreen.SAVINGS, BONDS_TAB),
             entry("entry.expense", Icons.EXPENSE, SearchEntry.EXPENSE),
@@ -112,7 +119,8 @@ class SearchActionCatalog(
         const val WISHLIST_TAB = 2
         const val FIRE_TAB = 3
         const val OVERVIEW_TAB = 0
-        const val STOCKS_FUNDS_TAB = 1
-        const val BONDS_TAB = 2
+        const val PERFORMANCE_TAB = 1
+        const val STOCKS_FUNDS_TAB = 2
+        const val BONDS_TAB = 3
     }
 }

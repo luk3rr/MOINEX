@@ -1,3 +1,9 @@
+/*
+ * Filename: BigDecimalExtensions.kt
+ * Created on: March 3, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.extension
 
 import java.math.BigDecimal

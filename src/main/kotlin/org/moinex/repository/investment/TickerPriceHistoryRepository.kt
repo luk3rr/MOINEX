@@ -8,6 +8,7 @@
 
 package org.moinex.repository.investment
 
+import org.moinex.model.dto.DailyPricePointDTO
 import org.moinex.model.investment.TickerPriceHistory
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -75,4 +76,55 @@ interface TickerPriceHistoryRepository : JpaRepository<TickerPriceHistory, Int> 
         @Param("tickerId") tickerId: Int,
         @Param("priceDate") priceDate: LocalDate,
     ): Boolean
+
+    @Query(
+        "SELECT ph " +
+            "FROM TickerPriceHistory ph " +
+            "WHERE ph.ticker.id = :tickerId " +
+            "ORDER BY ph.priceDate DESC LIMIT 1",
+    )
+    fun findLatestPriceByTicker(
+        @Param("tickerId") tickerId: Int,
+    ): TickerPriceHistory?
+
+    @Query(
+        "SELECT COUNT(ph) " +
+            "FROM TickerPriceHistory ph " +
+            "WHERE ph.ticker.id = :tickerId " +
+            "AND ph.priceDate >= :startDate " +
+            "AND ph.priceDate <= :endDate",
+    )
+    fun countByTickerIdAndDateRange(
+        @Param("tickerId") tickerId: Int,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
+    ): Long
+
+    @Query(
+        "SELECT ph " +
+            "FROM TickerPriceHistory ph " +
+            "WHERE ph.ticker.id = :tickerId " +
+            "AND ph.priceDate >= :startDate " +
+            "AND ph.priceDate <= :endDate " +
+            "ORDER BY ph.priceDate ASC",
+    )
+    fun findByTickerIdAndDateRange(
+        @Param("tickerId") tickerId: Int,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
+    ): List<TickerPriceHistory>
+
+    @Query(
+        "SELECT new org.moinex.model.dto.DailyPricePointDTO(ph.ticker.id, ph.priceDate, ph.closingPrice) " +
+            "FROM TickerPriceHistory ph " +
+            "WHERE ph.ticker.id IN :tickerIds " +
+            "AND ph.priceDate >= :startDate " +
+            "AND ph.priceDate <= :endDate " +
+            "ORDER BY ph.ticker.id ASC, ph.priceDate ASC",
+    )
+    fun findPricePointsByTickerIdsAndDateRange(
+        @Param("tickerIds") tickerIds: Collection<Int>,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
+    ): List<DailyPricePointDTO>
 }

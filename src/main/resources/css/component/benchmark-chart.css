@@ -1,0 +1,43 @@
+/* Benchmark chart: series 0 = portfolio, 1 = CDI, 2 = Ibovespa, 3 = IPCA */
+
+.benchmark-chart .chart-series-line.default-color0 {
+    -fx-stroke: theme-positive;
+    -fx-stroke-width: 3px;
+}
+
+.benchmark-chart .chart-series-line.default-color1 {
+    -fx-stroke: theme-accent-text;
+    -fx-stroke-width: 2px;
+}
+
+.benchmark-chart .chart-series-line.default-color2 {
+    -fx-stroke: theme-warning;
+    -fx-stroke-width: 2px;
+}
+
+.benchmark-chart .chart-series-line.default-color3 {
+    -fx-stroke: theme-chart-series-02;
+    -fx-stroke-width: 2px;
+    -fx-stroke-dash-array: 4 3;
+}
+
+.benchmark-chart .chart-line-symbol {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.benchmark-legend-portfolio {
+    -fx-text-fill: theme-positive;
+}
+
+.benchmark-legend-cdi {
+    -fx-text-fill: theme-accent-text;
+}
+
+.benchmark-legend-ibovespa {
+    -fx-text-fill: theme-warning;
+}
+
+.benchmark-legend-ipca {
+    -fx-text-fill: theme-chart-series-02;
+}

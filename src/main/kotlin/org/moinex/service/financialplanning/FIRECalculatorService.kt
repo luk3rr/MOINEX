@@ -1,3 +1,9 @@
+/*
+ * Filename: FIRECalculatorService.kt
+ * Created on: April 26, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.service.financialplanning
 
 import org.moinex.common.ClockProvider

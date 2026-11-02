@@ -117,11 +117,20 @@
                                           <Insets left="10.0" top="10.0" />
                                        </padding>
                                     </Label>
-                                    <Button onAction="#handleEditInvestmentTarget" text="%investment.button.editInvestmentTarget" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <graphic>
-                                          <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
-                                       </graphic>
-                                    </Button>
+                                    <HBox alignment="CENTER_RIGHT" spacing="8.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <Button fx:id="rebalanceButton" onAction="#handleRebalance" text="%savings.rebalance.button">
+                                             <graphic>
+                                                <FontIcon iconLiteral="mdmz-sync" styleClass="app-icon, icon-size-20" />
+                                             </graphic>
+                                          </Button>
+                                          <Button onAction="#handleEditInvestmentTarget" text="%investment.button.editInvestmentTarget">
+                                             <graphic>
+                                                <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
+                                             </graphic>
+                                          </Button>
+                                       </children>
+                                    </HBox>
                                     <HBox fx:id="portfolioP5" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
                                  </children>
                               </AnchorPane>

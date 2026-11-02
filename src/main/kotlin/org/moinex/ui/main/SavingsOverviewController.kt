@@ -56,9 +56,11 @@ import org.moinex.service.investment.BondService
 import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.InvestmentTargetService
 import org.moinex.service.investment.MarketService
+import org.moinex.service.investment.PortfolioAnalyticsService
 import org.moinex.service.investment.TickerService
 import org.moinex.ui.common.ProfitabilityMetricsPaneController
 import org.moinex.ui.dialog.investment.update.EditInvestmentTargetController
+import org.moinex.ui.dialog.investment.view.RebalanceController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -77,6 +79,7 @@ class SavingsOverviewController(
     private val bondService: BondService,
     private val investmentPerformanceService: InvestmentPerformanceService,
     private val chartFactory: ChartFactory,
+    private val portfolioAnalyticsService: PortfolioAnalyticsService,
 ) {
     @FXML
     private lateinit var overviewTotalInvestedLabel: Text
@@ -178,6 +181,9 @@ class SavingsOverviewController(
     private lateinit var portfolioP5: HBox
 
     @FXML
+    private lateinit var rebalanceButton: Button
+
+    @FXML
     private lateinit var profitabilityMetricsPaneController: ProfitabilityMetricsPaneController
 
     private lateinit var tickers: List<Ticker>
@@ -244,6 +250,19 @@ class SavingsOverviewController(
             overviewTotalValueLabel,
             overviewTabTotalValueField,
         ).forEach { it.fill = color }
+    }
+
+    @FXML
+    fun handleRebalance() {
+        val allocations = calculateAllocationVsTarget()
+
+        WindowUtils.openModalWindow(
+            Files.REBALANCE_FXML,
+            preferencesService.translate(TranslationKeys.SAVINGS_REBALANCE_TITLE),
+            springContext,
+            { controller: RebalanceController -> controller.setAllocations(allocations) },
+            emptyList(),
+        )
     }
 
     @FXML
@@ -897,33 +916,7 @@ class SavingsOverviewController(
     private fun calculateTopPerformers(
         best: Boolean,
         limit: Int = TOP_PERFORMERS_LIMIT,
-    ): List<TickerPerformanceDTO> {
-        loadTickersFromDatabase()
-
-        return tickers
-            .filter { it.currentQuantity > BigDecimal.ZERO }
-            .map { t ->
-                val invested = t.averageUnitValue.multiply(t.currentQuantity)
-                val current = t.currentQuantity.multiply(t.currentUnitValue)
-                val profitLoss = current.subtract(invested)
-                val percentage =
-                    if (invested > BigDecimal.ZERO) {
-                        profitLoss
-                            .divide(invested, 4, RoundingMode.HALF_UP)
-                            .multiply(BigDecimal(HUNDRED))
-                    } else {
-                        BigDecimal.ZERO
-                    }
-
-                TickerPerformanceDTO(t.name, t.symbol, percentage, profitLoss, current)
-            }.sortedWith(
-                if (best) {
-                    compareByDescending { it.profitLossPercentage }
-                } else {
-                    compareBy { it.profitLossPercentage }
-                },
-            ).take(limit)
-    }
+    ): List<TickerPerformanceDTO> = portfolioAnalyticsService.topPerformers(best, limit)
 
     private fun updateProfitabilityMetricsPanel() {
         val metrics = calculateProfitabilityMetricsByType()
@@ -1135,6 +1128,8 @@ class SavingsOverviewController(
         container.style = "-fx-padding: $ALLOCATION_PANEL_CONTAINER_SPACING;"
 
         val allocations = calculateAllocationVsTarget()
+        rebalanceButton.isVisible = allocations.isNotEmpty()
+        rebalanceButton.isManaged = allocations.isNotEmpty()
 
         val gridPane = GridPane()
         gridPane.hgap = ALLOCATION_PANEL_COLUMNS_SPACING.toDouble()

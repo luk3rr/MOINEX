@@ -1,3 +1,9 @@
+/*
+ * Filename: Constants.kt
+ * Created on: August 28, 2024
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.constant
 
 import javafx.scene.text.Font

@@ -10,7 +10,9 @@ class CapturePlanTest :
             val targets = CapturePlan.targets
 
             When("listing the screens") {
-                Then("it has the 16 screens of the before capture plus the alert, in the agreed order") {
+                Then(
+                    "it has the 16 screens of the before capture, the alert and the fundamental analysis dialog, in the agreed order",
+                ) {
                     targets.map { it.id } shouldContainExactly
                         listOf(
                             "home",
@@ -31,11 +33,23 @@ class CapturePlanTest :
                             "dialog-add-expense-error",
                             "search",
                             "alert-confirm",
+                            "fundamental-valuation",
+                            "fundamental-growth",
+                            "fundamental-profitability",
+                            "fundamental-fund-income",
+                            "ticker-detail",
+                            "savings-performance",
+                            "rebalance-dialog",
+                            "savings-performance-tab",
+                            "savings-performance-hover",
+                            "ticker-detail-hover",
+                            "bond-interest-history",
+                            "ticker-detail-income",
                         )
                 }
 
-                Then("the indexes are the fixed ones, with all 18 slots filled") {
-                    targets.map { it.index } shouldContainExactly (1..18).toList()
+                Then("the indexes are the fixed ones, with all 30 slots filled") {
+                    targets.map { it.index } shouldContainExactly (1..30).toList()
                 }
 
                 Then("every screen has a stylesheet and every dialog or alert has none") {

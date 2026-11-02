@@ -1,3 +1,9 @@
+/*
+ * Filename: FIRECalculatorSettings.kt
+ * Created on: April 26, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.model.financialplanning
 
 import jakarta.persistence.Column

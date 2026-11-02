@@ -1,3 +1,9 @@
+/*
+ * Filename: SearchMatcher.kt
+ * Created on: October 30, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.ui.common.search
 
 import java.text.Normalizer

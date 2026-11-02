@@ -1,3 +1,9 @@
+/*
+ * Filename: NotificationListCell.kt
+ * Created on: April 26, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.ui.common
 
 import javafx.geometry.Insets

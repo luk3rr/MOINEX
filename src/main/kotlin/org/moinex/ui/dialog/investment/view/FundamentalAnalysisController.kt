@@ -1,3 +1,9 @@
+/*
+ * Filename: FundamentalAnalysisController.kt
+ * Created on: January 9, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.ui.dialog.investment.view
 
 import javafx.fxml.FXML
@@ -26,6 +32,11 @@ import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.config.RetryConfig
+import org.moinex.model.dto.AssetKind
+import org.moinex.model.dto.FundamentalSnapshot
+import org.moinex.model.dto.QualityScore
+import org.moinex.model.dto.SectorComparison
+import org.moinex.model.dto.ValuationVerdict
 import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis
@@ -34,6 +45,10 @@ import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.service.ThemeService
 import org.moinex.service.investment.FundamentalAnalysisService
+import org.moinex.service.investment.FundamentalParser
+import org.moinex.service.investment.FundamentalScoringService
+import org.moinex.ui.common.DividendHistoryChart
+import org.moinex.ui.common.FundamentalInsightsView
 import org.moinex.ui.common.FundamentalMetricPaneController
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
@@ -49,6 +64,7 @@ class FundamentalAnalysisController(
     private val springContext: ConfigurableApplicationContext,
     private val notificationService: NotificationService,
     private val clockProvider: ClockProvider,
+    private val fundamentalScoringService: FundamentalScoringService,
 ) {
     @FXML
     private lateinit var companyNameValueLabel: Label
@@ -72,6 +88,9 @@ class FundamentalAnalysisController(
     private lateinit var metricsTabPane: TabPane
 
     @FXML
+    private lateinit var insightsBox: HBox
+
+    @FXML
     private lateinit var loadingContainer: VBox
 
     @FXML
@@ -85,6 +104,7 @@ class FundamentalAnalysisController(
 
     private lateinit var ticker: Ticker
     private var currentAnalysis: FundamentalAnalysis? = null
+    private var currentInsights: AnalysisInsights? = null
 
     companion object {
         private val logger = LoggerFactory.getLogger(FundamentalAnalysisController::class.java)
@@ -361,6 +381,53 @@ class FundamentalAnalysisController(
                 ),
             )
 
+        private const val JSON_KEY_INCOME = "income"
+
+        private val FUND_INCOME_METRICS =
+            listOf(
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD,
+                    "dividend_yield",
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD_TOOLTIP,
+                ),
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_LAST_DIVIDEND,
+                    "last_dividend",
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_LAST_DIVIDEND_TOOLTIP,
+                ),
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDENDS_12M,
+                    "dividends_12m_total",
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDENDS_12M_TOOLTIP,
+                ),
+            )
+
+        private val FUND_VALUE_METRICS =
+            listOf(
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE,
+                    "current_price",
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP,
+                ),
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP,
+                    "market_cap",
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP_TOOLTIP,
+                ),
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PRICE_TO_BOOK,
+                    "price_to_book",
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PRICE_TO_BOOK_TOOLTIP,
+                ),
+            )
+
+        private data class AnalysisInsights(
+            val snapshot: FundamentalSnapshot,
+            val verdict: ValuationVerdict,
+            val quality: QualityScore,
+            val sector: Map<String, SectorComparison>,
+        )
+
         private data class TabDef(
             val titleKey: String,
             val metrics: List<MetricDef>,
@@ -382,7 +449,7 @@ class FundamentalAnalysisController(
         private val TAB_BUILDERS: Map<String, (FundamentalAnalysisController, JSONObject) -> Tab> =
             buildMap {
                 SIMPLE_TABS.forEach { (jsonKey, tabDef) ->
-                    put(jsonKey) { c, json -> c.createSimpleTab(tabDef.titleKey, json, tabDef.metrics) }
+                    put(jsonKey) { c, json -> c.createSimpleTab(tabDef.titleKey, json, tabDef.metrics, jsonKey) }
                 }
                 put(JSON_KEY_GROWTH) { c, json -> c.createGrowthTab(json) }
             }
@@ -470,17 +537,15 @@ class FundamentalAnalysisController(
             val result =
                 runCatching {
                     FxUtils.withBackground {
-                        fundamentalAnalysisService.getAnalysis(
-                            ticker.id!!,
-                            period,
-                            forceRefresh,
-                        )
+                        val analysis = fundamentalAnalysisService.getAnalysis(ticker.id!!, period, forceRefresh)
+                        analysis to buildInsights(analysis)
                     }
                 }
 
             result
-                .onSuccess { analysis ->
+                .onSuccess { (analysis, insights) ->
                     currentAnalysis = analysis
+                    currentInsights = insights
                     displayAnalysis()
                     updateCacheStatusIndicators()
                 }.onFailure { exception ->
@@ -492,6 +557,36 @@ class FundamentalAnalysisController(
             refreshButton.isDisable = false
             periodComboBox.isDisable = false
         }
+    }
+
+    private fun buildInsights(analysis: FundamentalAnalysis): AnalysisInsights? =
+        runCatching {
+            val snapshot = FundamentalParser.parse(analysis.dataJson)
+            AnalysisInsights(
+                snapshot,
+                fundamentalScoringService.valuation(snapshot),
+                fundamentalScoringService.quality(snapshot),
+                fundamentalScoringService.sectorComparisons(analysis),
+            )
+        }.onFailure { logger.error("Could not compute the valuation and quality summary", it) }.getOrNull()
+
+    private fun showInsights() {
+        val insights = currentInsights
+        val show = insights != null
+        val view = FundamentalInsightsView(preferencesService::translate)
+
+        insightsBox.children.clear()
+        if (insights != null) {
+            if (insights.snapshot.kind == AssetKind.COMPANY) {
+                insightsBox.children.addAll(view.build(insights.snapshot, insights.verdict, insights.quality))
+            } else {
+                insightsBox.children.add(
+                    view.notice(preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_FUND_NOTICE)),
+                )
+            }
+        }
+        insightsBox.isVisible = show
+        insightsBox.isManaged = show
     }
 
     private fun displayAnalysis() {
@@ -515,6 +610,7 @@ class FundamentalAnalysisController(
 
         runCatching {
             val data = JSONObject(currentAnalysis!!.dataJson)
+            showInsights()
             populateMetricsTabs(data)
 
             // Force window to recalculate size after content is loaded
@@ -534,6 +630,12 @@ class FundamentalAnalysisController(
 
         logger.debug("Populating metrics tabs. Available keys in data: {}", data.keys().asSequence().toList())
 
+        val snapshot = currentInsights?.snapshot
+        if (snapshot != null && snapshot.kind != AssetKind.COMPANY) {
+            populateFundTabs(data, snapshot)
+            return
+        }
+
         TAB_BUILDERS.forEach { (key, builder) ->
             val tabData = data.optJSONObject(key)
             if (tabData != null) {
@@ -547,10 +649,61 @@ class FundamentalAnalysisController(
         logger.debug("Total tabs created: {}", metricsTabPane.tabs.size)
     }
 
+    private fun populateFundTabs(
+        data: JSONObject,
+        snapshot: FundamentalSnapshot,
+    ) {
+        data.optJSONObject(JSON_KEY_PRICE_PERFORMANCE)?.let {
+            metricsTabPane.tabs.add(
+                createSimpleTab(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_PRICE_PERFORMANCE,
+                    it,
+                    PRICE_PERFORMANCE_METRICS,
+                ),
+            )
+        }
+        metricsTabPane.tabs.add(createIncomeTab(data.optJSONObject(JSON_KEY_INCOME) ?: JSONObject(), snapshot))
+        metricsTabPane.tabs.add(
+            createSimpleTab(
+                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_VALUE,
+                data.optJSONObject(JSON_KEY_VALUATION) ?: JSONObject(),
+                FUND_VALUE_METRICS,
+            ),
+        )
+    }
+
+    private fun createIncomeTab(
+        income: JSONObject,
+        snapshot: FundamentalSnapshot,
+    ): Tab {
+        val tab = Tab(preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_INCOME))
+        tab.isClosable = false
+
+        val metrics = FlowPane(15.0, 15.0)
+        addMetrics(metrics, income, FUND_INCOME_METRICS)
+
+        val content = VBox(15.0, metrics)
+        content.padding = Insets(20.0)
+        if (snapshot.dividendHistory.any { it.value.signum() > 0 }) {
+            content.children.add(
+                Label(preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_FUND_DIVIDENDS_CHART_TITLE)),
+            )
+            content.children.add(DividendHistoryChart.create(snapshot.dividendHistory))
+        }
+
+        tab.content =
+            ScrollPane(content).apply {
+                isFitToWidth = true
+                styleClass.add(TRANSPARENT_SCROLL_PANE_CLASS)
+            }
+        return tab
+    }
+
     private fun createSimpleTab(
         titleKey: String,
         data: JSONObject,
         metrics: List<MetricDef>,
+        section: String? = null,
     ): Tab {
         val tab = Tab(preferencesService.translate(titleKey))
         tab.isClosable = false
@@ -558,7 +711,7 @@ class FundamentalAnalysisController(
         val content = FlowPane(15.0, 15.0)
         content.padding = Insets(20.0)
 
-        addMetrics(content, data, metrics)
+        addMetrics(content, data, metrics, section)
 
         tab.content =
             ScrollPane(content).apply {
@@ -572,6 +725,7 @@ class FundamentalAnalysisController(
         container: FlowPane,
         data: JSONObject,
         metrics: List<MetricDef>,
+        section: String? = null,
     ) {
         logger.debug("Adding {} metrics to container. Data keys: {}", metrics.size, data.keys().asSequence().toList())
         metrics.forEach { (labelKey, jsonKey, tooltipKey) ->
@@ -581,9 +735,18 @@ class FundamentalAnalysisController(
                 jsonKey,
                 data.has(jsonKey),
             )
-            val node = addMetricToContainer(container, preferencesService.translate(labelKey), data, jsonKey)
+            val comparison =
+                section?.let { currentInsights?.sector?.get(FundamentalScoringService.sectorKey(it, jsonKey)) }
+            val node =
+                addMetricToContainer(
+                    container,
+                    preferencesService.translate(labelKey),
+                    data,
+                    jsonKey,
+                    comparison,
+                    preferencesService.translate(tooltipKey),
+                )
             if (node != null) {
-                UIUtils.addTooltipToNode(node, preferencesService.translate(tooltipKey))
                 logger.debug("Successfully added metric: {}", labelKey)
             } else {
                 logger.debug("Metric returned null: {}", labelKey)
@@ -599,44 +762,41 @@ class FundamentalAnalysisController(
         val content = FlowPane(15.0, 15.0)
         content.padding = Insets(20.0)
 
-        if (growth.has(JSON_METRIC_REVENUE_GROWTH)) {
-            val revenueGrowth = growth.getJSONObject(JSON_METRIC_REVENUE_GROWTH)
+        val revenueGrowth = growth.optJSONObject(JSON_METRIC_REVENUE_GROWTH) ?: JSONObject()
 
-            addMetrics(
-                content,
-                revenueGrowth,
-                listOf(
-                    MetricDef(
-                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY,
-                        JSON_METRIC_YOY_GROWTH,
-                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY_TOOLTIP,
-                    ),
-                    MetricDef(
-                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR,
-                        JSON_METRIC_CAGR,
-                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR_TOOLTIP,
-                    ),
+        addMetrics(
+            content,
+            revenueGrowth,
+            listOf(
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY,
+                    JSON_METRIC_YOY_GROWTH,
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY_TOOLTIP,
                 ),
-            )
+                MetricDef(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR,
+                    JSON_METRIC_CAGR,
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR_TOOLTIP,
+                ),
+            ),
+        )
 
-            if (revenueGrowth.has(JSON_METRIC_YEARS)) {
-                val yearsMetric = JSONObject()
-                yearsMetric.put(JSON_METRIC_VALUE, revenueGrowth.getInt(JSON_METRIC_YEARS))
-                yearsMetric.put(JSON_METRIC_TYPE, JSON_VALUE_NUMBER)
-                yearsMetric.put(JSON_METRIC_DATA_TEMPORALITY, JSON_VALUE_CALCULATED)
+        if (revenueGrowth.has(JSON_METRIC_YEARS)) {
+            val yearsMetric = JSONObject()
+            yearsMetric.put(JSON_METRIC_VALUE, revenueGrowth.getInt(JSON_METRIC_YEARS))
+            yearsMetric.put(JSON_METRIC_TYPE, JSON_VALUE_NUMBER)
+            yearsMetric.put(JSON_METRIC_DATA_TEMPORALITY, JSON_VALUE_CALCULATED)
 
-                UIUtils.addTooltipToNode(
-                    addMetricToContainer(
-                        content,
-                        preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS),
-                        yearsMetric,
-                        JSON_METRIC_VALUE,
-                    ),
+            addMetricToContainer(
+                content,
+                preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS),
+                yearsMetric,
+                JSON_METRIC_VALUE,
+                infoText =
                     preferencesService.translate(
                         TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS_TOOLTIP,
                     ),
-                )
-            }
+            )
         }
 
         tab.content =
@@ -652,13 +812,10 @@ class FundamentalAnalysisController(
         label: String,
         data: JSONObject,
         key: String,
+        sectorComparison: SectorComparison? = null,
+        infoText: String? = null,
     ): Node? {
-        if (!data.has(key)) {
-            logger.debug("Data does not have key: {}", key)
-            return null
-        }
-
-        val metricObj = data[key]
+        val metricObj = if (data.has(key)) data[key] else JSONObject.NULL
         logger.debug(
             "Loading metric pane for label: {}, key: {}, metricObj type: {}",
             label,
@@ -676,6 +833,8 @@ class FundamentalAnalysisController(
             val lastUpdateDate =
                 currentAnalysis?.lastUpdate?.toLocalDate()?.toString()
             controller.updateMetricPane(label, metricObj, lastUpdateDate)
+            controller.setInfo(infoText)
+            controller.showSectorComparison(sectorComparison, metricObj, !currentAnalysis?.sector.isNullOrBlank())
             springContext.getBean<ThemeService>().applyIconsTo(metricPane)
 
             container.children.add(metricPane)
@@ -691,7 +850,6 @@ class FundamentalAnalysisController(
         loadingContainer.isVisible = show
         loadingContainer.isManaged = show
         metricsTabPane.isVisible = !show
-        metricsTabPane.isManaged = !show
     }
 
     private fun handleAnalysisError(exception: Throwable) {

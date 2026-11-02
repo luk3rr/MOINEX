@@ -51,12 +51,6 @@ class BondInterestHistoryController(
     private lateinit var historyTable: TableView<BondInterestCalculation>
 
     @FXML
-    private lateinit var editButton: Button
-
-    @FXML
-    private lateinit var resetButton: Button
-
-    @FXML
     private lateinit var recalculateButton: Button
 
     @FXML
@@ -95,7 +89,6 @@ class BondInterestHistoryController(
         setupBondInfo()
         setupTableColumns()
         loadHistoryData()
-        setupTableListeners()
     }
 
     private fun setupBondInfo() {
@@ -198,17 +191,6 @@ class BondInterestHistoryController(
         val history = bondInterestCalculationService.getMonthlyInterestHistory(bond)
         val observableList = FXCollections.observableArrayList(history)
         historyTable.items = observableList
-    }
-
-    private fun setupTableListeners() {
-        historyTable.selectionModel.selectedItemProperty().addListener { _, _, newVal ->
-            val hasSelection = newVal != null
-            editButton.isDisable = !hasSelection
-            resetButton.isDisable = !hasSelection || !newVal.isManuallyAdjusted()
-        }
-
-        editButton.isDisable = true
-        resetButton.isDisable = true
     }
 
     @FXML

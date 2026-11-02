@@ -1,3 +1,9 @@
+/*
+ * Filename: CreditCardFormDTO.kt
+ * Created on: March 20, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.model.dto.form
 
 import org.moinex.model.creditcard.CreditCardOperator

@@ -1,3 +1,7 @@
+# Filename: generate_dummy_data.py
+# Created on: August 15, 2025
+# Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+
 import sqlite3
 from datetime import datetime, timedelta
 import argparse
@@ -349,6 +353,29 @@ def populate_tickers(cursor, data):
         execute_query(cursor, "INSERT INTO ticker (id, name, symbol, type, current_quantity, current_unit_value, average_unit_value, average_unit_value_count, archived, last_update) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", params)
     print("Tickers inserted successfully.")
 
+def populate_ticker_price_history(cursor, data):
+    """Insere um ano de fechamentos diarios por ticker ativo, numa caminhada aleatoria que termina no preco atual."""
+    print("Inserting daily price history...")
+    today = datetime.now().date()
+    for row in data["ticker"]:
+        ticker_id, current_unit_value, archived = row[0], row[5], row[8]
+        if archived or not current_unit_value:
+            continue
+        rng = random.Random(ticker_id)
+        days = [today - timedelta(days=offset) for offset in range(365, -1, -1)]
+        days = [day for day in days if day.weekday() < 5]
+        prices = [float(current_unit_value)]
+        for _ in range(len(days) - 1):
+            prices.append(max(0.01, prices[-1] / (1 + rng.uniform(-0.025, 0.025))))
+        prices.reverse()
+        last_of_month = {}
+        for day in days:
+            last_of_month[(day.year, day.month)] = day
+        for day, price in zip(days, prices):
+            is_month_end = 1 if last_of_month[(day.year, day.month)] == day and (day.year, day.month) < (today.year, today.month) else 0
+            execute_query(cursor, "INSERT INTO ticker_price_history (ticker_id, price_date, closing_price, is_month_end) VALUES (?, ?, ?, ?);", (ticker_id, day.isoformat(), round(price, 2), is_month_end))
+    print("Daily price history inserted successfully.")
+
 def populate_bonds(cursor, data):
     """Insere os bonds no banco de dados."""
     print("Inserting bonds...")
@@ -401,6 +428,28 @@ def populate_ticker_operations(cursor, data):
     
     print("Ticker operations inserted successfully.")
 
+def populate_dividends(cursor, data):
+    """Insere proventos mensais ou trimestrais de alguns tickers que pagam dividendos."""
+    print("Inserting dividends...")
+    cursor.execute("SELECT id FROM wallet ORDER BY id LIMIT 1;")
+    wallet = cursor.fetchone()
+    if not wallet:
+        return
+    payers = {3: (1, 38.0), 1: (3, 120.0), 2: (3, 75.0), 8: (1, 22.0)}
+    for ticker_id, (every_months, base_amount) in payers.items():
+        rng = random.Random(ticker_id)
+        for months_ago in range(0, 11):
+            if months_ago % every_months != 0:
+                continue
+            amount = round(base_amount * rng.uniform(0.8, 1.2), 2)
+            date = get_dynamic_date(-months_ago, -3)
+            wt_params = (None, wallet[0], 9, 'INCOME', 'CONFIRMED', date, amount, "Dividendos")
+            execute_query(cursor, "INSERT INTO wallet_transaction (id, wallet_id, category_id, type, status, date, amount, description, include_in_analysis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0);", wt_params)
+            cursor.execute("SELECT last_insert_rowid();")
+            wt_id = cursor.fetchone()[0]
+            execute_query(cursor, "INSERT INTO dividend (ticker_id, wallet_transaction_id) VALUES (?, ?);", (ticker_id, wt_id))
+    print("Dividends inserted successfully.")
+
 def populate_bond_operations(cursor, data):
     """Insere as operações de bonds."""
     print("Inserting bond operations...")
@@ -442,6 +491,7 @@ def main():
 
         # Insere tickers e bonds
         populate_tickers(cursor, CONFIG["initial_data"])
+        populate_ticker_price_history(cursor, CONFIG["initial_data"])
         populate_bonds(cursor, CONFIG["initial_data"])
 
         # Gera as transações dinamicamente
@@ -455,6 +505,7 @@ def main():
 
         # Insere operações de tickers e bonds
         populate_ticker_operations(cursor, CONFIG["initial_data"])
+        populate_dividends(cursor, CONFIG["initial_data"])
         populate_bond_operations(cursor, CONFIG["initial_data"])
 
         update_wallet_balances(cursor)

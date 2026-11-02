@@ -1,3 +1,9 @@
+/*
+ * Filename: BondOperationCalculationDTO.kt
+ * Created on: March 15, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.model.dto
 
 import org.moinex.model.investment.Bond

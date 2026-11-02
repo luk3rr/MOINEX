@@ -1,3 +1,9 @@
+/*
+ * Filename: CreditCardInvoicePaymentDTO.kt
+ * Created on: April 25, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.model.dto
 
 import java.math.BigDecimal

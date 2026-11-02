@@ -298,6 +298,37 @@ class FundamentalAnalysisServiceGetAnalysisTest :
             }
         }
 
+        Given("an ETF ticker (valid for fundamental analysis)") {
+            When("getting analysis for ETF ticker") {
+                val ticker =
+                    TickerFactory.create(
+                        id = 17,
+                        type = AssetType.ETF,
+                        name = "Index ETF",
+                        symbol = "ETF001",
+                    )
+
+                val analysis =
+                    FundamentalAnalysisFactory.create(
+                        id = 17,
+                        ticker = ticker,
+                        periodType = PeriodType.ANNUAL,
+                        lastUpdate = LocalDateTime.now().minusHours(12),
+                    )
+
+                every { tickerRepository.findById(17) } returns Optional.of(ticker)
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                    analysis
+
+                val result = service.getAnalysis(17, PeriodType.ANNUAL)
+
+                Then("should return analysis for ETF") {
+                    result.id shouldBe 17
+                    result.ticker.type shouldBe AssetType.ETF
+                }
+            }
+        }
+
         Given("a ticker with no cached analysis") {
             When("getting analysis for ticker without cache") {
                 val ticker =

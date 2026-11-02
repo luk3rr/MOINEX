@@ -1,3 +1,9 @@
+/*
+ * Filename: JavaFxUtils.kt
+ * Created on: March 17, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.extension
 
 import javafx.scene.Node

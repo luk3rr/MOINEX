@@ -16,6 +16,7 @@ import org.moinex.common.ClockProvider
 import org.moinex.common.extension.throwIfError
 import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.common.util.APIUtils
+import org.moinex.model.dto.DailyPricePointDTO
 import org.moinex.model.dto.TickerPriceInitializationStatsDTO
 import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPriceHistory
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 @Service
 class TickerPriceHistoryService(
@@ -38,6 +40,11 @@ class TickerPriceHistoryService(
     private val tickerSaleRepository: TickerSaleRepository,
     private val clockProvider: ClockProvider,
 ) {
+    companion object {
+        const val DAILY_WINDOW_MONTHS = 12
+        const val DAILY_DENSITY_THRESHOLD = 0.6
+    }
+
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
@@ -73,6 +80,113 @@ class TickerPriceHistoryService(
             stats.updateCount,
             stats.skipCount,
         )
+    }
+
+    /**
+     * Keeps one closing price per trading day for the last [DAILY_WINDOW_MONTHS] months, for every active ticker (or
+     * just [tickers]). A failure on one ticker is logged and never removes data already stored.
+     */
+    suspend fun syncDailyPriceHistory(tickers: List<Ticker>? = null) {
+        val targets = tickers ?: tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
+
+        targets.forEach { ticker ->
+            runCatching { syncDaily(ticker) }
+                .onFailure { logger.error("Failed to sync the daily price history of {}: {}", ticker, it.message) }
+        }
+    }
+
+    /**
+     * Fetches the trading days missing for [ticker] and upserts them. When the stored series is dense up to its last
+     * day only the days since then are fetched, otherwise the whole window is.
+     * @return how many rows were written
+     */
+    suspend fun syncDaily(ticker: Ticker): Int {
+        val today = clockProvider.today()
+        val windowStart = today.minusMonths(DAILY_WINDOW_MONTHS.toLong())
+        val fetchStart = dailyFetchStart(ticker.id!!, windowStart)
+
+        val jsonObject =
+            APIUtils
+                .fetchStockPriceHistory(ticker.symbol, fetchStart.toNoTimeFormat(), today.plusDays(1).toNoTimeFormat())
+                .throwIfError("Fetch daily price history for $ticker")
+
+        val prices = jsonObject.getJSONArray("prices")
+        if (prices.length() == 0) return 0
+
+        val existingByDate =
+            priceHistoryRepository
+                .findByTickerIdAndDateRange(ticker.id!!, fetchStart, today.plusDays(1))
+                .associateBy { it.priceDate }
+        val currentMonth = clockProvider.currentMonth()
+
+        val rows =
+            prices
+                .asSequence()
+                .map { it as JSONObject }
+                .map { toDailyRow(ticker, it, existingByDate, currentMonth) }
+                .toList()
+
+        priceHistoryRepository.saveAll(rows)
+        logger.info("Synced {} daily prices for {} starting {}", rows.size, ticker, fetchStart)
+
+        return rows.size
+    }
+
+    fun getDailyPrices(
+        tickerId: Int,
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): List<TickerPriceHistory> = priceHistoryRepository.findByTickerIdAndDateRange(tickerId, startDate, endDate)
+
+    /**
+     * Daily closing prices of several tickers in one query, oldest first, keyed by ticker id.
+     */
+    fun getPricePoints(
+        tickerIds: Collection<Int>,
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): Map<Int, List<DailyPricePointDTO>> =
+        if (tickerIds.isEmpty()) {
+            emptyMap()
+        } else {
+            priceHistoryRepository
+                .findPricePointsByTickerIdsAndDateRange(tickerIds, startDate, endDate)
+                .groupBy { it.tickerId }
+        }
+
+    private fun toDailyRow(
+        ticker: Ticker,
+        priceData: JSONObject,
+        existingByDate: Map<LocalDate, TickerPriceHistory>,
+        currentMonth: YearMonth,
+    ): TickerPriceHistory {
+        val date = priceData.getString("date").toNoTimeFormat()
+        val price = BigDecimal(priceData.getDouble("price"))
+        val monthEnd = priceData.getBoolean("is_month_end") && YearMonth.from(date).isBefore(currentMonth)
+        val existing = existingByDate[date]
+
+        return if (existing != null) {
+            existing.apply {
+                closingPrice = price
+                isMonthEnd = isMonthEnd || monthEnd
+            }
+        } else {
+            TickerPriceHistory(ticker = ticker, priceDate = date, closingPrice = price, isMonthEnd = monthEnd)
+        }
+    }
+
+    private fun dailyFetchStart(
+        tickerId: Int,
+        windowStart: LocalDate,
+    ): LocalDate {
+        val latest = priceHistoryRepository.findLatestPriceByTicker(tickerId)?.priceDate ?: return windowStart
+        if (latest.isBefore(windowStart)) return windowStart
+
+        val storedDays = priceHistoryRepository.countByTickerIdAndDateRange(tickerId, windowStart, latest)
+        val spanDays = ChronoUnit.DAYS.between(windowStart, latest) + 1
+        val isDense = storedDays >= spanDays * DAILY_DENSITY_THRESHOLD
+
+        return if (isDense) latest else windowStart
     }
 
     fun getClosestPriceBeforeDate(

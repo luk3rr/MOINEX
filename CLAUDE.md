@@ -21,6 +21,8 @@ A `Makefile` wraps the Gradle tasks above plus install/uninstall (see `make help
 
 Tests use **Kotest BehaviorSpec** (Given/When/Then DSL), **MockK** for mocking, and **AssertJ**-style matchers. Test fixtures live in `src/test/kotlin/org/moinex/factory/`. The H2 in-memory database is used for tests.
 
+The Python scripts have their own `unittest` suite in `src/test/python/`, run with `/usr/bin/python3 -m unittest discover -s src/test/python`. It is not part of `./gradlew test` or of the CI pipeline yet.
+
 ## Code Style
 
 ```bash
@@ -47,12 +49,24 @@ UI (JavaFX controllers/FXML)  →  Service (@Service beans)  →  Repository (Sp
 
 - **`org.moinex.app`** — entry point (`App` → `JavaFXApp` → `SpringApp`)
 - **`org.moinex.config`** — Spring config, `RetryConfig` (exponential backoff), `AppDispatchers` (coroutine dispatchers)
-- **`org.moinex.service`** — all business logic, organized by domain: `wallet`, `investment`, `creditcard`, `goal`, `wishlist`, `networth`, `financialplanning`, `summary`
+- **`org.moinex.service`** — all business logic, organized by domain (`investment` also holds `PortfolioAnalyticsService`, the Performance tab / ticker detail / rebalance numbers, and `FundamentalScoringService`, the valuation verdict and quality score): `wallet`, `investment`, `creditcard`, `goal`, `wishlist`, `networth`, `financialplanning`, `summary`
 - **`org.moinex.repository`** — JPA repositories, mirroring service domains
 - **`org.moinex.model`** — JPA entities, enums (27 types), DTOs for computed values
 - **`org.moinex.ui`** — JavaFX controllers and dialogs (~105 files + 89 FXML resources)
 - **`org.moinex.common`** — cross-cutting utilities: `APIUtils` (Python process runner), `FxUtils`, `RetryPolicy`, custom chart components
 - **Theme** — `service/ThemeService` sets the AtlantaFX base theme and applies `css/theme/base.css` plus `tokens.{dark,light}.css` to every window. Colors in CSS and FXML come only from the `theme-*` tokens (the palette lives in the token files); code-drawn colors live in `common/ui/ThemeColors.kt`. Icons are `FontIcon` literals from `common/ui/Icons.kt` (`app-icon` + `icon-size-N` classes). Only shadows and overlay scrims may use `rgba(0,0,0,α)`.
+
+## File header
+
+Every app source file (`.kt` in `src/main`, `.py` scripts) starts with the header `Filename` / `Created on: <Month D, YYYY>` / `Author: Lucas Araújo <araujolucas@dcc.ufmg.br>` (`/* */` in Kotlin, `#` in Python), added when the file is created. See any existing file for the exact form.
+
+## UI patterns
+
+- Information shown as `<Title>: <value>` uses `common/ui/TitledValue` (bold title with the colon, regular value). Existing screens are migrated as they are touched.
+
+## Screenshots for visual checks
+
+`scripts/capture-screens.sh <dir>` renders the screens of `CapturePlan` (30 targets) from a fake home and a dummy database, never touching `~/.moinex`. Limit it with `CAPTURE_ONLY=<ids>`, `CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR`. Validation images from an AI-DLC intent go in `.aidlc/<intent>/construction/screenshots/`, which git ignores; do not commit them.
 
 ## Python Script Integration
 
@@ -71,7 +85,7 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On 
 ## Database
 
 - **Location:** `~/.moinex/data/moinex.db`
-- **Migrations:** Flyway, `src/main/resources/db/migration/` (34 migrations, prefix `V0xx__`)
+- **Migrations:** Flyway, `src/main/resources/db/migration/` (35 migrations, prefix `V0xx__`; `V035` adds `benchmark_price_history`, the Ibovespa series)
 - **Hibernate:** `ddl-auto: validate` — schema must exist before startup; never let Hibernate manage schema
 - **Startup order:** `FlywayConfig` is a manual bean that migrates and then runs `data.sql`, and the `entityManagerFactory` bean definition is made to depend on `flyway` so Hibernate validates an existing schema. `spring.sql.init.mode` is `never` on purpose; do not turn it back on, since Spring would run `data.sql` before the tables exist.
 - **Connection pool:** HikariCP, max 1 connection (SQLite constraint)

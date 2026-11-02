@@ -1,3 +1,9 @@
+/*
+ * Filename: RetryConfig.kt
+ * Created on: March 9, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.config
 
 import kotlin.math.pow

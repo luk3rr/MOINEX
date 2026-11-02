@@ -1,3 +1,9 @@
+/*
+ * Filename: BalanceCalculationConfig.kt
+ * Created on: March 15, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.config
 
 import org.moinex.model.enums.BalanceType

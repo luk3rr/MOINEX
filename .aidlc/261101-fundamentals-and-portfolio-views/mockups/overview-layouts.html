@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockups Visão Geral</title>
+<style>
+:root{--base:#21222C;--card:#282A36;--pane:#383a52;--hover:#44475A;--text:#F8F8F2;--sec:#BFBFC3;--border:#44475A;--pos:#50FA7B;--neg:#FF5555;--warn:#FFB86C;--acc:#BD93F9;--side:#0a614e;--s0:#16A34A;--s2:#3B82F6;--s5:#4ADE80}
+@media(prefers-color-scheme:light){:root.auto{--base:#f6f8fa;--card:#fff;--pane:#eef1f5;--hover:#e3e7ec;--text:#1F2328;--sec:#59636e;--border:#d0d7de;--pos:#1A7F37;--neg:#C62F3E;--warn:#9a6700;--side:#0a614e}}
+*{box-sizing:border-box}body{margin:0;background:#111;color:var(--text);font:13px "Noto Sans",system-ui,sans-serif;padding:16px}
+h1{font-size:16px;margin:0 0 4px}p.n{color:#aaa;margin:0 0 12px;max-width:900px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{background:#2a2a2a;color:#ddd;border:2px solid #555;border-radius:20px;padding:6px 16px;cursor:pointer}.tabs button.on{border-color:var(--acc);color:#fff}
+.app{display:grid;grid-template-columns:56px 1fr;background:var(--base);border:1px solid #333;border-radius:6px;overflow:hidden;max-width:1180px}
+.side{background:var(--side);display:flex;flex-direction:column;gap:18px;align-items:center;padding:14px 0}.side i{width:22px;height:22px;border-radius:5px;background:#ffffff55;display:block}.side i.on{background:#fff}
+.main{padding:10px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.totals{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}.totals b{display:block;font-size:15px;font-weight:400;color:var(--sec)}.totals span{font-size:15px}
+.savtabs{display:flex;gap:6px}.savtabs span{padding:5px 14px;border-radius:20px;border:2px solid var(--border);color:var(--sec)}.savtabs span.on{border-color:var(--acc);color:var(--text)}.savtabs span.new{border-style:dashed;border-color:var(--warn);color:var(--warn)}
+.grid{display:grid;grid-template-columns:1.5fr 1.1fr .7fr;gap:10px}
+h3{margin:0 0 8px;font-size:13px}
+.pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:6px}.pager i{width:8px;height:8px;border-radius:50%;background:var(--hover)}.pager i.on{background:var(--acc)}.arrow{border:2px solid var(--acc);border-radius:20px;padding:1px 10px;color:var(--acc)}
+.row{display:flex;justify-content:space-between;padding:3px 0;color:var(--sec)}.row b{color:var(--text);font-weight:600}.pos{color:var(--pos)}.neg{color:var(--neg)}
+.bar{height:5px;background:var(--hover);border-radius:3px;margin:3px 0 7px}.bar i{display:block;height:100%;border-radius:3px;background:var(--neg)}
+.tag{display:inline-block;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:0 8px;font-size:11px}
+.btn{border:2px solid var(--acc);border-radius:20px;padding:2px 12px;color:var(--text);font-size:12px}
+.legend{display:flex;gap:14px;color:var(--sec);font-size:12px;margin-top:4px}.legend i{display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:middle}
+.note{margin:10px 0 0;color:#aaa;max-width:1180px}.hide{display:none}
+.two{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--sec);font-size:10px}
+</style></head><body class="">
+<h1>Visão Geral: onde colocar os 3 novos gráficos</h1>
+<p class="n">Wireframes de alta fidelidade com a paleta Dracula do app (valores fictícios e ilustrativos). Alterne entre as duas opções. A opção C (reorganizar o grid) não foi desenhada: exige redesenhar todos os painéis.</p>
+<div class="tabs"><button class="on" data-t="a">A · Carrossel de 5 páginas</button><button data-t="a2">A · páginas 4 e 5</button><button data-t="b">B · Nova aba "Desempenho"</button></div>
+
+<!-- A página 3 -->
+<div id="a" class="view">
+<div class="app"><div class="side"><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div><div class="main">
+<div class="card totals"><div><b>Total Investido</b><span>R$ 66.400,83</span></div><div><b>Ganhos com Juros e Valorizações</b><span>R$ 6.937,50</span></div><div><b>Perdas com Desvalorização</b><span>R$ 502,50</span></div><div><b>Valor Total</b><span>R$ 72.700,83</span></div></div>
+<div class="grid">
+<div class="card"><h3>Carteira vs benchmarks <span class="tag">pág 3 de 5</span></h3>
+<div class="tabs" style="margin:0 0 6px"><span class="btn">6M</span><span class="btn" style="background:var(--acc);color:#111">12M</span><span class="btn">Desde o início</span></div>
+<svg viewBox="0 0 520 220"><g stroke="#44475A" stroke-width=".6"><line x1="40" x2="510" y1="30" y2="30"/><line x1="40" x2="510" y1="75" y2="75"/><line x1="40" x2="510" y1="120" y2="120"/><line x1="40" x2="510" y1="165" y2="165"/><line x1="40" x2="510" y1="195" y2="195"/></g>
+<text x="4" y="33">+14%</text><text x="4" y="78">+10%</text><text x="4" y="123">+5%</text><text x="4" y="168">0%</text><text x="4" y="198">−2%</text>
+<polyline fill="none" stroke="#50FA7B" stroke-width="3" points="40,165 110,150 180,135 250,110 320,92 390,70 450,52 510,42"/>
+<polyline fill="none" stroke="#BD93F9" stroke-width="2" points="40,165 110,158 180,148 250,138 320,128 390,118 450,108 510,98"/>
+<polyline fill="none" stroke="#FFB86C" stroke-width="2" points="40,165 110,172 180,150 250,160 320,135 390,142 450,122 510,125"/>
+<polyline fill="none" stroke="#8BE9FD" stroke-width="2" stroke-dasharray="4 3" points="40,165 110,162 180,158 250,155 320,150 390,146 450,142 510,138"/>
+<text x="40" y="214">jan</text><text x="180" y="214">mar</text><text x="320" y="214">mai</text><text x="450" y="214">set</text></svg>
+<div class="legend"><span><i style="background:#50FA7B;height:4px"></i>Carteira +12,2%</span><span><i style="background:#BD93F9"></i>CDI +9,8%</span><span><i style="background:#FFB86C"></i>Ibovespa +6,1%</span><span><i style="background:#8BE9FD"></i>IPCA +4,6%</span></div>
+<div class="pager"><span class="arrow">←</span><i></i><i></i><i class="on"></i><i></i><i></i><span class="arrow">→</span></div></div>
+<div class="card"><h3>Desempenho dos Ativos Variáveis</h3><div class="row"><span>ETH-USD</span><b class="pos">+25,00%</b></div><div class="row"><span>ADA-USD</span><b class="pos">+18,42%</b></div><div class="row"><span>BTC-USD</span><b class="pos">+15,85%</b></div><div class="row"><span>MGLU3.SA</span><b class="neg">−21,20%</b></div><hr style="border-color:var(--border)"><h3>Métricas de Rentabilidade</h3><div class="row"><span>Rentabilidade</span><b class="pos">+9,49%</b></div><div class="row"><span>Dividend Yield</span><b>0,00%</b></div></div>
+<div class="card"><h3>Indicadores</h3><div class="row"><span>Selic</span><b>13,75%</b></div><div class="row"><span>IPCA 12m</span><b>4,58%</b></div><h3 style="margin-top:12px">Cotações</h3><div class="row"><span>Dólar</span><b>R$ 5,38</b></div><div class="row"><span>Ibovespa</span><b>167.922</b></div></div>
+</div>
+<div class="card"><h3>Plano de Alocação <span class="btn" style="float:right">✎ Editar</span> <span class="btn" style="float:right;margin-right:8px;border-color:var(--warn)">⚖ Rebalancear</span></h3>
+<div class="two" style="grid-template-columns:1fr 1fr"><div><div class="row"><span>Criptomoedas</span><b class="neg">Muito acima em 45,30 %</b></div><div class="bar"><i style="width:90%"></i></div><span class="tag">+45,3 pp acima da meta</span></div><div><div class="row"><span>Fundos</span><b class="neg">Faltam 18,22 %</b></div><div class="bar"><i style="width:40%"></i></div><span class="tag">−18,2 pp abaixo da meta</span></div></div></div>
+</div></div>
+<p class="note"><b>Prós:</b> mudança mínima, nada some, as setas já existem. <b>Contras:</b> o gráfico fica pequeno (≈ 480×220 px), 3 das 5 páginas ficam escondidas atrás de setas e o usuário pode nunca descobrir.</p>
+</div>
+
+<!-- A páginas 4 e 5 -->
+<div id="a2" class="view hide">
+<div class="app"><div class="side"><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div><div class="main"><div class="grid" style="grid-template-columns:1fr 1fr">
+<div class="card"><h3>Contribuição por ativo <span class="tag">pág 4 de 5</span></h3>
+<svg viewBox="0 0 440 200"><g font-size="10"><text x="4" y="22">ETH-USD</text><rect x="90" y="12" width="150" height="14" fill="#50FA7B"/><text x="246" y="23">+R$ 1.750</text>
+<text x="4" y="46">BTC-USD</text><rect x="90" y="36" width="120" height="14" fill="#50FA7B"/><text x="216" y="47">+R$ 3.250</text>
+<text x="4" y="70">ITUB4.SA</text><rect x="90" y="60" width="40" height="14" fill="#50FA7B"/><text x="136" y="71">+R$ 480</text>
+<text x="4" y="94">PETR4.SA</text><rect x="90" y="84" width="38" height="14" fill="#50FA7B"/><text x="134" y="95">+R$ 330</text>
+<text x="4" y="118">MGLU3.SA</text><rect x="60" y="108" width="30" height="14" fill="#FF5555"/><text x="4" y="130" style="font-size:9px"> </text><text x="96" y="119">−R$ 502</text>
+<line x1="90" x2="90" y1="6" y2="150" stroke="#6272A4"/>
+<text x="4" y="160" style="font-weight:700;fill:#F8F8F2">Total</text><rect x="90" y="150" width="190" height="14" fill="#BD93F9"/><text x="286" y="161">+R$ 6.300</text></g></svg>
+<div class="pager"><span class="arrow">←</span><i></i><i></i><i></i><i class="on"></i><i></i><span class="arrow">→</span></div></div>
+<div class="card"><h3>Dividendos <span class="tag">pág 5 de 5</span></h3>
+<svg viewBox="0 0 440 200"><line x1="30" x2="430" y1="150" y2="150" stroke="#44475A"/>
+<g><rect x="40" y="110" width="22" height="40" fill="#16A34A"/><rect x="40" y="95" width="22" height="15" fill="#3B82F6"/>
+<rect x="95" y="120" width="22" height="30" fill="#16A34A"/><rect x="150" y="70" width="22" height="80" fill="#16A34A"/><rect x="150" y="45" width="22" height="25" fill="#3B82F6"/><rect x="205" y="125" width="22" height="25" fill="#16A34A"/><rect x="260" y="100" width="22" height="50" fill="#16A34A"/><rect x="260" y="80" width="22" height="20" fill="#3B82F6"/><rect x="315" y="115" width="22" height="35" fill="#16A34A"/><rect x="370" y="60" width="22" height="90" fill="#16A34A"/></g>
+<line x1="30" x2="430" y1="105" y2="105" stroke="#FFB86C" stroke-dasharray="5 3"/><text x="300" y="100" style="fill:#FFB86C">média mensal R$ 620</text>
+<text x="38" y="168">jan</text><text x="148" y="168">mar</text><text x="258" y="168">mai</text><text x="368" y="168">jul</text></svg>
+<div class="row"><span>Projeção 12 meses <span class="tag">estimativa</span></span><b>R$ 7.440</b></div>
+<div class="pager"><span class="arrow">←</span><i></i><i></i><i></i><i></i><i class="on"></i><span class="arrow">→</span></div></div>
+</div></div></div></div>
+
+<!-- B -->
+<div id="b" class="view hide">
+<div class="app"><div class="side"><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div><div class="main">
+<div class="savtabs"><span>Visão Geral</span><span class="new on">Desempenho (nova)</span><span>Ações e Fundos</span><span>Renda Fixa</span></div>
+<div class="card"><div class="tabs" style="margin:0"><span class="btn">6M</span><span class="btn" style="background:var(--acc);color:#111">12M</span><span class="btn">Desde o início</span></div></div>
+<div class="two"><div class="card"><h3>Carteira vs benchmarks</h3>
+<svg viewBox="0 0 640 230"><g stroke="#44475A" stroke-width=".6"><line x1="40" x2="630" y1="30" y2="30"/><line x1="40" x2="630" y1="85" y2="85"/><line x1="40" x2="630" y1="140" y2="140"/><line x1="40" x2="630" y1="195" y2="195"/></g>
+<polyline fill="none" stroke="#50FA7B" stroke-width="3" points="40,195 130,175 220,150 310,120 400,95 490,70 560,52 630,42"/>
+<polyline fill="none" stroke="#BD93F9" stroke-width="2" points="40,195 130,186 220,172 310,158 400,144 490,130 560,120 630,112"/>
+<polyline fill="none" stroke="#FFB86C" stroke-width="2" points="40,195 130,205 220,178 310,190 400,160 490,168 560,146 630,150"/>
+<polyline fill="none" stroke="#8BE9FD" stroke-width="2" stroke-dasharray="4 3" points="40,195 130,191 220,186 310,181 400,176 490,171 560,166 630,162"/>
+<text x="4" y="33">+14%</text><text x="4" y="88">+9%</text><text x="4" y="143">+4%</text><text x="4" y="198">0%</text></svg>
+<div class="legend"><span><i style="background:#50FA7B;height:4px"></i>Carteira +12,2%</span><span><i style="background:#BD93F9"></i>CDI +9,8%</span><span><i style="background:#FFB86C"></i>Ibovespa +6,1%</span><span><i style="background:#8BE9FD"></i>IPCA +4,6%</span></div></div>
+<div class="card"><h3>Contribuição por ativo</h3>
+<div class="row"><span>BTC-USD</span><b class="pos">+R$ 3.250</b></div><div class="bar"><i style="width:80%;background:var(--pos)"></i></div>
+<div class="row"><span>ETH-USD</span><b class="pos">+R$ 1.750</b></div><div class="bar"><i style="width:45%;background:var(--pos)"></i></div>
+<div class="row"><span>ITUB4.SA</span><b class="pos">+R$ 480</b></div><div class="bar"><i style="width:14%;background:var(--pos)"></i></div>
+<div class="row"><span>PETR4.SA</span><b class="pos">+R$ 330</b></div><div class="bar"><i style="width:10%;background:var(--pos)"></i></div>
+<div class="row"><span>MGLU3.SA</span><b class="neg">−R$ 502</b></div><div class="bar"><i style="width:13%"></i></div>
+<div class="row"><b>Total</b><b>+R$ 6.300</b></div></div></div>
+<div class="card"><h3>Dividendos (12 meses)</h3>
+<svg viewBox="0 0 1000 120"><line x1="20" x2="990" y1="95" y2="95" stroke="#44475A"/><g fill="#16A34A"><rect x="40" y="60" width="40" height="35"/><rect x="120" y="70" width="40" height="25"/><rect x="200" y="30" width="40" height="65"/><rect x="280" y="75" width="40" height="20"/><rect x="360" y="50" width="40" height="45"/><rect x="440" y="65" width="40" height="30"/><rect x="520" y="25" width="40" height="70"/><rect x="600" y="70" width="40" height="25"/><rect x="680" y="55" width="40" height="40"/><rect x="760" y="75" width="40" height="20"/><rect x="840" y="35" width="40" height="60"/><rect x="920" y="60" width="40" height="35"/></g><g fill="#3B82F6"><rect x="200" y="15" width="40" height="15"/><rect x="520" y="10" width="40" height="15"/><rect x="840" y="20" width="40" height="15"/></g>
+<line x1="20" x2="990" y1="62" y2="62" stroke="#FFB86C" stroke-dasharray="6 4"/><text x="800" y="58" style="fill:#FFB86C">média R$ 620</text></svg>
+<div class="row"><span>Projeção 12 meses <span class="tag">estimativa</span></span><b>R$ 7.440</b></div></div>
+</div></div>
+<p class="note"><b>Prós:</b> gráficos grandes e todos visíveis ao mesmo tempo, sem esconder nada atrás de setas; a Visão Geral continua limpa e leve. <b>Contras:</b> um clique a mais; nova tela (FXML, controller, tema, testes de captura); a ideia de "alerta de rebalanceamento" ainda ficaria na Visão Geral junto ao plano de alocação.</p>
+</div>
+
+<script>
+const v=document.querySelectorAll('.view');document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');v.forEach(x=>x.classList.toggle('hide',x.id!==b.dataset.t))});
+</script></body></html>

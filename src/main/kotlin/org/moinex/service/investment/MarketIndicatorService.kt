@@ -29,6 +29,12 @@ class MarketIndicatorService(
     private val bondOperationRepository: BondOperationRepository,
     private val clockProvider: ClockProvider,
 ) {
+    companion object {
+        const val MAX_HISTORY_GAP_DAYS = 35L
+        const val DAILY_STALE_AFTER_DAYS = 5L
+        const val MONTHLY_STALE_AFTER_DAYS = 45L
+    }
+
     private val logger = LoggerFactory.getLogger(MarketIndicatorService::class.java)
 
     @Transactional
@@ -56,6 +62,32 @@ class MarketIndicatorService(
             results.second.size,
         )
     }
+
+    /**
+     * Makes sure [indicator] has history from [startDate] to today, whether or not a bond uses it. Missing days are
+     * downloaded; a failure is logged and keeps what is stored.
+     */
+    suspend fun ensureHistory(
+        indicator: InterestIndex,
+        startDate: LocalDate,
+    ) {
+        val today = clockProvider.today()
+        val earliest = marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator)?.referenceDate
+        val latest = marketIndicatorHistoryRepository.findLatestByIndicatorType(indicator)?.referenceDate
+
+        val syncFrom =
+            when {
+                earliest == null || latest == null -> startDate
+                earliest.isAfter(startDate.plusDays(MAX_HISTORY_GAP_DAYS)) -> startDate
+                latest.isBefore(today.minusDays(staleAfterDays(indicator))) -> latest
+                else -> return
+            }
+
+        syncIndicatorHistory(indicator, syncFrom, today)
+    }
+
+    private fun staleAfterDays(indicator: InterestIndex): Long =
+        if (indicator == InterestIndex.IPCA) MONTHLY_STALE_AFTER_DAYS else DAILY_STALE_AFTER_DAYS
 
     /**
      * Get all indicator history between two dates

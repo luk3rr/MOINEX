@@ -1,3 +1,9 @@
+/*
+ * Filename: RecurringTransactionService.kt
+ * Created on: November 10, 2024
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.service.wallet
 
 import org.moinex.common.ClockProvider

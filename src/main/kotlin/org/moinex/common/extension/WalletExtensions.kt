@@ -1,3 +1,9 @@
+/*
+ * Filename: WalletExtensions.kt
+ * Created on: March 15, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.extension
 
 import org.moinex.config.BalanceCalculationConfig

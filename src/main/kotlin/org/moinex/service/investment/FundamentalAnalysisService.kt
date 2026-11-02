@@ -37,7 +37,7 @@ class FundamentalAnalysisService(
         const val CACHE_VALIDITY_HOURS = 24 * 7
         const val RECOMMENDED_UPDATE_HOURS = 24
 
-        val VALID_TICKER_TYPES = setOf(AssetType.STOCK, AssetType.REIT)
+        val VALID_TICKER_TYPES = setOf(AssetType.STOCK, AssetType.REIT, AssetType.ETF)
     }
 
     @Transactional

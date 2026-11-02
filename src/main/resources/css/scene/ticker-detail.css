@@ -1,0 +1,8 @@
+.ticker-stat-label {
+    -fx-text-fill: theme-text-secondary;
+    -fx-font-size: 11px;
+}
+
+.ticker-stat-value {
+    -fx-font-weight: bold;
+}

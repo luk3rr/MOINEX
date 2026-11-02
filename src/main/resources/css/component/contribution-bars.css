@@ -1,0 +1,20 @@
+/* Contribution by asset: one row per ticker with a bar proportional to its profit */
+
+.contribution-bar-positive {
+    -fx-background-color: theme-positive;
+    -fx-background-radius: 3;
+}
+
+.contribution-bar-negative {
+    -fx-background-color: theme-negative;
+    -fx-background-radius: 3;
+}
+
+.contribution-total-row {
+    -fx-border-color: theme-border transparent transparent transparent;
+    -fx-padding: 6 0 0 0;
+}
+
+.contribution-total-label {
+    -fx-font-weight: bold;
+}

@@ -1,3 +1,7 @@
+# Filename: transfer_data.py
+# Created on: July 18, 2025
+# Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+
 import sqlite3
 import sys
 import os

@@ -1,3 +1,9 @@
+/*
+ * Filename: DialogForm.kt
+ * Created on: October 30, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.ui
 
 import javafx.scene.Node

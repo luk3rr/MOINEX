@@ -1,3 +1,9 @@
+/*
+ * Filename: TranslationKeys.kt
+ * Created on: March 18, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.constant
 
 object TranslationKeys {
@@ -494,6 +500,40 @@ object TranslationKeys {
     // Savings
     const val SAVINGS_TAB_OVERVIEW: String = "savings.tab.overview"
     const val SAVINGS_TAB_STOCKS_FUNDS: String = "savings.tab.stocksFunds"
+    const val SAVINGS_TAB_PERFORMANCE: String = "savings.tab.performance"
+    const val SAVINGS_PERFORMANCE_BENCHMARKS_TITLE: String = "savings.performance.benchmarks.title"
+    const val SAVINGS_PERFORMANCE_BENCHMARKS_NOTE: String = "savings.performance.benchmarks.note"
+    const val SAVINGS_PERFORMANCE_BENCHMARKS_EMPTY: String = "savings.performance.benchmarks.empty"
+    const val SAVINGS_PERFORMANCE_SERIES_PORTFOLIO: String = "savings.performance.series.portfolio"
+    const val SAVINGS_PERFORMANCE_SERIES_CDI: String = "savings.performance.series.cdi"
+    const val SAVINGS_PERFORMANCE_SERIES_IBOVESPA: String = "savings.performance.series.ibovespa"
+    const val SAVINGS_PERFORMANCE_SERIES_IPCA: String = "savings.performance.series.ipca"
+    const val SAVINGS_PERFORMANCE_LOADING: String = "savings.performance.loading"
+    const val SAVINGS_PERFORMANCE_CONTRIBUTION_TITLE: String = "savings.performance.contribution.title"
+    const val SAVINGS_PERFORMANCE_CONTRIBUTION_NOTE: String = "savings.performance.contribution.note"
+    const val SAVINGS_PERFORMANCE_CONTRIBUTION_TOTAL: String = "savings.performance.contribution.total"
+    const val SAVINGS_PERFORMANCE_CONTRIBUTION_EMPTY: String = "savings.performance.contribution.empty"
+    const val SAVINGS_PERFORMANCE_DIVIDENDS_TITLE: String = "savings.performance.dividends.title"
+    const val SAVINGS_PERFORMANCE_DIVIDENDS_AVERAGE: String = "savings.performance.dividends.average"
+    const val SAVINGS_PERFORMANCE_DIVIDENDS_PROJECTION: String = "savings.performance.dividends.projection"
+    const val SAVINGS_PERFORMANCE_DIVIDENDS_OTHERS: String = "savings.performance.dividends.others"
+    const val SAVINGS_PERFORMANCE_DIVIDENDS_EMPTY: String = "savings.performance.dividends.empty"
+    const val SAVINGS_PERFORMANCE_DIVIDENDS_NOTE: String = "savings.performance.dividends.note"
+    const val SAVINGS_REBALANCE_BUTTON: String = "savings.rebalance.button"
+    const val SAVINGS_REBALANCE_TITLE: String = "savings.rebalance.title"
+    const val SAVINGS_REBALANCE_CONTRIBUTION: String = "savings.rebalance.contribution"
+    const val SAVINGS_REBALANCE_COLUMN_TYPE: String = "savings.rebalance.column.type"
+    const val SAVINGS_REBALANCE_COLUMN_CURRENT: String = "savings.rebalance.column.current"
+    const val SAVINGS_REBALANCE_COLUMN_TARGET: String = "savings.rebalance.column.target"
+    const val SAVINGS_REBALANCE_COLUMN_DEVIATION: String = "savings.rebalance.column.deviation"
+    const val SAVINGS_REBALANCE_COLUMN_ACTION: String = "savings.rebalance.column.action"
+    const val SAVINGS_REBALANCE_BUY: String = "savings.rebalance.buy"
+    const val SAVINGS_REBALANCE_SELL: String = "savings.rebalance.sell"
+    const val SAVINGS_REBALANCE_NONE: String = "savings.rebalance.none"
+    const val SAVINGS_REBALANCE_NOTE: String = "savings.rebalance.note"
+    const val SAVINGS_REBALANCE_CLOSE: String = "savings.rebalance.close"
+    const val SEARCH_ACTION_TAB_PERFORMANCE: String = "search.action.tab.savingsPerformance"
+    const val SEARCH_ACTION_TAB_PERFORMANCE_KEYWORDS: String = "search.action.tab.savingsPerformance.keywords"
     const val SAVINGS_TAB_BONDS: String = "savings.tab.bonds"
 
     // Savings Overview
@@ -533,6 +573,44 @@ object TranslationKeys {
     const val SAVINGS_STOCKS_FUNDS_BUTTON_EXCHANGE_CRYPTOS: String = "savings.stocksFunds.button.exchangeCryptos"
     const val SAVINGS_STOCKS_FUNDS_FILTER_TYPE: String = "savings.stocksFunds.filter.type"
     const val SAVINGS_STOCKS_FUNDS_FILTER_ALL: String = "savings.stocksFunds.filter.all"
+    const val SAVINGS_STOCKS_FUNDS_TABLE_HEADER_RETURN: String = "savings.stocksFunds.table.header.return"
+    const val SAVINGS_STOCKS_FUNDS_TABLE_HEADER_WEIGHT: String = "savings.stocksFunds.table.header.weight"
+    const val SAVINGS_STOCKS_FUNDS_TABLE_HEADER_DY_ON_COST: String = "savings.stocksFunds.table.header.dyOnCost"
+    const val SAVINGS_STOCKS_FUNDS_TABLE_HEADER_DAY_CHANGE: String = "savings.stocksFunds.table.header.dayChange"
+    const val SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TREND: String = "savings.stocksFunds.table.header.trend"
+    const val SAVINGS_STOCKS_FUNDS_SORT_TITLE: String = "savings.stocksFunds.sort.title"
+
+    // Ticker detail
+    const val TICKER_DETAIL_TITLE: String = "tickerDetail.title"
+    const val TICKER_DETAIL_QUANTITY: String = "tickerDetail.quantity"
+    const val TICKER_DETAIL_AVERAGE_PRICE: String = "tickerDetail.averagePrice"
+    const val TICKER_DETAIL_RETURN: String = "tickerDetail.return"
+    const val TICKER_DETAIL_TODAY: String = "tickerDetail.today"
+    const val TICKER_DETAIL_NO_HISTORY: String = "tickerDetail.noHistory"
+    const val TICKER_DETAIL_TRADES_DATE: String = "tickerDetail.trades.date"
+    const val TICKER_DETAIL_TRADES_TYPE: String = "tickerDetail.trades.type"
+    const val TICKER_DETAIL_TRADES_QUANTITY: String = "tickerDetail.trades.quantity"
+    const val TICKER_DETAIL_TRADES_PRICE: String = "tickerDetail.trades.price"
+    const val TICKER_DETAIL_BUY: String = "tickerDetail.buy"
+    const val TICKER_DETAIL_SELL: String = "tickerDetail.sell"
+    const val TICKER_DETAIL_CLOSE: String = "tickerDetail.close"
+    const val TICKER_DETAIL_PRICE: String = "tickerDetail.price"
+    const val TICKER_DETAIL_TAB_PRICE: String = "tickerDetail.tab.price"
+    const val TICKER_DETAIL_TAB_INCOME: String = "tickerDetail.tab.income"
+    const val TICKER_DETAIL_POSITION_VALUE: String = "tickerDetail.position.value"
+    const val TICKER_DETAIL_POSITION_WEIGHT: String = "tickerDetail.position.weight"
+    const val TICKER_DETAIL_POSITION_RANGE: String = "tickerDetail.position.range"
+    const val TICKER_DETAIL_POSITION_FROM_HIGH: String = "tickerDetail.position.fromHigh"
+    const val TICKER_DETAIL_INCOME_TOTAL12M: String = "tickerDetail.income.total12m"
+    const val TICKER_DETAIL_INCOME_TOTAL_RECEIVED: String = "tickerDetail.income.totalReceived"
+    const val TICKER_DETAIL_INCOME_LAST: String = "tickerDetail.income.last"
+    const val TICKER_DETAIL_INCOME_DY_ON_COST: String = "tickerDetail.income.dyOnCost"
+    const val TICKER_DETAIL_INCOME_EMPTY: String = "tickerDetail.income.empty"
+    const val SAVINGS_STOCKS_FUNDS_BUTTON_DETAIL: String = "savings.stocksFunds.button.detail"
+    const val SAVINGS_STOCKS_FUNDS_SORT_NAME: String = "savings.stocksFunds.sort.name"
+    const val SAVINGS_STOCKS_FUNDS_SORT_RETURN: String = "savings.stocksFunds.sort.return"
+    const val SAVINGS_STOCKS_FUNDS_SORT_WEIGHT: String = "savings.stocksFunds.sort.weight"
+    const val SAVINGS_STOCKS_FUNDS_SORT_DAY: String = "savings.stocksFunds.sort.day"
     const val SAVINGS_STOCKS_FUNDS_SEARCH_PLACEHOLDER: String = "savings.stocksFunds.searchPlaceholder"
     const val SAVINGS_STOCKS_FUNDS_PORTFOLIO: String = "savings.stocksFunds.portfolio"
     const val SAVINGS_STOCKS_FUNDS_DIALOG_ADD_TICKER_TITLE: String = "savings.stocksFunds.dialog.addTicker.title"
@@ -881,6 +959,57 @@ object TranslationKeys {
 
     // Fundamental Analysis - Metadata
     const val FUNDAMENTAL_ANALYSIS_REFERENCE_DATE: String = "fundamentalAnalysis.referenceDate"
+
+    // Fundamental Analysis - Reasons a metric has no value
+    const val FUNDAMENTAL_ANALYSIS_REASON_NEGATIVE_EPS: String = "fundamentalAnalysis.reason.negativeEps"
+    const val FUNDAMENTAL_ANALYSIS_REASON_NEGATIVE_EQUITY: String = "fundamentalAnalysis.reason.negativeEquity"
+    const val FUNDAMENTAL_ANALYSIS_REASON_NEGATIVE_GROWTH: String = "fundamentalAnalysis.reason.negativeGrowth"
+    const val FUNDAMENTAL_ANALYSIS_REASON_INSUFFICIENT_HISTORY: String =
+        "fundamentalAnalysis.reason.insufficientHistory"
+    const val FUNDAMENTAL_ANALYSIS_REASON_NOT_APPLICABLE: String = "fundamentalAnalysis.reason.notApplicable"
+    const val FUNDAMENTAL_ANALYSIS_REASON_DATA_UNAVAILABLE: String = "fundamentalAnalysis.reason.dataUnavailable"
+
+    // Fundamental Analysis - Insights (valuation and quality) and sector comparison
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_TITLE: String = "fundamentalAnalysis.insights.valuation.title"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_CHEAP: String = "fundamentalAnalysis.insights.valuation.cheap"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_FAIR: String = "fundamentalAnalysis.insights.valuation.fair"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_EXPENSIVE: String =
+        "fundamentalAnalysis.insights.valuation.expensive"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_UNAVAILABLE: String =
+        "fundamentalAnalysis.insights.valuation.unavailable"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_EPS_FROM_STATEMENT: String =
+        "fundamentalAnalysis.insights.valuation.epsFromStatement"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_VALUATION_TOOLTIP: String = "fundamentalAnalysis.insights.valuation.tooltip"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_TITLE: String = "fundamentalAnalysis.insights.quality.title"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_WEAK: String = "fundamentalAnalysis.insights.quality.weak"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_REGULAR: String = "fundamentalAnalysis.insights.quality.regular"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_GOOD: String = "fundamentalAnalysis.insights.quality.good"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_EXCELLENT: String = "fundamentalAnalysis.insights.quality.excellent"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_UNAVAILABLE: String =
+        "fundamentalAnalysis.insights.quality.unavailable"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_TOOLTIP: String = "fundamentalAnalysis.insights.quality.tooltip"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_TIP_PROFITABILITY: String =
+        "fundamentalAnalysis.insights.quality.tip.profitability"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_TIP_DEBT: String = "fundamentalAnalysis.insights.quality.tip.debt"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_TIP_GROWTH: String =
+        "fundamentalAnalysis.insights.quality.tip.growth"
+    const val FUNDAMENTAL_ANALYSIS_INSIGHTS_QUALITY_TIP_CASH: String = "fundamentalAnalysis.insights.quality.tip.cash"
+    const val FUNDAMENTAL_ANALYSIS_SECTOR_MEDIAN: String = "fundamentalAnalysis.sector.median"
+    const val FUNDAMENTAL_ANALYSIS_SECTOR_FEW_PEERS: String = "fundamentalAnalysis.sector.fewPeers"
+    const val FUNDAMENTAL_ANALYSIS_SECTOR_UNKNOWN: String = "fundamentalAnalysis.sector.unknown"
+    const val FUNDAMENTAL_ANALYSIS_TAB_INCOME: String = "fundamentalAnalysis.tab.income"
+    const val FUNDAMENTAL_ANALYSIS_TAB_VALUE: String = "fundamentalAnalysis.tab.value"
+    const val FUNDAMENTAL_ANALYSIS_METRIC_LAST_DIVIDEND: String = "fundamentalAnalysis.metric.lastDividend"
+    const val FUNDAMENTAL_ANALYSIS_METRIC_LAST_DIVIDEND_TOOLTIP: String =
+        "fundamentalAnalysis.metric.lastDividend.tooltip"
+    const val FUNDAMENTAL_ANALYSIS_METRIC_DIVIDENDS_12M: String = "fundamentalAnalysis.metric.dividends12m"
+    const val FUNDAMENTAL_ANALYSIS_METRIC_DIVIDENDS_12M_TOOLTIP: String =
+        "fundamentalAnalysis.metric.dividends12m.tooltip"
+    const val FUNDAMENTAL_ANALYSIS_METRIC_PRICE_TO_BOOK: String = "fundamentalAnalysis.metric.priceToBook"
+    const val FUNDAMENTAL_ANALYSIS_METRIC_PRICE_TO_BOOK_TOOLTIP: String =
+        "fundamentalAnalysis.metric.priceToBook.tooltip"
+    const val FUNDAMENTAL_ANALYSIS_FUND_NOTICE: String = "fundamentalAnalysis.fund.notice"
+    const val FUNDAMENTAL_ANALYSIS_FUND_DIVIDENDS_CHART_TITLE: String = "fundamentalAnalysis.fund.dividendsChart"
 
     // Fundamental Analysis - Errors
     const val FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_TITLE: String =

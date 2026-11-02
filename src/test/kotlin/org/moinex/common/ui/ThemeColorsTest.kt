@@ -23,6 +23,8 @@ class ThemeColorsTest :
                             Triple("theme-bg-sidebar", ThemeColors.DARK_BG_SIDEBAR, ThemeColors.LIGHT_BG_SIDEBAR),
                             Triple("theme-on-sidebar", ThemeColors.DARK_ON_SIDEBAR, ThemeColors.LIGHT_ON_SIDEBAR),
                             Triple("theme-warning", ThemeColors.DARK_WARNING, ThemeColors.LIGHT_WARNING),
+                            Triple("theme-positive", ThemeColors.DARK_POSITIVE, ThemeColors.LIGHT_POSITIVE),
+                            Triple("theme-negative", ThemeColors.DARK_NEGATIVE, ThemeColors.LIGHT_NEGATIVE),
                             Triple("theme-alloc-track", ThemeColors.DARK_ALLOC_TRACK, ThemeColors.LIGHT_ALLOC_TRACK),
                         )
                     pairs.forEach { (token, darkHex, lightHex) ->

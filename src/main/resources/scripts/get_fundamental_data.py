@@ -8,6 +8,7 @@ import sys
 import json
 import argparse
 import csv
+import re
 import time
 import yfinance as yf
 from datetime import datetime
@@ -19,6 +20,63 @@ RETRY_MAX_ATTEMPTS = 5
 RETRY_INITIAL_DELAY = 1.0
 RETRY_MULTIPLIER = 1.5
 RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
+
+EPS_DIVERGENCE_THRESHOLD = 0.25
+NON_MONETARY_ROW_MARKERS = ("shares", "rate", "ratio", "percent")
+
+SCHEMA_VERSION = 2
+ASSET_KIND_COMPANY = "company"
+ASSET_KIND_FUND = "fund"
+ASSET_KIND_ETF = "etf"
+BRAZILIAN_FUND_SYMBOL = re.compile(r"^[A-Z]{4}11$")
+DIVIDEND_MONTHS = 12
+
+REASON_NEGATIVE_EPS = "NEGATIVE_EPS"
+REASON_NEGATIVE_EQUITY = "NEGATIVE_EQUITY"
+REASON_NEGATIVE_GROWTH = "NEGATIVE_GROWTH"
+REASON_INSUFFICIENT_HISTORY = "INSUFFICIENT_HISTORY"
+REASON_NOT_APPLICABLE = "NOT_APPLICABLE"
+REASON_DATA_UNAVAILABLE = "DATA_UNAVAILABLE"
+
+METRIC_SPECS = {
+    "profitability": {"roe": "percent", "roic": "percent", "net_margin": "percent", "ebitda_margin": "percent"},
+    "debt": {
+        "total_debt": "currency",
+        "net_debt": "currency",
+        "net_debt_to_ebitda": "ratio",
+        "current_ratio": "ratio",
+    },
+    "efficiency": {"asset_turnover": "ratio", "ebitda": "currency"},
+    "cash_generation": {
+        "free_cash_flow": "currency",
+        "operating_cash_flow": "currency",
+        "capex": "currency",
+        "fcf_to_net_income": "ratio",
+    },
+    "valuation": {
+        "current_price": "currency",
+        "market_cap": "currency",
+        "enterprise_value": "currency",
+        "eps": "currency",
+        "pe_ratio": "ratio",
+        "peg_ratio": "ratio",
+        "eps_cagr": "percent",
+        "ev_to_ebitda": "ratio",
+        "earnings_yield": "percent",
+        "fcf_yield": "percent",
+        "dividend_yield": "percent",
+        "dividend_rate": "currency",
+        "payout_ratio": "percent",
+        "graham_number": "currency",
+        "graham_fair_value": "currency",
+        "margin_of_safety": "percent",
+    },
+}
+
+FUND_METRIC_SPECS = {
+    "income": {"dividend_yield": "percent", "last_dividend": "currency", "dividends_12m_total": "currency"},
+    "valuation": {"current_price": "currency", "market_cap": "currency", "price_to_book": "ratio"},
+}
 
 
 def retry_call(fn, symbol):
@@ -203,9 +261,9 @@ def calculate_roe(net_income, shareholders_equity):
 
     :param net_income: Net income
     :param shareholders_equity: Shareholders equity
-    :return: ROE as percentage or None
+    :return: ROE as percentage, or None when equity is zero or negative (the ratio would be misleading)
     """
-    if shareholders_equity and shareholders_equity != 0:
+    if shareholders_equity and shareholders_equity > 0:
         return (net_income / shareholders_equity) * 100
     return None
 
@@ -307,9 +365,9 @@ def calculate_pe_ratio(price, earnings_per_share):
 
     :param price: Current stock price
     :param earnings_per_share: Earnings per share
-    :return: P/E ratio or None
+    :return: P/E ratio, or None when earnings are zero or negative (a negative P/E means nothing)
     """
-    if earnings_per_share and earnings_per_share != 0:
+    if earnings_per_share and earnings_per_share > 0:
         return price / earnings_per_share
     return None
 
@@ -399,8 +457,9 @@ def calculate_graham_fair_value(eps, growth_rate, bond_yield=0.10):
     """
     try:
         if eps and eps > 0 and growth_rate is not None:
-            # Cap growth rate at 25% as recommended by Graham
-            g = min(growth_rate, 0.25)
+            # Cap growth rate at 25% as recommended by Graham and floor it at 0
+            # (8.5 is the no-growth multiple; negative growth would make the value negative)
+            g = max(0.0, min(growth_rate, 0.25))
 
             fair_value = (eps * (8.5 + 2 * g * 100) * 4.4) / (bond_yield * 100)
             return fair_value
@@ -538,6 +597,396 @@ def calculate_revenue_growth(revenues, reference_date=None):
         return None
 
 
+def drop_empty_periods(df, key_row):
+    """
+    Drop period columns whose key row is NaN.
+
+    Recent yfinance versions append the oldest period as a column where only
+    auxiliary rows are filled, which turned revenue/EPS CAGR (and everything
+    derived from them, like the Graham fair value and PEG) into None.
+
+    :param df: Financial statement DataFrame (rows = items, columns = periods)
+    :param key_row: Row that must be present for a period to be considered valid
+    :return: DataFrame without the empty periods
+    """
+    try:
+        if key_row in df.index:
+            return df.loc[:, df.loc[key_row].notna()]
+        return df.dropna(axis=1, how="all")
+    except Exception:
+        return df
+
+
+def statement_eps(financials, period):
+    """
+    Get the trailing-twelve-month diluted EPS from the income statement.
+
+    Annual: the most recent "Diluted EPS". Quarterly: the sum of the four most recent
+    quarters, only when all four are present.
+
+    :param financials: Income statement DataFrame
+    :param period: "annual" or "quarterly"
+    :return: EPS or None
+    """
+    try:
+        if "Diluted EPS" not in financials.index:
+            return None
+        row = financials.loc["Diluted EPS"]
+        if period == "quarterly":
+            last_four = row.iloc[:4]
+            if len(last_four) < 4 or last_four.isna().any():
+                return None
+            return float(last_four.sum())
+        valid = row.dropna()
+        return float(valid.iloc[0]) if len(valid) else None
+    except Exception:
+        return None
+
+
+def resolve_eps(eps_info, eps_statement, threshold=EPS_DIVERGENCE_THRESHOLD, force_statement=False):
+    """
+    Choose between the EPS reported by Yahoo (trailingEps) and the one from the income statement.
+
+    Yahoo's trailingEps is sometimes inconsistent (e.g. computed over a single share class), so when
+    it diverges from the statement EPS by more than the threshold the statement value is used.
+
+    :param eps_info: trailingEps from ticker.info
+    :param eps_statement: Diluted EPS from the income statement
+    :param threshold: Maximum relative divergence tolerated
+    :param force_statement: Use the statement EPS whenever it exists (e.g. after a currency conversion)
+    :return: Tuple (eps, source) where source is "info" or "statement"
+    """
+    if not eps_statement:
+        return eps_info, "info"
+    if eps_info is None or force_statement:
+        return eps_statement, "statement"
+    if abs(eps_info - eps_statement) / abs(eps_statement) > threshold:
+        return eps_statement, "statement"
+    return eps_info, "info"
+
+
+def statement_book_value_per_share(financials, shareholders_equity):
+    """
+    Book value per share consistent with the statement EPS: equity / diluted average shares.
+
+    :param financials: Income statement DataFrame
+    :param shareholders_equity: Stockholders equity of the same period
+    :return: Book value per share or None
+    """
+    try:
+        if "Diluted Average Shares" not in financials.index or not shareholders_equity:
+            return None
+        shares = financials.loc["Diluted Average Shares"].dropna()
+        if not len(shares) or shares.iloc[0] <= 0:
+            return None
+        return float(shareholders_equity) / float(shares.iloc[0])
+    except Exception:
+        return None
+
+
+def get_fx_rate(from_currency, to_currency, reference_date=None):
+    """
+    Get the closing exchange rate from one currency to another.
+
+    :param from_currency: Source currency code (e.g. "USD")
+    :param to_currency: Target currency code (e.g. "BRL")
+    :param reference_date: ISO date of the statement period; the closest earlier close is used
+    :return: Tuple (rate, date) or (None, None) when unavailable
+    """
+    try:
+        from datetime import timedelta
+        pair = yf.Ticker(f"{from_currency}{to_currency}=X")
+        if reference_date:
+            end = datetime.fromisoformat(reference_date) + timedelta(days=1)
+            hist = pair.history(start=(end - timedelta(days=8)).strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"))
+        else:
+            hist = pair.history(period="5d")
+        if hist.empty:
+            return None, None
+        return float(hist["Close"].iloc[-1]), hist.index[-1].strftime("%Y-%m-%d")
+    except Exception:
+        return None, None
+
+
+def scale_monetary_rows(df, factor):
+    """
+    Multiply the monetary rows of a statement by an exchange rate, leaving share counts and ratios alone.
+
+    :param df: Financial statement DataFrame
+    :param factor: Exchange rate
+    :return: Scaled copy of the DataFrame
+    """
+    scaled = df.copy()
+    for row in scaled.index:
+        if not any(marker in str(row).lower() for marker in NON_MONETARY_ROW_MARKERS):
+            scaled.loc[row] = scaled.loc[row] * factor
+    return scaled
+
+
+def is_non_positive(value):
+    """
+    Check whether a value exists and is zero or negative.
+
+    :param value: Number or None
+    :return: True when the value is present and not positive
+    """
+    return value is not None and value <= 0
+
+
+def missing_reason(section, key, ctx):
+    """
+    Explain why a metric has no value, so the interface can say it instead of showing "N/A".
+
+    :param section: Section name (profitability, debt, efficiency, cash_generation, valuation, growth)
+    :param key: Metric key inside the section
+    :param ctx: Dictionary with the inputs the metrics are computed from
+    :return: One of the REASON_* constants
+    """
+    eps = ctx.get("eps")
+    reason = REASON_DATA_UNAVAILABLE
+
+    if section == "profitability" and key == "roe" and is_non_positive(ctx.get("equity")):
+        reason = REASON_NEGATIVE_EQUITY
+    elif section == "debt" and key == "net_debt_to_ebitda" and is_non_positive(ctx.get("ebitda")):
+        reason = REASON_NOT_APPLICABLE
+    elif section == "growth" and key in ("yoy_growth", "cagr"):
+        minimum_periods = 2 if key == "yoy_growth" else 3
+        if ctx.get("revenue_periods", 0) < minimum_periods:
+            reason = REASON_INSUFFICIENT_HISTORY
+    elif section == "valuation":
+        if key == "pe_ratio" and is_non_positive(eps):
+            reason = REASON_NEGATIVE_EPS
+        elif key == "eps_cagr":
+            if ctx.get("eps_history_len", 0) < 2:
+                reason = REASON_INSUFFICIENT_HISTORY
+            elif is_non_positive(ctx.get("eps_oldest")):
+                reason = REASON_NEGATIVE_EPS
+        elif key == "peg_ratio":
+            if is_non_positive(eps):
+                reason = REASON_NEGATIVE_EPS
+            elif ctx.get("eps_cagr") is None:
+                reason = missing_reason("valuation", "eps_cagr", ctx)
+            elif ctx["eps_cagr"] <= 0:
+                reason = REASON_NEGATIVE_GROWTH
+        elif key == "ev_to_ebitda" and is_non_positive(ctx.get("ebitda")):
+            reason = REASON_NOT_APPLICABLE
+        elif key in ("dividend_yield", "dividend_rate", "payout_ratio") and not ctx.get("dividend_rate"):
+            reason = REASON_NOT_APPLICABLE
+        elif key == "graham_number":
+            if is_non_positive(eps):
+                reason = REASON_NEGATIVE_EPS
+            elif is_non_positive(ctx.get("book_value")):
+                reason = REASON_NEGATIVE_EQUITY
+        elif key == "graham_fair_value":
+            if is_non_positive(eps):
+                reason = REASON_NEGATIVE_EPS
+            elif eps and ctx.get("growth_estimate") is None:
+                reason = REASON_INSUFFICIENT_HISTORY
+        elif key == "margin_of_safety":
+            reason = missing_reason("valuation", "graham_fair_value", ctx)
+            if reason == REASON_INSUFFICIENT_HISTORY and ctx.get("graham_number"):
+                reason = REASON_DATA_UNAVAILABLE
+            if reason == REASON_DATA_UNAVAILABLE:
+                reason = missing_reason("valuation", "graham_number", ctx)
+    return reason
+
+
+def placeholder_metric(metric_type, reason, reference_date=None):
+    """
+    Build the object that stands for a metric without value.
+
+    :param metric_type: percent, currency, ratio or number
+    :param reason: One of the REASON_* constants
+    :param reference_date: Reference date of the data
+    :return: Metric object with a null value and the reason
+    """
+    obj = {"value": None, "type": metric_type, "data_temporality": "calculated", "reason": reason}
+    if reference_date:
+        obj["reference_date"] = reference_date
+    return obj
+
+
+def fill_missing_metrics(result, ctx, reference_dates, specs=None, reason_fn=None):
+    """
+    Make every metric of every section present: a metric that could not be computed becomes an object
+    with a null value and the reason, instead of a bare null or a missing key.
+
+    :param result: Result dictionary being built (changed in place)
+    :param ctx: Inputs used by the reason function
+    :param reference_dates: Reference date per section
+    :param specs: Mapping section -> {metric key: type}; defaults to the company metrics
+    :param reason_fn: Function (section, key, ctx) -> reason; defaults to missing_reason
+    """
+    specs = METRIC_SPECS if specs is None else specs
+    reason_fn = missing_reason if reason_fn is None else reason_fn
+
+    for section, metrics in specs.items():
+        data = result.setdefault(section, {})
+        for key, metric_type in metrics.items():
+            if data.get(key) is None:
+                data[key] = placeholder_metric(metric_type, reason_fn(section, key, ctx), reference_dates.get(section))
+
+
+def fill_missing_growth(result, ctx, reference_date):
+    """
+    Make the revenue growth metrics present, with the reason when they could not be computed.
+
+    :param result: Result dictionary being built (changed in place)
+    :param ctx: Inputs used by missing_reason
+    :param reference_date: Reference date of the growth data
+    """
+    growth = result.setdefault("growth", {})
+    revenue_growth = growth.get("revenue_growth") or {}
+    for key in ("yoy_growth", "cagr"):
+        if revenue_growth.get(key) is None:
+            revenue_growth[key] = placeholder_metric("percent", missing_reason("growth", key, ctx), reference_date)
+    revenue_growth.setdefault("years", ctx.get("revenue_periods", 0))
+    growth["revenue_growth"] = revenue_growth
+
+
+def classify_asset(symbol, info, has_statements):
+    """
+    Tell a company from a real estate fund (FII) or an ETF, since only companies have financial statements.
+
+    :param symbol: Ticker symbol (e.g. FIIA11.SA)
+    :param info: ticker.info from yfinance
+    :param has_statements: True when yfinance returned financial statements
+    :return: "company", "fund" or "etf"
+    """
+    quote_type = str(info.get("quoteType") or "").upper()
+    if quote_type in ("ETF", "MUTUALFUND"):
+        return ASSET_KIND_ETF
+
+    upper = symbol.upper()
+    is_brazilian_11 = upper.endswith(".SA") and bool(BRAZILIAN_FUND_SYMBOL.match(upper[:-3]))
+    if is_brazilian_11 and str(info.get("industry") or "").startswith("REIT"):
+        return ASSET_KIND_FUND
+    if is_brazilian_11 and not has_statements and not info.get("sector"):
+        return ASSET_KIND_ETF
+    return ASSET_KIND_COMPANY
+
+
+def monthly_dividends(dividends, today, months=DIVIDEND_MONTHS):
+    """
+    Sum the dividends per calendar month, for the last months including the current one.
+
+    :param dividends: Series of dividends indexed by payment date (may be empty)
+    :param today: Reference date (datetime)
+    :param months: How many months to return
+    :return: List of {"month": "YYYY-MM", "value": total} from the oldest to the current month
+    """
+    totals = {}
+    try:
+        for date, value in dividends.items():
+            key = date.strftime("%Y-%m")
+            totals[key] = totals.get(key, 0.0) + float(value)
+    except Exception:
+        totals = {}
+
+    result = []
+    for offset in range(months - 1, -1, -1):
+        index = today.year * 12 + (today.month - 1) - offset
+        key = f"{index // 12:04d}-{index % 12 + 1:02d}"
+        result.append({"month": key, "value": round(totals.get(key, 0.0), 6)})
+    return result
+
+
+def fund_missing_reason(section, key, ctx):
+    """
+    Explain why a fund or ETF metric has no value.
+
+    :param section: Section name (income or valuation)
+    :param key: Metric key
+    :param ctx: Dictionary with "kind" and "has_dividends"
+    :return: One of the REASON_* constants
+    """
+    if section == "income" and not ctx.get("has_dividends"):
+        return REASON_NOT_APPLICABLE
+    if key == "price_to_book" and ctx.get("kind") == ASSET_KIND_ETF:
+        return REASON_NOT_APPLICABLE
+    return REASON_DATA_UNAVAILABLE
+
+
+def build_fund_result(symbol, ticker, info, period, asset_kind):
+    """
+    Build the analysis of a fund or ETF: price performance, income and price-to-book, with no company statements.
+
+    :param symbol: Ticker symbol
+    :param ticker: yfinance Ticker object
+    :param info: ticker.info
+    :param period: "annual" or "quarterly"
+    :param asset_kind: "fund" or "etf"
+    :return: Result dictionary (same layout as the company analysis)
+    """
+    now = datetime.now()
+    today = now.strftime("%Y-%m-%d")
+    result = {
+        "symbol": symbol,
+        "company_name": safe_get(info, "longName", symbol),
+        "sector": safe_get(info, "sector"),
+        "industry": safe_get(info, "industry"),
+        "currency": safe_get(info, "currency", DEFAULT_CURRENCY),
+        "period_type": period,
+        "last_updated": now.isoformat(),
+        "schema_version": SCHEMA_VERSION,
+        "asset_kind": asset_kind,
+    }
+
+    price_performance = get_price_performance(ticker)
+    if price_performance:
+        result["price_performance"] = price_performance
+
+    price = safe_get(info, "currentPrice") or safe_get(info, "regularMarketPrice")
+    if not price and price_performance and price_performance.get("current_price"):
+        price = price_performance["current_price"]["value"]
+
+    try:
+        dividends = ticker.dividends
+    except Exception:
+        dividends = None
+    monthly = monthly_dividends(dividends if dividends is not None else [], now)
+    total_12m = sum(item["value"] for item in monthly)
+    has_dividends = total_12m > 0
+
+    if not price and not has_dividends:
+        result["error"] = "Financial data not available"
+        return result
+
+    last_dividend_value = None
+    last_dividend_date = None
+    if dividends is not None and len(dividends) > 0:
+        last_dividend_value = float(dividends.iloc[-1])
+        last_dividend_date = dividends.index[-1].strftime("%Y-%m-%d")
+
+    price_to_book = safe_get(info, "priceToBook")
+    book_value = safe_get(info, "bookValue")
+    if price_to_book is None and price and book_value:
+        price_to_book = price / book_value
+
+    result["income"] = {
+        "dividend_yield": create_percent_object(
+            (total_12m / price) * 100 if has_dividends and price else None, "calculated", today
+        ),
+        "last_dividend": create_currency_object(last_dividend_value, "historical", last_dividend_date),
+        "dividends_12m_total": create_currency_object(total_12m if has_dividends else None, "calculated", today),
+    }
+    result["valuation"] = {
+        "current_price": create_currency_object(price, "real_time"),
+        "market_cap": create_currency_object(safe_get(info, "marketCap"), "real_time"),
+        "price_to_book": create_ratio_object(price_to_book, "calculated", today),
+    }
+
+    fill_missing_metrics(
+        result,
+        {"kind": asset_kind, "has_dividends": has_dividends},
+        {"income": today, "valuation": today},
+        FUND_METRIC_SPECS,
+        fund_missing_reason,
+    )
+    result["income"]["dividends_12m"] = monthly
+    return result
+
+
 def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
     """
     Get fundamental data for a stock symbol
@@ -561,6 +1010,25 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             balance_sheet = ticker.balance_sheet
             cashflow = ticker.cashflow
 
+        asset_kind = classify_asset(symbol, info, not financials.empty and not balance_sheet.empty)
+        if asset_kind != ASSET_KIND_COMPANY:
+            return build_fund_result(symbol, ticker, info, period, asset_kind)
+
+        financials = drop_empty_periods(financials, "Total Revenue")
+        balance_sheet = drop_empty_periods(balance_sheet, "Total Assets")
+        cashflow = drop_empty_periods(cashflow, "Operating Cash Flow")
+
+        price_currency = safe_get(info, "currency", DEFAULT_CURRENCY)
+        financial_currency = safe_get(info, "financialCurrency", price_currency)
+        fx_rate = None
+        fx_date = None
+        if financial_currency != price_currency and not financials.empty:
+            fx_rate, fx_date = get_fx_rate(financial_currency, price_currency, financials.columns[0].strftime("%Y-%m-%d"))
+            if fx_rate:
+                financials = scale_monetary_rows(financials, fx_rate)
+                balance_sheet = scale_monetary_rows(balance_sheet, fx_rate)
+                cashflow = scale_monetary_rows(cashflow, fx_rate)
+
         result = {
             "symbol": symbol,
             "company_name": safe_get(info, "longName", symbol),
@@ -569,6 +1037,8 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             "currency": safe_get(info, "currency", DEFAULT_CURRENCY),
             "period_type": period,
             "last_updated": datetime.now().isoformat(),
+            "schema_version": SCHEMA_VERSION,
+            "asset_kind": ASSET_KIND_COMPANY,
         }
 
         # Current price data
@@ -682,7 +1152,10 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 }
 
             # 6. Valuation
-            eps = safe_get(info, "trailingEps")
+            eps_statement = statement_eps(financials, period)
+            eps, eps_source = resolve_eps(
+                safe_get(info, "trailingEps"), eps_statement, force_statement=bool(fx_rate)
+            )
             pe_ratio = calculate_pe_ratio(current_price, eps) if current_price and eps else None
             earnings_yield = calculate_earnings_yield(eps, current_price) if current_price and eps else None
             fcf_yield = calculate_fcf_yield(free_cash_flow, market_cap) if free_cash_flow and market_cap else None
@@ -719,6 +1192,10 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
 
             # Benjamin Graham's Fair Value calculations
             book_value_per_share = safe_get(info, "bookValue")
+            if eps_source == "statement":
+                book_value_per_share = (
+                    statement_book_value_per_share(financials, shareholders_equity) or book_value_per_share
+                )
             graham_number = calculate_graham_number(eps, book_value_per_share) if eps and book_value_per_share else None
 
             # For Graham revised formula, use revenue CAGR as growth estimate
@@ -732,7 +1209,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             # Calculate margin of safety
             margin_of_safety = None
             fair_value_used = graham_fair_value if graham_fair_value else graham_number
-            if fair_value_used and current_price:
+            if fair_value_used and fair_value_used > 0 and current_price:
                 margin_of_safety = ((fair_value_used - current_price) / fair_value_used) * 100
 
             result["valuation"] = {
@@ -752,7 +1229,36 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 "graham_number": create_currency_object(graham_number, "calculated", financials_date),
                 "graham_fair_value": create_currency_object(graham_fair_value, "calculated", financials_date),
                 "margin_of_safety": create_percent_object(margin_of_safety, "calculated", financials_date),
+                "eps_source": eps_source,
+                "financial_currency": financial_currency,
+                "fx_rate": fx_rate,
+                "fx_date": fx_date,
             }
+
+            fill_missing_metrics(
+                result,
+                {
+                    "eps": eps,
+                    "eps_cagr": eps_cagr,
+                    "eps_history_len": len(eps_history) if eps_history else 0,
+                    "eps_oldest": eps_history[-1] if eps_history else None,
+                    "book_value": book_value_per_share,
+                    "equity": shareholders_equity,
+                    "ebitda": ebitda,
+                    "dividend_rate": dividend_rate,
+                    "growth_estimate": growth_estimate,
+                    "graham_number": graham_number,
+                    "revenue_periods": min(5, len(financials.columns)),
+                },
+                {
+                    "profitability": financials_date,
+                    "debt": balance_date,
+                    "efficiency": financials_date,
+                    "cash_generation": cashflow_date,
+                    "valuation": financials_date,
+                },
+            )
+            fill_missing_growth(result, {"revenue_periods": min(5, len(financials.columns))}, financials_date)
 
         else:
             result["error"] = "Financial data not available"

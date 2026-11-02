@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockups Telas</title>
+<style>
+:root{--base:#21222C;--card:#282A36;--hover:#44475A;--text:#F8F8F2;--sec:#BFBFC3;--border:#44475A;--pos:#50FA7B;--neg:#FF5555;--warn:#FFB86C;--acc:#BD93F9;--side:#0a614e}
+*{box-sizing:border-box}body{margin:0;background:#111;color:var(--text);font:13px "Noto Sans",system-ui,sans-serif;padding:16px}
+h1{font-size:16px;margin:0 0 4px}p.n{color:#aaa;margin:0 0 12px;max-width:900px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.tabs button{background:#2a2a2a;color:#ddd;border:2px solid #555;border-radius:20px;padding:6px 16px;cursor:pointer}.tabs button.on{border-color:var(--acc);color:#fff}
+.app{background:var(--base);border:1px solid #333;border-radius:6px;padding:10px;max-width:1180px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.totals{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}.totals b{display:block;font-weight:400;color:var(--sec)}.totals span{font-size:15px}
+.btn{display:inline-block;border:2px solid var(--acc);border-radius:20px;padding:2px 12px;font-size:12px}.btn.on{background:var(--acc);color:#111}
+.tools{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--text);border:1px solid var(--border);padding:6px 8px;background:#21222c}td{padding:7px 8px;border-bottom:1px solid var(--border)}td.r,th.r{text-align:right}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.tag{display:inline-block;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:0 8px;font-size:11px}
+.badge{display:inline-block;border-radius:12px;padding:2px 12px;font-weight:700}.b-bad{background:rgba(255,85,85,.15);border:1px solid var(--neg);color:var(--neg)}.b-ok{background:rgba(80,250,123,.12);border:1px solid var(--pos);color:var(--pos)}
+.row{display:flex;justify-content:space-between;padding:3px 0;color:var(--sec)}.row b{color:var(--text)}
+.hide{display:none}.grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px}.metric small{color:var(--sec);display:block}.metric big{font-size:18px;display:block;margin:4px 0}
+.dlg{background:var(--card);border:2px solid var(--hover);border-radius:8px;padding:14px;max-width:760px}
+svg{width:100%;display:block}svg text{fill:var(--sec);font-size:10px}
+.note{color:#aaa;max-width:1180px;margin-top:10px}
+</style></head><body>
+<h1>Mockups das telas (valores fictícios e ilustrativos)</h1>
+<p class="n">Paleta Dracula do app. M3 (aba Desempenho) está em <code>overview-layouts.html</code>.</p>
+<div class="tabs"><button class="on" data-t="m1">M1 · Ações e Fundos</button><button data-t="m2">M2 · Detalhe do ativo</button><button data-t="m4">M4 · Rebalanceamento</button><button data-t="m5">M5 · Análise fundamentalista</button><button data-t="m6">M5b · FII/ETF</button></div>
+
+<div id="m1" class="view"><div class="app">
+<div class="card totals"><div><b>Capital Líquido Investido</b><span>R$ 51.627,50</span></div><div><b>Valor Atual</b><span>R$ 57.927,50</span></div><div><b>Lucro/Prejuízo</b><span class="pos">+ R$ 6.300,00</span></div><div><b>Dividendos recebidos</b><span>R$ 0,00</span></div></div>
+<div class="card"><div class="tools"><b>Portfólio</b><span class="btn">⟳ Atualizar Preços</span><span style="flex:1"></span>
+<span class="btn on">Todos</span><span class="btn">Ações</span><span class="btn">Fundos</span><span class="btn">Cripto</span><span class="btn">🔍 buscar</span></div>
+<table><tr><th>ID</th><th>Nome</th><th>Símbolo</th><th class="r">Qtd</th><th class="r">Preço</th><th class="r">Valor Total</th><th class="r">Médio</th><th>Tendência 12m</th><th class="r">Retorno ▼</th><th class="r">Peso</th><th class="r">DY/custo</th></tr>
+<tr><td>3</td><td>Itaú Unibanco PN</td><td>ITUB4.SA</td><td class="r">200</td><td class="r">28,90</td><td class="r">5.780,00</td><td class="r">26,50</td><td><svg width="90" height="24" viewBox="0 0 90 24"><polyline fill="none" stroke="#50FA7B" stroke-width="2" points="0,20 12,17 24,18 36,12 48,13 60,8 72,6 90,3"/></svg></td><td class="r pos">+ 9,06 %</td><td class="r">8,9 %</td><td class="r">6,1 %</td></tr>
+<tr><td>1</td><td>Petrobras PN</td><td>PETR4.SA</td><td class="r">100</td><td class="r">38,50</td><td class="r">3.850,00</td><td class="r">35,20</td><td><svg width="90" height="24" viewBox="0 0 90 24"><polyline fill="none" stroke="#50FA7B" stroke-width="2" points="0,5 12,8 24,14 36,18 48,14 60,10 72,8 90,6"/></svg></td><td class="r pos">+ 9,38 %</td><td class="r">5,9 %</td><td class="r">9,8 %</td></tr>
+<tr><td>2</td><td>Vale ON</td><td>VALE3.SA</td><td class="r">50</td><td class="r">62,30</td><td class="r">3.115,00</td><td class="r">58,75</td><td><svg width="90" height="24" viewBox="0 0 90 24"><polyline fill="none" stroke="#50FA7B" stroke-width="2" points="0,14 14,12 28,15 42,10 56,12 70,8 90,7"/></svg></td><td class="r pos">+ 6,04 %</td><td class="r">4,8 %</td><td class="r">5,2 %</td></tr>
+<tr><td>4</td><td>Magazine Luiza ON</td><td>MGLU3.SA</td><td class="r">150</td><td class="r">12,45</td><td class="r">1.867,50</td><td class="r">15,80</td><td><svg width="90" height="24" viewBox="0 0 90 24"><polyline fill="none" stroke="#FF5555" stroke-width="2" points="0,4 14,8 28,10 42,15 56,18 70,20 90,21"/></svg></td><td class="r neg">− 21,20 %</td><td class="r">2,9 %</td><td class="r">0,0 %</td></tr>
+<tr><td>9</td><td>Ativo novo</td><td>NEWX3.SA</td><td class="r">10</td><td class="r">20,00</td><td class="r">200,00</td><td class="r">20,00</td><td style="color:var(--sec)">—</td><td class="r">0,00 %</td><td class="r">0,3 %</td><td class="r">—</td></tr></table></div>
+<p class="note">Sparkline com cor por período; sem série mostra "—". Duplo clique na linha, menu de contexto ou busca global abrem M2. Ordenação também pelos cabeçalhos.</p></div></div>
+
+<div id="m2" class="view hide"><div class="app"><div class="dlg">
+<div style="display:flex;justify-content:space-between"><b style="font-size:15px">PETR4.SA · Petrobras PN</b><span class="btn">Análise fundamentalista</span></div>
+<div class="row"><span><b style="font-size:18px">R$ 38,50</b> <span class="pos">+0,8% hoje</span></span><span>Qtd 100 · Médio R$ 35,20 · Retorno <b class="pos">+9,38% (+R$ 330)</b></span></div>
+<div class="tools"><span class="btn">3M</span><span class="btn">6M</span><span class="btn on">12M</span></div>
+<svg viewBox="0 0 700 240"><g stroke="#44475A" stroke-width=".6"><line x1="40" x2="690" y1="30" y2="30"/><line x1="40" x2="690" y1="90" y2="90"/><line x1="40" x2="690" y1="150" y2="150"/><line x1="40" x2="690" y1="210" y2="210"/></g>
+<text x="6" y="33">42</text><text x="6" y="93">38</text><text x="6" y="153">34</text><text x="6" y="213">30</text>
+<polyline fill="none" stroke="#50FA7B" stroke-width="2" points="40,170 110,150 170,120 230,60 290,50 350,90 410,70 470,120 530,100 590,60 650,70 690,66"/>
+<line x1="40" x2="690" y1="136" y2="136" stroke="#FFB86C" stroke-dasharray="6 4"/><text x="560" y="130" style="fill:#FFB86C">preço médio 35,20</text>
+<polygon points="170,134 164,146 176,146" fill="#50FA7B"/><polygon points="470,134 464,146 476,146" fill="#50FA7B"/><polygon points="590,86 584,74 596,74" fill="#FF5555"/>
+<text x="40" y="230">jan</text><text x="230" y="230">abr</text><text x="410" y="230">jul</text><text x="590" y="230">out</text></svg>
+<div class="row"><span><span class="pos">▲</span> 12/03 compra 50 @ 33,00 · <span class="pos">▲</span> 02/07 compra 50 @ 37,40 · <span class="neg">▼</span> 10/09 venda 20 @ 40,10</span></div></div></div></div>
+
+<div id="m4" class="view hide"><div class="app"><div class="dlg">
+<b style="font-size:15px">Sugestão de rebalanceamento</b>
+<div class="tools" style="margin-top:8px">Valor para aportar (opcional): <span class="card" style="padding:3px 14px">R$ 0,00</span></div>
+<table><tr><th>Tipo</th><th class="r">Atual</th><th class="r">Meta</th><th class="r">Desvio</th><th>Ação sugerida</th></tr>
+<tr><td>Criptomoedas</td><td class="r">47,8 %</td><td class="r">2,5 %</td><td class="r neg">+45,3 pp</td><td>Vender R$ 32.900</td></tr>
+<tr><td>Fundos</td><td class="r">11,8 %</td><td class="r">30,0 %</td><td class="r neg">−18,2 pp</td><td>Comprar R$ 13.200</td></tr>
+<tr><td>Ações</td><td class="r">20,1 %</td><td class="r">30,0 %</td><td class="r neg">−9,9 pp</td><td>Comprar R$ 7.200</td></tr></table>
+<div class="row" style="margin-top:8px"><span>Estimativa; não considera impostos nem custos.</span><span class="btn">Fechar</span></div></div></div></div>
+
+<div id="m5" class="view hide"><div class="app"><div class="dlg" style="max-width:1000px">
+<div style="display:flex;justify-content:space-between"><b style="font-size:15px">PETR4.SA — Petrobras PN</b><span><span class="btn on">Anual</span> <span class="btn">Trimestral</span> <span class="btn">⟳</span></span></div>
+<div class="grid2" style="margin:10px 0"><div class="metric"><span class="badge b-bad">● CARO</span><big>Preço 52,71</big><div class="row"><span>Graham Number</span><b>35,70</b></div><div class="row"><span>Valor justo (Graham)</span><b>39,23</b></div><div class="row"><span>Margem de segurança</span><b class="neg">−34,4 %</b></div><small>LPA do balanço (1,52) em uso, em vez do Yahoo (10,49) ⓘ</small></div>
+<div class="metric"><small>Qualidade</small><big>72 / 100 · Boa</big><div class="row"><span>Rentabilidade</span><b>80</b></div><div class="row"><span>Endividamento</span><b>65</b></div><div class="row"><span>Crescimento</span><b>40</b></div><div class="row"><span>Caixa</span><b>85</b></div></div></div>
+<div class="tools"><span class="btn">Rentabilidade</span><span class="btn">Crescimento</span><span class="btn">Endividamento</span><span class="btn">Eficiência</span><span class="btn">Caixa</span><span class="btn on">Valuation</span></div>
+<div class="grid3"><div class="metric"><small>Graham Number ⓘ</small><big style="font-size:14px;color:var(--warn)">Não aplicável: LPA negativo</big><small>ref. 31/12/2025</small></div>
+<div class="metric"><small>ROE ⓘ</small><big>12,4 %</big><small class="pos">▲ vs setor 9,1 % (5 pares) · ref. 31/12/2025</small></div>
+<div class="metric"><small>PEG ⓘ</small><big style="font-size:14px;color:var(--warn)">Indisponível: crescimento do LPA negativo</big><small>ref. 31/12/2025</small></div>
+<div class="metric"><small>P/L ⓘ</small><big>34,7</big><small>vs setor — (menos de 3 pares)</small></div></div></div></div></div>
+
+<div id="m6" class="view hide"><div class="app"><div class="dlg" style="max-width:1000px">
+<div style="display:flex;justify-content:space-between"><b style="font-size:15px">FIIA11.SA — FII Logístico</b><span class="tag">Demonstrativos de empresa não se aplicam</span></div>
+<div class="tools" style="margin-top:8px"><span class="btn">Preço</span><span class="btn on">Renda</span><span class="btn">Valor</span></div>
+<div class="grid3"><div class="metric"><small>Dividend Yield (12m) ⓘ</small><big>8,9 %</big><small>ref. 30/10/2026</small></div><div class="metric"><small>Último provento ⓘ</small><big>R$ 1,10</big><small>pago em 14/10/2026</small></div><div class="metric"><small>P/VP ⓘ</small><big>0,95</big><small class="pos">● Abaixo do valor patrimonial</small></div></div>
+<div class="card" style="margin-top:10px"><small style="color:var(--sec)">Proventos mensais (12m)</small><svg viewBox="0 0 700 90"><g fill="#16A34A"><rect x="30" y="30" width="30" height="50"/><rect x="90" y="28" width="30" height="52"/><rect x="150" y="30" width="30" height="50"/><rect x="210" y="24" width="30" height="56"/><rect x="270" y="30" width="30" height="50"/><rect x="330" y="26" width="30" height="54"/><rect x="390" y="30" width="30" height="50"/><rect x="450" y="22" width="30" height="58"/><rect x="510" y="30" width="30" height="50"/><rect x="570" y="28" width="30" height="52"/></g></svg></div></div></div></div>
+<script>
+const v=document.querySelectorAll('.view');document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');v.forEach(x=>x.classList.toggle('hide',x.id!==b.dataset.t))});
+</script></body></html>

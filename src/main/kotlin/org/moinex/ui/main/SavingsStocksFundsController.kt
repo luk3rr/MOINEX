@@ -8,41 +8,51 @@
 
 package org.moinex.ui.main
 
+import atlantafx.base.controls.SegmentedControl
 import jakarta.persistence.EntityNotFoundException
 import javafx.animation.Interpolator
 import javafx.animation.RotateTransition
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.control.Button
-import javafx.scene.control.ComboBox
+import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.image.ImageView
+import javafx.scene.input.MouseButton
 import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
+import javafx.util.Callback
 import javafx.util.Duration
-import javafx.util.StringConverter
 import org.kordamp.ikonli.javafx.FontIcon
+import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isValidForFundamentalAnalysis
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.ui.ScreenActionProvider
+import org.moinex.common.ui.SegmentedFilter
+import org.moinex.common.ui.SparklineCell
+import org.moinex.common.ui.SparklineGeometry
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.model.dto.PortfolioSnapshotDTO
+import org.moinex.model.dto.TickerRowDTO
+import org.moinex.model.dto.TickerSort
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.NotificationType
-import org.moinex.model.investment.Dividend
 import org.moinex.model.investment.Ticker
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
+import org.moinex.service.investment.PortfolioAnalyticsService
+import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.investment.TickerService
 import org.moinex.ui.dialog.investment.create.AddCryptoExchangeController
 import org.moinex.ui.dialog.investment.create.AddDividendController
@@ -53,14 +63,19 @@ import org.moinex.ui.dialog.investment.update.EditTickerController
 import org.moinex.ui.dialog.investment.view.ArchivedTickersController
 import org.moinex.ui.dialog.investment.view.FundamentalAnalysisController
 import org.moinex.ui.dialog.investment.view.InvestmentTransactionsController
+import org.moinex.ui.dialog.investment.view.TickerDetailController
+import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.MessageFormat
 
 @Controller
 class SavingsStocksFundsController(
     private val tickerService: TickerService,
+    private val tickerPriceHistoryService: TickerPriceHistoryService,
+    private val portfolioAnalyticsService: PortfolioAnalyticsService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
     private val notificationService: NotificationService,
@@ -99,7 +114,10 @@ class SavingsStocksFundsController(
     private lateinit var stocksFundsFilterGroup: HBox
 
     @FXML
-    private lateinit var stocksFundsTabTickerTypeComboBox: ComboBox<AssetType>
+    private lateinit var stocksFundsTypeSegment: SegmentedControl
+
+    @FXML
+    private lateinit var stocksFundsSortSegment: SegmentedControl
 
     @FXML
     private lateinit var updatePortfolioPricesButton: Button
@@ -107,8 +125,11 @@ class SavingsStocksFundsController(
     @FXML
     private lateinit var updatePricesButtonIcon: FontIcon
 
-    private lateinit var tickers: List<Ticker>
-    private lateinit var dividends: List<Dividend>
+    private lateinit var typeFilter: SegmentedFilter<AssetType?>
+    private lateinit var sortFilter: SegmentedFilter<TickerSort>
+    private var rowsById: Map<Int, TickerRowDTO> = emptyMap()
+    private var snapshot: PortfolioSnapshotDTO? = null
+    private var refreshSequence = 0
     private var isUpdatingPortfolioPrices = false
     private var updatePricesRotation: RotateTransition? = null
 
@@ -117,6 +138,9 @@ class SavingsStocksFundsController(
 
     override fun screenActions(): List<RowAction> =
         listOf(
+            RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_DETAIL)) {
+                handleViewTickerDetail()
+            },
             RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_REGISTER_TICKER)) {
                 handleRegisterTicker()
             },
@@ -135,6 +159,9 @@ class SavingsStocksFundsController(
         RowContextMenu.install(
             stocksFundsTabTickerTable,
             listOf(
+                RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_DETAIL)) {
+                    handleViewTickerDetail()
+                },
                 RowAction(
                     preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_EDIT),
                 ) { handleEditTicker() },
@@ -162,9 +189,9 @@ class SavingsStocksFundsController(
         stocksFundsTabTickerSearchField.minWidthProperty().bind(searchWidth)
         stocksFundsTabTickerSearchField.maxWidthProperty().bind(searchWidth)
         configureTableView()
-        populateTickerTypeComboBox()
+        populateFilters()
+        openDetailOnDoubleClick()
 
-        updateTransactionTableView()
         updatePortfolioIndicators()
 
         if (isUpdatingPortfolioPrices) {
@@ -311,7 +338,10 @@ class SavingsStocksFundsController(
         FxUtils.launchBackgroundThenUI(
             background = {
                 runCatching {
-                    tickerService.updateTickersPriceFromApi(stocksFundsTabTickerTable.items)
+                    val tickers = stocksFundsTabTickerTable.items.toList()
+                    tickerService.updateTickersPriceFromApi(tickers).also {
+                        tickerPriceHistoryService.syncDailyPriceHistory(tickers)
+                    }
                 }
             },
             onUI = { result ->
@@ -395,6 +425,50 @@ class SavingsStocksFundsController(
     }
 
     @FXML
+    fun handleViewTickerDetail() {
+        val selectedTicker = stocksFundsTabTickerTable.selectionModel.selectedItem
+
+        if (selectedTicker == null) {
+            WindowUtils.showInformationDialog(
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE),
+            )
+            return
+        }
+
+        WindowUtils.openModalWindow(
+            Files.TICKER_DETAIL_FXML,
+            MessageFormat.format(
+                preferencesService.translate(TranslationKeys.TICKER_DETAIL_TITLE),
+                selectedTicker.symbol,
+            ),
+            springContext,
+            { controller: TickerDetailController ->
+                controller.setTicker(
+                    selectedTicker,
+                    if (selectedTicker.isValidForFundamentalAnalysis()) {
+                        { openFundamentalAnalysis(selectedTicker) }
+                    } else {
+                        null
+                    },
+                )
+            },
+            emptyList(),
+        )
+    }
+
+    private fun openDetailOnDoubleClick() {
+        stocksFundsTabTickerTable.setOnMouseClicked { event ->
+            if (event.clickCount == 2 &&
+                event.button == MouseButton.PRIMARY &&
+                stocksFundsTabTickerTable.selectionModel.selectedItem != null
+            ) {
+                handleViewTickerDetail()
+            }
+        }
+    }
+
+    @FXML
     fun handleViewFundamentalAnalysis() {
         val selectedTicker = stocksFundsTabTickerTable.selectionModel.selectedItem
 
@@ -414,6 +488,10 @@ class SavingsStocksFundsController(
             return
         }
 
+        openFundamentalAnalysis(selectedTicker)
+    }
+
+    private fun openFundamentalAnalysis(selectedTicker: Ticker) {
         WindowUtils.openModalWindow(
             Files.FUNDAMENTAL_ANALYSIS_FXML,
             MessageFormat.format(
@@ -478,78 +556,51 @@ class SavingsStocksFundsController(
         }
     }
 
-    private fun loadTickersFromDatabase() {
-        tickers = tickerService.getAllNonArchivedTickers()
-    }
-
-    private fun loadDividendsFromDatabase() {
-        dividends = tickerService.getAllDividends()
-    }
-
-    private fun updateNetCapitalInvestedField() {
+    private fun applyTotals(snapshot: PortfolioSnapshotDTO) {
         val netCapitalInvested =
-            tickers
-                .map { it.averageUnitValue.multiply(it.currentQuantity) }
+            snapshot.rows
+                .map { it.ticker.averageUnitValue.multiply(it.ticker.currentQuantity) }
                 .fold(BigDecimal.ZERO, BigDecimal::add)
+        val currentValue = snapshot.rows.map { it.value }.fold(BigDecimal.ZERO, BigDecimal::add)
 
         stocksFundsTabNetCapitalInvestedField.text = UIUtils.formatCurrency(netCapitalInvested)
-    }
-
-    private fun updateCurrentValueField() {
-        val currentValue =
-            tickers
-                .map { it.currentQuantity.multiply(it.currentUnitValue) }
-                .fold(BigDecimal.ZERO, BigDecimal::add)
-
         stocksFundsTabCurrentValueField.text = UIUtils.formatCurrency(currentValue)
+        stocksFundsTabProfitLossField.text = UIUtils.formatCurrency(currentValue.subtract(netCapitalInvested))
+        stocksFundsTabDividendsReceivedField.text = UIUtils.formatCurrency(snapshot.totalDividends)
     }
 
-    private fun updateProfitLossField() {
-        val netCapitalInvested =
-            tickers
-                .map { it.averageUnitValue.multiply(it.currentQuantity) }
-                .fold(BigDecimal.ZERO, BigDecimal::add)
-
-        val currentValue =
-            tickers
-                .map { it.currentQuantity.multiply(it.currentUnitValue) }
-                .fold(BigDecimal.ZERO, BigDecimal::add)
-
-        val profitLoss = currentValue.subtract(netCapitalInvested)
-
-        stocksFundsTabProfitLossField.text = UIUtils.formatCurrency(profitLoss)
-    }
-
-    private fun updateDividendsReceivedField() {
-        val dividendsReceived =
-            dividends
-                .map { it.walletTransaction!!.amount }
-                .fold(BigDecimal.ZERO, BigDecimal::add)
-
-        stocksFundsTabDividendsReceivedField.text = UIUtils.formatCurrency(dividendsReceived)
-    }
-
+    /**
+     * Reloads the portfolio in the background and then redraws the totals and the table, so that opening the screen or
+     * closing a dialog never waits for the database on the interface thread. An answer that arrives after a newer
+     * request is dropped.
+     */
     private fun updatePortfolioIndicators() {
-        loadTickersFromDatabase()
-        loadDividendsFromDatabase()
+        val request = ++refreshSequence
 
-        updateNetCapitalInvestedField()
-        updateCurrentValueField()
-        updateProfitLossField()
-        updateDividendsReceivedField()
-        updateTransactionTableView()
+        FxUtils.launchBackgroundThenUI(
+            background = { runCatching { portfolioAnalyticsService.portfolioSnapshot() } },
+            onUI = { result ->
+                if (request != refreshSequence) return@launchBackgroundThenUI
+
+                result
+                    .onSuccess {
+                        snapshot = it
+                        applyTotals(it)
+                        updateTransactionTableView()
+                    }.onFailure { logger.error("Could not load the portfolio", it) }
+            },
+        )
     }
 
     private fun updateTransactionTableView() {
+        val loaded = snapshot ?: return
         val similarTextOrId = stocksFundsTabTickerSearchField.text.lowercase()
-        val selectedTickerType = stocksFundsTabTickerTypeComboBox.value
 
-        val filteredTickers =
-            tickerService
-                .getAllNonArchivedTickers()
-                .filter { ticker ->
-                    selectedTickerType?.let { ticker.type == it } ?: true
-                }.filter { ticker ->
+        val rows =
+            PortfolioAnalyticsService
+                .filterAndSort(loaded.rows, typeFilter.value, sortFilter.value)
+                .filter { row ->
+                    val ticker = row.ticker
                     if (similarTextOrId.isEmpty()) {
                         true
                     } else {
@@ -565,35 +616,43 @@ class SavingsStocksFundsController(
                     }
                 }
 
-        stocksFundsTabTickerTable.items.setAll(filteredTickers)
+        rowsById = rows.associateBy { it.ticker.id!! }
+        stocksFundsTabTickerTable.items.setAll(rows.map { it.ticker })
         stocksFundsTabTickerTable.refresh()
     }
 
-    private fun populateTickerTypeComboBox() {
-        val tickerTypesWithNull = FXCollections.observableArrayList(AssetType.entries)
-        tickerTypesWithNull.addFirst(null)
+    private fun populateFilters() {
+        val typeOptions =
+            listOf<Pair<String, AssetType?>>(
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL) to null,
+            ) +
+                listOf(AssetType.STOCK, AssetType.REIT, AssetType.ETF, AssetType.FUND, AssetType.CRYPTOCURRENCY)
+                    .map { UIUtils.translateAssetType(it) to it }
 
-        stocksFundsTabTickerTypeComboBox.items = tickerTypesWithNull
+        typeFilter = SegmentedFilter(stocksFundsTypeSegment, typeOptions)
 
-        stocksFundsTabTickerTypeComboBox.converter =
-            object : StringConverter<AssetType>() {
-                override fun toString(tickerType: AssetType?): String =
-                    tickerType?.let {
-                        UIUtils.translateAssetType(it)
-                    } ?: preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
-
-                override fun fromString(string: String): AssetType? =
-                    if (string == preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)) {
-                        null
-                    } else {
-                        AssetType.valueOf(string)
-                    }
-            }
+        sortFilter =
+            SegmentedFilter(
+                stocksFundsSortSegment,
+                listOf(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_SORT_NAME) to TickerSort.NAME,
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_SORT_RETURN) to
+                        TickerSort.RETURN,
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_SORT_WEIGHT) to
+                        TickerSort.WEIGHT,
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_SORT_DAY) to
+                        TickerSort.DAY_CHANGE,
+                ),
+            )
     }
 
     private fun configureListeners() {
         stocksFundsTabTickerSearchField.textProperty().addListener { _, _, _ -> updateTransactionTableView() }
-        stocksFundsTabTickerTypeComboBox.valueProperty().addListener { _, _, _ -> updateTransactionTableView() }
+        typeFilter.onChange { updateTransactionTableView() }
+        sortFilter.onChange {
+            stocksFundsTabTickerTable.sortOrder.clear()
+            updateTransactionTableView()
+        }
     }
 
     private fun configureTableView() {
@@ -621,9 +680,94 @@ class SavingsStocksFundsController(
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE,
             ) { UIUtils.formatCurrencyDynamic(it.averageUnitValue) },
+            createSparklineColumn(),
+            createPercentColumn(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_RETURN, signed = true) {
+                it.returnPct
+            },
+            createPercentColumn(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_DAY_CHANGE, signed = true) {
+                it.dayChangePct
+            },
+            createPercentColumn(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_WEIGHT, signed = false) {
+                it.weightPct
+            },
+            createPercentColumn(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_DY_ON_COST, signed = false) {
+                it.dyOnCostPct
+            },
         )
 
         stocksFundsTabTickerTable.style = "${stocksFundsTabTickerTable.style}-fx-fixed-cell-size: 45px;"
+    }
+
+    private fun createSparklineColumn(): TableColumn<Ticker, List<BigDecimal>> =
+        TableColumn<Ticker, List<BigDecimal>>(
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TREND),
+        ).apply {
+            setCellValueFactory { SimpleObjectProperty(rowsById[it.value.id]?.sparkline.orEmpty()) }
+            comparator =
+                compareBy { series: List<BigDecimal> ->
+                    if (series.size < SparklineGeometry.MIN_POINTS || series.first().signum() == 0) {
+                        null
+                    } else {
+                        series.last().divide(series.first(), SPARKLINE_SORT_SCALE, RoundingMode.HALF_UP)
+                    }
+                }.let { Comparator.nullsFirst(it) }
+            cellFactory = Callback { SparklineCell(preferencesService::isDarkMode) }
+            prefWidth = SPARKLINE_COLUMN_WIDTH
+            minWidth = SPARKLINE_COLUMN_WIDTH
+            maxWidth = SPARKLINE_COLUMN_WIDTH
+            isResizable = false
+        }
+
+    private fun createPercentColumn(
+        headerKey: String,
+        signed: Boolean,
+        valueExtractor: (TickerRowDTO) -> BigDecimal?,
+    ): TableColumn<Ticker, BigDecimal> =
+        TableColumn<Ticker, BigDecimal>(preferencesService.translate(headerKey)).apply {
+            setCellValueFactory { SimpleObjectProperty(rowsById[it.value.id]?.let(valueExtractor)) }
+            comparator = compareBy(nullsFirst()) { value: BigDecimal? -> value }
+            cellFactory =
+                Callback {
+                    object : TableCell<Ticker, BigDecimal>() {
+                        override fun updateItem(
+                            item: BigDecimal?,
+                            empty: Boolean,
+                        ) {
+                            super.updateItem(item, empty)
+                            styleClass.removeAll(Styles.POSITIVE_BALANCE_STYLE, Styles.NEGATIVE_BALANCE_STYLE)
+                            alignment = Pos.CENTER_RIGHT
+                            text = if (empty) null else formatPercentCell(item, signed)
+                            if (!empty && signed && item != null && item.signum() != 0) {
+                                styleClass.add(
+                                    if (item.signum() >
+                                        0
+                                    ) {
+                                        Styles.POSITIVE_BALANCE_STYLE
+                                    } else {
+                                        Styles.NEGATIVE_BALANCE_STYLE
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+        }
+
+    private fun formatPercentCell(
+        value: BigDecimal?,
+        signed: Boolean,
+    ): String {
+        if (value == null) return Constants.NA_DATA
+
+        val sign =
+            when {
+                !signed -> ""
+                value.signum() > 0 -> "+ "
+                value.signum() < 0 -> "− "
+                else -> ""
+            }
+
+        return sign + UIUtils.formatPercentageForFundamentalAnalysis(value.abs())
     }
 
     private fun createIdColumn(): TableColumn<Ticker, Int> =
@@ -692,5 +836,8 @@ class SavingsStocksFundsController(
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(SavingsStocksFundsController::class.java)
+        private const val SPARKLINE_COLUMN_WIDTH = 100.0
+        private const val SPARKLINE_SORT_SCALE = 6
     }
 }

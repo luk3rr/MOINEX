@@ -1,0 +1,30 @@
+/* Ticker price chart: series 0 = price, 1 = average price, 2 = trades (markers only) */
+
+.ticker-price-chart .chart-series-line.default-color0 {
+    -fx-stroke: theme-chart-series-02;
+    -fx-stroke-width: 2px;
+}
+
+.ticker-price-chart .chart-series-line.default-color1 {
+    -fx-stroke: theme-warning;
+    -fx-stroke-width: 1.5px;
+    -fx-stroke-dash-array: 6 4;
+}
+
+.ticker-price-chart .chart-series-line.default-color2 {
+    -fx-stroke: transparent;
+}
+
+.ticker-price-chart .chart-line-symbol.default-color0,
+.ticker-price-chart .chart-line-symbol.default-color1 {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.ticker-price-chart .trade-buy {
+    -fx-fill: theme-positive;
+}
+
+.ticker-price-chart .trade-sell {
+    -fx-fill: theme-negative;
+}

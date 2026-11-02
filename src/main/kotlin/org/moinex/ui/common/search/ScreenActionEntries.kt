@@ -1,3 +1,9 @@
+/*
+ * Filename: ScreenActionEntries.kt
+ * Created on: October 30, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.ui.common.search
 
 import org.moinex.common.constant.TranslationKeys
@@ -15,8 +21,8 @@ data class ScreenActionEntry(
 )
 
 object ScreenActionEntries {
-    private const val SAVINGS_STOCKS_FUNDS_TAB = 1
-    private const val SAVINGS_BONDS_TAB = 2
+    private const val SAVINGS_STOCKS_FUNDS_TAB = 2
+    private const val SAVINGS_BONDS_TAB = 3
     private const val GOALS_TAB = 0
     private const val WISHLIST_TAB = 2
 

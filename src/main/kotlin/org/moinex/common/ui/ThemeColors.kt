@@ -1,3 +1,9 @@
+/*
+ * Filename: ThemeColors.kt
+ * Created on: October 29, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.ui
 
 import javafx.scene.paint.Color
@@ -21,6 +27,10 @@ object ThemeColors {
     const val LIGHT_WARNING = "#9A6700"
     const val DARK_ALLOC_TRACK = "#44475A"
     const val LIGHT_ALLOC_TRACK = "#E5E7EB"
+    const val DARK_POSITIVE = "#50FA7B"
+    const val LIGHT_POSITIVE = "#1A7F37"
+    const val DARK_NEGATIVE = "#FF5555"
+    const val LIGHT_NEGATIVE = "#C62F3E"
     const val DARK_ACCENT = "#BD93F9"
     const val LIGHT_ACCENT_TEXT = "#6D4FC2"
 
@@ -53,6 +63,10 @@ object ThemeColors {
         )
 
     fun textPrimary(isDarkMode: Boolean): Color = Color.web(if (isDarkMode) DARK_TEXT_PRIMARY else LIGHT_TEXT_PRIMARY)
+
+    fun positive(isDarkMode: Boolean): Color = Color.web(if (isDarkMode) DARK_POSITIVE else LIGHT_POSITIVE)
+
+    fun negative(isDarkMode: Boolean): Color = Color.web(if (isDarkMode) DARK_NEGATIVE else LIGHT_NEGATIVE)
 
     fun allocTrack(isDarkMode: Boolean): Color = Color.web(if (isDarkMode) DARK_ALLOC_TRACK else LIGHT_ALLOC_TRACK)
 

@@ -1,3 +1,9 @@
+/*
+ * Filename: InvestmentPerformanceSnapshotRepository.kt
+ * Created on: February 17, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.repository.investment
 
 import org.moinex.model.investment.InvestmentPerformanceSnapshot

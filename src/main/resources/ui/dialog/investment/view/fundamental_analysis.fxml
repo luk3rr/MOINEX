@@ -9,11 +9,12 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane minHeight="659.0" stylesheets="@../../../../css/component/anchor-pane.css, @../../../../css/scene/fundamental-analysis.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.investment.view.FundamentalAnalysisController">
+<AnchorPane minHeight="780.0" stylesheets="@../../../../css/component/anchor-pane.css, @../../../../css/scene/fundamental-analysis.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.investment.view.FundamentalAnalysisController">
    <children>
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -129,22 +130,27 @@
                </children>
             </AnchorPane>
 
-            <!-- Loading Container -->
-            <VBox fx:id="loadingContainer" alignment="CENTER" managed="false" spacing="20.0" visible="false" VBox.vgrow="ALWAYS">
-               <children>
-                  <ProgressIndicator fx:id="loadingIndicator" />
-                  <Label text="%fundamentalAnalysis.loading">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
+            <!-- Valuation and quality summary -->
+            <HBox fx:id="insightsBox" managed="false" spacing="10.0" visible="false" VBox.vgrow="NEVER" />
 
-            <!-- Metrics TabPane -->
-            <TabPane fx:id="metricsTabPane" maxHeight="400.0" prefHeight="350.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-               <!-- Tabs will be dynamically created by the controller -->
-            </TabPane>
+            <!-- Metrics tabs, with the loading indicator drawn over them -->
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <TabPane fx:id="metricsTabPane" maxHeight="400.0" prefHeight="350.0" tabClosingPolicy="UNAVAILABLE">
+                     <!-- Tabs will be dynamically created by the controller -->
+                  </TabPane>
+                  <VBox fx:id="loadingContainer" alignment="CENTER" managed="false" spacing="20.0" visible="false">
+                     <children>
+                        <ProgressIndicator fx:id="loadingIndicator" />
+                        <Label text="%fundamentalAnalysis.loading">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
             <HBox alignment="CENTER" spacing="10.0">
                <children>
 

@@ -4,7 +4,7 @@ Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium
 
 ## Armazenamento
 - SQLite em `~/.moinex/data/moinex.db` (diretório configurável nas preferências, com fallback para o padrão). [src: app/SpringApp.kt:28-48] [src: CLAUDE.md]
-- Pool HikariCP com 1 conexão; Hibernate 7.4 com `ddl-auto: validate` e `SQLiteDialect` do `hibernate-community-dialects`; schema só por Flyway (34 migrations, V001..V034). [src: CLAUDE.md] [src: src/main/resources/db/migration/]
+- Pool HikariCP com 1 conexão; Hibernate 7.4 com `ddl-auto: validate` e `SQLiteDialect` do `hibernate-community-dialects`; schema só por Flyway (35 migrations, V001..V035). [src: CLAUDE.md] [src: src/main/resources/db/migration/]
 - Preferências do usuário (ex.: tema, pasta do banco) em `java.util.prefs` e `PreferencesService`, fora do banco. [src: app/SpringApp.kt:31-33] [src: service/PreferencesService.kt]
 
 ## Entidades (36), por domínio
@@ -41,3 +41,16 @@ Sufixo `V0xx__descricao.sql`; `data.sql` semeia dados iniciais (inserção só s
 
 ## PII
 Dados financeiros pessoais, locais. Credenciais de IA ficam em `AiCredentialStore`; valores não são copiados aqui. [src: ai/credentials/AiCredentialStore.kt]
+
+## Atualização 2026-11-01: investimentos
+- `Asset` (@MappedSuperclass: name, symbol único, type, currentQuantity, currentUnitValue, averageUnitValue); `Ticker` acrescenta lastUpdate, isArchived, domain (site/logo). [src: model/investment/Asset.kt] [src: model/investment/Ticker.kt]
+- `TickerPriceHistory(ticker, priceDate, closingPrice, isMonthEnd)`; `InvestmentPerformanceSnapshot(referenceMonth, investedValue, portfolioValue, accumulatedCapitalGains, monthlyCapitalGains)`. [src: model/investment/]
+- `FundamentalAnalysis` (tabela `fundamental_analysis`, único por ticker+período, `data_json` TEXT). [src: model/investment/FundamentalAnalysis.kt]
+- DTOs: `InvestmentPerformanceDTO`, `TickerPerformanceDTO`, `ProfitabilityMetricsDTO`, `AllocationDTO`. [src: model/dto/]
+- `Dividend` é gerido por `TickerService`; não existe `DividendService`. [src: service/investment/TickerService.kt:333]
+
+## Atualização 2026-11-01 (intent fundamentals-and-portfolio-views, não commitado)
+- `V035__create_benchmark_price_history.sql` cria `benchmark_price_history` (entidade `BenchmarkPrice`, repositório `BenchmarkPriceRepository`): fechamento diário do Ibovespa (`^BVSP`) para a comparação de desempenho. [src: db/migration/V035__create_benchmark_price_history.sql] [src: model/investment/BenchmarkPrice.kt]
+- `TickerPriceHistory` agora também guarda série diária de 12 meses (`TickerPriceHistoryService.syncDaily`), além do fim de mês. [src: service/investment/TickerPriceHistoryService.kt]
+- `FundamentalAnalysis.data_json` passa ao schema v2 com `reason` por métrica (por que é N/A); lido por `FundamentalParser` em `FundamentalSnapshot`. [src: service/investment/FundamentalParser.kt] [src: model/dto/FundamentalSnapshot.kt]
+- DTOs novos: `BenchmarkSeriesDTO`/`DividendPanelDTO`/`ContributionDTO`, `TickerRowDTO`/`TickerDetailDTO` (com `TickerPositionDTO` e `TickerIncomeDTO`), `RebalanceDTO`, `FundamentalScoring` (veredito e nota de qualidade). [src: model/dto/]

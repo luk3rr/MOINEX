@@ -1,6 +1,5 @@
 package org.moinex.service.investment
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -280,12 +279,11 @@ class MarketIndicatorServiceTest :
             }
         }
 
-        Given("negative rate value") {
+        Given("negative rate value, as in a month of deflation") {
             When("creating indicator with negative rate") {
-                Then("should throw IllegalArgumentException") {
-                    shouldThrow<IllegalArgumentException> {
-                        MarketIndicatorHistoryFactory.create(rateValue = BigDecimal("-5.00"))
-                    }
+                Then("should accept it, because a monthly IPCA can be negative") {
+                    MarketIndicatorHistoryFactory.create(rateValue = BigDecimal("-0.32")).rateValue shouldBe
+                        BigDecimal("-0.32")
                 }
             }
         }

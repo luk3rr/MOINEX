@@ -40,9 +40,9 @@ class SearchActionCatalogTest :
             }
 
         Given("the catalog") {
-            Then("it has 23 actions with unique ids") {
-                actions.size shouldBe 23
-                actions.map { it.id }.toSet().size shouldBe 23
+            Then("it has 24 actions with unique ids") {
+                actions.size shouldBe 24
+                actions.map { it.id }.toSet().size shouldBe 24
             }
 
             Then("every screen action of the global search has its labels in both languages") {

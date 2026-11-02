@@ -1,3 +1,9 @@
+/*
+ * Filename: InvestmentPerformanceSnapshot.kt
+ * Created on: February 17, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.model.investment
 
 import jakarta.persistence.Column

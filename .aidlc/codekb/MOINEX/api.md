@@ -17,3 +17,18 @@ O app não expõe API de rede; as interfaces são internas e de saída.
 
 ## Versionamento e erros
 Sem versionamento de API. Exceções de domínio em `org.moinex.exception`. [src: src/main/kotlin/org/moinex/exception/]
+
+## Atualização 2026-11-01: contrato dos scripts Python
+Todos escrevem JSON em stdout (exceção: `get_brazilian_market_indicators.py` usa `print(dict)`). Cada métrica de `get_fundamental_data.py` é `{value, type: percent|currency|ratio|number, data_temporality: real_time|historical|calculated, reference_date?}` e as seções são `price_performance`, `profitability`, `growth`, `debt`, `efficiency`, `cash_generation`, `valuation`; sem demonstrativos vem `error: "Financial data not available"`. [src: scripts/get_fundamental_data.py] [src: service/investment/FundamentalAnalysisService.kt:103]
+
+| Script | Chamador |
+|---|---|
+| get_stock_price.py | APIUtils.fetchStockPrices (TickerService:537, MarketService:117) |
+| get_stock_price_history.py | fetchStockPriceHistory (TickerPriceHistoryService:213) |
+| get_stock_logo.py | fetchStockLogos (TickerService:669) |
+| get_fundamental_data.py | fetchFundamentalAnalysis (FundamentalAnalysisService:81) |
+| get_market_indicator_history.py | fetchMarketIndicatorHistory (MarketIndicatorService:165) |
+| get_brazilian_market_indicators.py | fetchBrazilianMarketIndicators (MarketService:105) |
+
+## Atualização 2026-11-01
+`get_stock_price_history.py` passou a devolver série diária e também `^BVSP`; `get_fundamental_data.py` emite schema v2 com `reason` por métrica e EPS do balanço, e extrai valuation, qualidade e setor para FIIs/ETFs. Os scripts seguem sem sessão `requests` própria no yfinance. [src: src/main/resources/scripts/] [src: src/test/python/]

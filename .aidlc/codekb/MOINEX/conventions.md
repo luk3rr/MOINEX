@@ -1,6 +1,6 @@
 # Conventions — MOINEX
 
-Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium-high
+Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium-high
 
 ## Estilo e lint
 - ktlint (plugin 14.2.0, engine 1.4.1, compilador embutido fixado em 2.0.21) + Spotless (plugin aplicado sem bloco de configuração); 4 espaços, linha ≤120, final de arquivo com newline. [src: .editorconfig:1-20] [src: build.gradle.kts:16-17]
@@ -30,3 +30,11 @@ Traduções em `messages_pt_BR.properties` e `messages_en.properties`; nunca ree
 
 ## Definition of done
 Lint e testes passando no pipeline (build, spotlessCheck/ktlintCheck, test+Jacoco, Sonar). [src: .github/workflows/pipeline.yml:33-39]
+
+## Atualização 2026-11-01: convenções de UI
+- Cores em CSS/FXML só de tokens `theme-*`; cores desenhadas em código só de `ThemeColors`; só sombras e scrims podem usar `rgba(0,0,0,α)`. [src: CLAUDE.md] [src: common/ui/ThemeColors.kt]
+- Ícones: `FontIcon` com literais de `Icons.kt` e classes `app-icon` + `icon-size-N`. [src: common/ui/Icons.kt]
+- Filtros com poucas opções fixas usam `SegmentedFilter`; ações de linha vão no botão direito (`RowContextMenu`); ações de tela vão no rodapé "+" e na busca global via `ScreenActionProvider`. [src: git log bf3b6d11, 135821d3, 1718224c]
+- Diálogos: `DialogForm.install` (Enter salva) e `FieldValidation` (validação inline). [src: common/ui/]
+- Testes: 128 arquivos; há testes de tokens/contraste de tema, `common/ui`, busca e `CapturePlan`, mas nenhum de controllers, charts ou `ThemeService`. [src: find src/test]
+- Antes de comitar, rodar `ktlintCheck` + `test` (hook); i18n em UTF-8 sem `\uXXXX`. [src: CLAUDE.md]

@@ -1,3 +1,9 @@
+/*
+ * Filename: ClockExtensions.kt
+ * Created on: March 8, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.extension
 
 import org.moinex.common.constant.Constants

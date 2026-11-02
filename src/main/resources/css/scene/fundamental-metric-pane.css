@@ -4,3 +4,7 @@
     -fx-font-size: 11px;
     -fx-text-fill: theme-text-secondary;
 }
+
+.metric-accent.metric-unavailable {
+    -fx-text-fill: theme-warning;
+}

@@ -1,3 +1,9 @@
+/*
+ * Filename: WalletService.kt
+ * Created on: August 31, 2024
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.service.wallet
 
 import org.moinex.common.ClockProvider

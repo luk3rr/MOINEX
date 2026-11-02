@@ -1,6 +1,6 @@
 # Overview — MOINEX
 
-Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium
+Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium
 
 ## Propósito
 App desktop de finanças pessoais (carteiras, transações, cartões de crédito, metas e planejamento, investimentos, patrimônio líquido, lista de desejos) feito com Spring Boot + JavaFX, dados locais em SQLite. [src: CLAUDE.md]
@@ -24,7 +24,7 @@ Arquivos em `src/main/kotlin/org/moinex/ui/main/`:
 | Lista de desejos | WishlistController.kt |
 | Configurações | SettingsController.kt |
 | Central de notificações | NotificationCenterController.kt |
-Utilitários: calculadora e calendário (`ui/common/CalculatorController.kt`, `CalendarController.kt`).
+Busca global (Ctrl+S) em `ui/common/search/` (telas, abas, lançamentos, ações de cada tela). Utilitários: calculadora e calendário (`ui/common/CalculatorController.kt`, `CalendarController.kt`).
 
 ## Glossário
 | Termo | Significado | Onde |
@@ -49,8 +49,13 @@ flowchart LR
 Caption: o app é local; só sai para a rede em cotações/indicadores e no chat de IA. [src: CLAUDE.md] [src: src/main/kotlin/org/moinex/ai/provider/]
 
 ## Maturidade
-- Versão 2.19.0 (tag `v2.19.0`), mais de 611 commits, tags de release `vX.Y.Z`; v2.19.0 exige Java 25. [src: build.gradle.kts:86]
+- Versão 2.20.2 (tag `v2.20.2`), 670 commits, tags de release `vX.Y.Z`; exige Java 25. [src: build.gradle.kts:88] [src: git describe]
 - Código migrado de Java para Kotlin em 2026 (cabeçalhos "Migrated to Kotlin"); ainda aparecem arquivos Java no histórico. [src: src/main/kotlin/org/moinex/app/App.kt:1-8]
 
 ## Identidade visual a preservar
 Marcada pelo usuário na validação de 2026-10-29: paleta Dracula no tema escuro, botões em pílula (raio 20, borda 2px) e o verde da sidebar (`theme-bg-sidebar` #0a614e, hover #106e5b). [user] [src: css/theme/tokens.dark.css] [src: css/component/buttons.css:1-12]
+
+## Atualização 2026-11-01
+- Tema migrado para AtlantaFX (Dracula/PrimerLight) + ícones Ikonli; JFoenix removido; identidade visual (pílulas, verde da sidebar) mantida via tokens. [src: build.gradle.kts:53-55] [src: service/ThemeService.kt]
+- Tela de ações e fundos: sem gráficos, só tabela de tickers e totais. Visão geral: rosca de alocação, barras empilhadas investido x ganho de capital, top performers, métricas de rentabilidade, alocação vs. meta, indicadores BR, cotações e commodities. [src: ui/main/SavingsStocksFundsController.kt] [src: ui/main/SavingsOverviewController.kt]
+- O banco de uso real do usuário fica fora do repositório e é somente leitura para o AI-DLC; trabalhos usam dados fictícios ou uma cópia. [user]

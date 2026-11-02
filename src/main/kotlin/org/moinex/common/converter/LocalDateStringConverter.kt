@@ -1,3 +1,9 @@
+/*
+ * Filename: LocalDateStringConverter.kt
+ * Created on: March 7, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.converter
 
 import jakarta.persistence.AttributeConverter

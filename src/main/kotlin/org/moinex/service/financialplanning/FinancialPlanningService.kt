@@ -1,3 +1,9 @@
+/*
+ * Filename: FinancialPlanningService.kt
+ * Created on: July 27, 2025
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.service.financialplanning
 
 import org.moinex.common.constant.TranslationKeys

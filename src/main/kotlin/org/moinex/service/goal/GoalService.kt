@@ -1,3 +1,9 @@
+/*
+ * Filename: GoalService.kt
+ * Created on: December 7, 2024
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.service.goal
 
 import org.moinex.common.ClockProvider

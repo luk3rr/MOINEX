@@ -1,0 +1,43 @@
+/* Dividends panel: one stacked series per ticker, with colors far apart from each other */
+
+.dividend-chart .chart-bar.default-color0,
+.dividend-chart .chart-legend-item-symbol.default-color0 {
+    -fx-bar-fill: theme-chart-series-00;
+    -fx-background-color: theme-chart-series-00;
+}
+
+.dividend-chart .chart-bar.default-color1,
+.dividend-chart .chart-legend-item-symbol.default-color1 {
+    -fx-bar-fill: theme-chart-series-02;
+    -fx-background-color: theme-chart-series-02;
+}
+
+.dividend-chart .chart-bar.default-color2,
+.dividend-chart .chart-legend-item-symbol.default-color2 {
+    -fx-bar-fill: theme-chart-series-07;
+    -fx-background-color: theme-chart-series-07;
+}
+
+.dividend-chart .chart-bar.default-color3,
+.dividend-chart .chart-legend-item-symbol.default-color3 {
+    -fx-bar-fill: theme-chart-series-12;
+    -fx-background-color: theme-chart-series-12;
+}
+
+.dividend-chart .chart-bar.default-color4,
+.dividend-chart .chart-legend-item-symbol.default-color4 {
+    -fx-bar-fill: theme-chart-series-17;
+    -fx-background-color: theme-chart-series-17;
+}
+
+.dividend-chart .chart-bar.default-color5,
+.dividend-chart .chart-legend-item-symbol.default-color5 {
+    -fx-bar-fill: theme-chart-series-21;
+    -fx-background-color: theme-chart-series-21;
+}
+
+.dividend-chart .chart-bar.default-color6,
+.dividend-chart .chart-legend-item-symbol.default-color6 {
+    -fx-bar-fill: theme-chart-series-23;
+    -fx-background-color: theme-chart-series-23;
+}

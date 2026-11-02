@@ -1,3 +1,9 @@
+/*
+ * Filename: SuggestionsHandlerHelper.kt
+ * Created on: March 15, 2025
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.common.helper
 
 import javafx.beans.value.ChangeListener

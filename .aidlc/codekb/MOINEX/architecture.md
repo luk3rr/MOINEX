@@ -1,6 +1,6 @@
 # Architecture — MOINEX
 
-Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium-high
+Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium-high
 
 ## Estilo
 Monólito em camadas, processo único: JavaFX na frente, Spring (injeção + JPA) por baixo, SQLite local. [src: CLAUDE.md]
@@ -37,9 +37,9 @@ Caption: a UI só fala com services; services falam com repositórios e Python. 
 - `AppStartupRunner` roda processamentos recorrentes e atualização de mercado em coroutines na inicialização. [src: app/AppStartupRunner.kt:42-120]
 
 ## Transversais
-- **Tema:** `ThemeService` troca uma folha de tokens (`tokens.light.css`/`tokens.dark.css`) no `rootPane` e em cada Scene/janela aberta, e aplica `ColorAdjust` nos `ImageView` para ícones no escuro. [src: service/ThemeService.kt:20-80] [src: common/extension/JavaFxUtils.kt:8-10]
+- **Tema:** `ThemeService.install()` define o user-agent stylesheet do AtlantaFX (`Dracula` ou `PrimerLight`) e registra um listener em `Window.getWindows()`, então toda janela nova ou já aberta (diálogos e `Alert` inclusos) recebe `tokens.{dark,light}.css` + `base.css` na posição 0 dos stylesheets. Cores de CSS/FXML só vêm de tokens `theme-*`; cores desenhadas em código vêm de `common/ui/ThemeColors.kt`; ícones são `FontIcon` Ikonli de `common/ui/Icons.kt`. [src: service/ThemeService.kt] [src: common/ui/ThemeColors.kt] [src: common/ui/Icons.kt]
 - **Diálogos modais:** `WindowUtils.openModalWindow/openPopupWindow` criam `Stage` + `Scene`, aplicam tokens e `common-styles.css`. [src: common/util/WindowUtils.kt:140-230]
-- **Alertas nativos** (`Alert`) em `WindowUtils.show*Dialog` não passam por `ThemeService`: ficam com o estilo padrão do JavaFX. [src: common/util/WindowUtils.kt:60-130]
+- **Alertas nativos** (`Alert`) passam a receber o tema pelo listener de janelas do `ThemeService`. [src: service/ThemeService.kt] [inferred]
 - **Ordem de inicialização do banco:** Flyway (bean manual) → `data.sql` → Hibernate valida o schema; no Spring Boot 4 isso é garantido por uma dependência explícita do `entityManagerFactory` no bean `flyway`. [src: config/FlywayConfig.kt]
 - **i18n:** `ResourceBundle` via `PreferencesService.bundle`; chaves em `TranslationKeys.kt`. [src: common/constant/TranslationKeys.kt]
 - **Assíncrono:** `FxUtils.launchOnBackground/launchBackgroundThenUI`, `AppDispatchers`. [src: common/util/FxUtils.kt] [src: config/AppDispatchers.kt]
@@ -47,3 +47,6 @@ Caption: a UI só fala com services; services falam com repositórios e Python. 
 ## Decisões e motivos
 - Python para cotações em vez de cliente Kotlin: motivo desconhecido. [inferred: yfinance só existe em Python]
 - Pool HikariCP de 1 conexão: restrição do SQLite. [src: CLAUDE.md]
+
+## Atualização 2026-11-01: infraestrutura de UI (`common/ui/`)
+`SegmentedFilter<T>` (filtro em botões), `TableColumns.centerIdHeaders`, `RowContextMenu.install` + `RowAction` (ações no botão direito da linha), `ScreenActionProvider` (cada tela expõe suas ações ao rodapé "+" e à busca global), `DialogForm` (Enter salva) e `FieldValidation` (validação inline). Busca global: `ui/common/search/{GlobalSearch,SearchActionCatalog,SearchMatcher,ScreenActionEntries,SearchModel}`, atalho Ctrl+S em `MainController`. [src: common/ui/] [src: ui/common/search/] [src: ui/main/MainController.kt:357]

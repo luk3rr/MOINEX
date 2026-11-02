@@ -10,6 +10,7 @@
       <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <tabs>
             <Tab fx:id="overviewTab" closable="false" text="%savings.tab.overview" />
+            <Tab fx:id="performanceTab" closable="false" text="%savings.tab.performance" />
             <Tab fx:id="stocksFundsTab" closable="false" text="%savings.tab.stocksFunds" />
             <Tab fx:id="bondsTab" closable="false" text="%savings.tab.bonds" />
          </tabs>

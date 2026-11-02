@@ -1,3 +1,9 @@
+/*
+ * Filename: AppDispatchers.kt
+ * Created on: March 16, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.config
 
 import kotlinx.coroutines.CoroutineDispatcher

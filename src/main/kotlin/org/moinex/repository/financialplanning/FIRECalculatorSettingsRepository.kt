@@ -1,3 +1,9 @@
+/*
+ * Filename: FIRECalculatorSettingsRepository.kt
+ * Created on: April 26, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
 package org.moinex.repository.financialplanning
 
 import org.moinex.model.financialplanning.FIRECalculatorSettings
