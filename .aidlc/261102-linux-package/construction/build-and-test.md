@@ -47,3 +47,10 @@
 - FR-6/FR-7 precisam do roteiro manual com sudo.
 - `.deb` depende de GTK3 (`libgtk-3-0 | libgtk-3-0t64`) declarado à mão; novas libs nativas do JavaFX podem exigir ajuste.
 - O Yahoo limitou o IP de teste (429); não prova o caminho de rede ponta a ponta em condições normais.
+
+## Achados na máquina real (2026-11-02)
+
+- O atalho gerado pelo jpackage não trazia `StartupWMClass`; a janela se identifica como `org.moinex.app.JavaFXApp`. Corrigido com um template de atalho (`packaging/linux/Moinex.desktop`) passado em `--resource-dir`, e a validação agora exige essa linha.
+- Ao gerar o `.deb` a partir do app-image, o jpackage trocou o ícone pelo padrão do Java (PNG 32×32). Corrigido passando o ícone do projeto como `Moinex.png` no `--resource-dir`; a validação compara o hash do ícone do `.deb` com o do projeto.
+- Mesmo com o pacote corrigido, o GNOME Shell (Wayland) continuou mostrando o ícone padrão por cache pelo caminho do arquivo; renomear o arquivo do ícone confirmou a causa. Afeta só quem já instalou um pacote com o ícone errado; novas instalações não são afetadas.
+- Lição: o CI sozinho não vê ícone nem integração com o desktop; esses itens só se confirmam numa sessão gráfica real.

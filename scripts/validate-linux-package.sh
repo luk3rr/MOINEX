@@ -47,6 +47,11 @@ CONTENTS="$(dpkg-deb -c "${DEB}")"
 for expected in "./opt/moinex/bin/Moinex" "./opt/moinex/lib/python/bin/python3" "./opt/moinex/lib/moinex-Moinex.desktop" "./opt/moinex/lib/app/moinex.jar"; do
     grep -Eq " ${expected}( -> .*)?\$" <<< "${CONTENTS}" || fail ".deb sem ${expected}"
 done
+DESKTOP="$(dpkg-deb --fsys-tarfile "${DEB}" | tar -xO ./opt/moinex/lib/moinex-Moinex.desktop)"
+grep -q "^StartupWMClass=org.moinex.app.JavaFXApp$" <<< "${DESKTOP}" || fail ".desktop sem StartupWMClass=org.moinex.app.JavaFXApp (ícone genérico na barra de tarefas)"
+DEB_ICON_SHA="$(dpkg-deb --fsys-tarfile "${DEB}" | tar -xO ./opt/moinex/lib/Moinex.png | sha256sum | awk '{print $1}')"
+SRC_ICON_SHA="$(sha256sum "${ROOT_DIR}/docs/img/icons/moinex-icon-256.png" | awk '{print $1}')"
+[ "${DEB_ICON_SHA}" = "${SRC_ICON_SHA}" ] || fail "o ícone do .deb não é o do Moinex (provável ícone padrão do Java)"
 OUTSIDE="$(awk '{print $6}' <<< "${CONTENTS}" | grep -v '^\./opt' | grep -v '^\./$' || true)"
 [ -z "${OUTSIDE}" ] || fail ".deb contém arquivos fora de /opt: ${OUTSIDE}"
 

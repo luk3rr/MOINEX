@@ -16,6 +16,7 @@ STAGING_DIR="${ROOT_DIR}/build/jpackage-input"
 APP_IMAGE_DIR="${ROOT_DIR}/build/linux-app-image"
 PYTHON_DIR="${ROOT_DIR}/build/python-linux"
 APP_CONTENT_DIR="${ROOT_DIR}/build/linux-app-content"
+RESOURCE_DIR="${ROOT_DIR}/build/linux-resources"
 APP_NAME="Moinex"
 PACKAGE_NAME="moinex"
 
@@ -117,6 +118,10 @@ build_tar() {
 build_deb() {
     log "Gerando o .deb"
     mkdir -p "${OUTPUT_DIR}"
+    rm -rf "${RESOURCE_DIR}"
+    mkdir -p "${RESOURCE_DIR}"
+    cp "${ROOT_DIR}/packaging/linux/Moinex.desktop" "${RESOURCE_DIR}/Moinex.desktop"
+    cp "${ROOT_DIR}/docs/img/icons/moinex-icon-256.png" "${RESOURCE_DIR}/Moinex.png"
     jpackage \
         --type deb \
         --app-image "${APP_IMAGE_DIR}/${APP_NAME}" \
@@ -133,6 +138,7 @@ build_deb() {
         --linux-menu-group "Office;Finance;" \
         --linux-app-category utils \
         --linux-package-deps "libgtk-3-0 | libgtk-3-0t64, libxtst6, libxxf86vm1" \
+        --resource-dir "${RESOURCE_DIR}" \
         --linux-shortcut
 }
 
