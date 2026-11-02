@@ -11,6 +11,7 @@ set PYTHON_VERSION=3.12.8
 set PYTHON_EMBED_URL=https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip
 set PYTHON_DIR=python-embedded
 set GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
+set PIP_VERSION=25.3
 
 echo [INFO] Configurando Python embarcado para o instalador...
 
@@ -56,7 +57,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 REM Install pip
 echo [INFO] Instalando pip...
-"%PYTHON_DIR%\python.exe" "%PYTHON_DIR%\get-pip.py"
+"%PYTHON_DIR%\python.exe" "%PYTHON_DIR%\get-pip.py" "pip==%PIP_VERSION%"
 
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Falha ao instalar pip
