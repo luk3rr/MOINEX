@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Generates one PNG per screen and theme with the development screenshot runner.
-# Usage: scripts/capture-screens.sh <output-dir>   (CAPTURE_ONLY=home,wallets limits the screens; CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR for Portuguese)
+# Usage: scripts/dev/capture-screens.sh <output-dir>   (CAPTURE_ONLY=home,wallets limits the screens; CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR for Portuguese)
 # The app runs with a throwaway user.home and a dummy database, never with the real data.
 set -euo pipefail
 
 if [ $# -ne 1 ]; then
-    echo "Usage: scripts/capture-screens.sh <output-dir>" >&2
+    echo "Usage: scripts/dev/capture-screens.sh <output-dir>" >&2
     exit 1
 fi
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 mkdir -p "$1"
 OUT_DIR="$(cd "$1" && pwd)"
 JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-25-openjdk-amd64}"
@@ -50,7 +50,7 @@ wait "$BOOTSTRAP_PID" 2>/dev/null || true
 BOOTSTRAP_PID=""
 
 echo "[3/4] Loading the dummy data"
-python3 "$ROOT/scripts/generate_dummy_data.py" --db_path "$DB_PATH"
+python3 "$ROOT/scripts/data/generate_dummy_data.py" --db_path "$DB_PATH"
 
 echo "[4/4] Capturing the screens into $OUT_DIR"
 "$JAVA_BIN" "${JAVA_OPTS[@]}" "-Dmoinex.capture.dir=$OUT_DIR" "-Dmoinex.capture.only=${CAPTURE_ONLY:-}" -jar "$JAR"

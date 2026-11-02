@@ -7,7 +7,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 ICON_DIR="$PROJECT_ROOT/docs/img/icons"
 PNG_FILE="$ICON_DIR/moinex-icon-256.png"
 ICO_FILE="$ICON_DIR/moinex-icon.ico"

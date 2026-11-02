@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Opens MOINEX on a throwaway database filled with mock data, for screenshots and demos.
-# Usage: scripts/demo.sh   (normally run through `make demo`)
+# Usage: scripts/dev/demo.sh   (normally run through `make demo`)
 # The app runs with a temporary user.home, so the real ~/.moinex database is never read or changed.
 # The temporary directory is removed when the window is closed.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-25-openjdk-amd64}"
 JAVA_BIN="$JAVA_HOME/bin/java"
 JAR="$ROOT/build/libs/moinex.jar"
@@ -51,7 +51,7 @@ wait "$BOOTSTRAP_PID" 2>/dev/null || true
 BOOTSTRAP_PID=""
 
 echo "[2/3] Loading the mock data"
-python3 "$ROOT/scripts/generate_dummy_data.py" --db_path "$DB_PATH"
+python3 "$ROOT/scripts/data/generate_dummy_data.py" --db_path "$DB_PATH"
 
 echo "[3/3] Opening MOINEX (close the window to discard the demo data)"
 "$JAVA_BIN" "${JAVA_OPTS[@]}" -jar "$JAR"

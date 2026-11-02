@@ -7,9 +7,9 @@
 # Tests the Linux packages in clean Ubuntu containers, as a user would: installs the .deb with apt,
 # starts the app under Xvfb, reinstalls over it (upgrade), removes it, and checks that the user data
 # survives. Also runs the portable tar.gz. Meant for the packages built by the CI (download the
-# workflow artifact) or by scripts/build-linux-package.sh.
+# workflow artifact) or by scripts/linux/build-package.sh.
 #
-# Usage: scripts/test-linux-package-containers.sh [PACKAGE_DIR]
+# Usage: scripts/linux/test-package-containers.sh [PACKAGE_DIR]
 #   PACKAGE_DIR  directory with moinex_*_amd64.deb and moinex-*-linux-x64.tar.gz (default: installer-output)
 #   IMAGES       space-separated images to test (default: "ubuntu:22.04 ubuntu:24.04")
 # Needs docker; run it with sudo (or as a user in the docker group).
@@ -17,7 +17,7 @@
 
 set -u
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PACKAGE_DIR_ARG="${1:-${ROOT_DIR}/installer-output}"
 [ -d "${PACKAGE_DIR_ARG}" ] || { echo "diretório não encontrado: ${PACKAGE_DIR_ARG}" >&2; exit 1; }
 PACKAGE_DIR="$(cd "${PACKAGE_DIR_ARG}" && pwd)"

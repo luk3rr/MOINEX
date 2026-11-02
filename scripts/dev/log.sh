@@ -6,7 +6,7 @@
 #
 # Shows the MOINEX application log. The log file is the same no matter how the app was installed
 # (.deb, tar.gz, install.sh, bootRun): ${user.home}/.local/state/moinex/moinex.log (see logback.xml).
-# Usage: scripts/log.sh [-n LINES] [-s] [-e] [-g PATTERN] [-a]
+# Usage: scripts/dev/log.sh [-n LINES] [-s] [-e] [-g PATTERN] [-a]
 #   -n LINES    number of lines to show first (default 200)
 #   -s          snapshot: print and exit instead of following the log live (default is live, like tail -f)
 #   -e          only WARN and ERROR lines
@@ -24,7 +24,7 @@ PATTERN=""
 ALL=0
 
 usage() {
-    sed -n '3,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '7,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 while getopts "n:seg:ah" opt; do

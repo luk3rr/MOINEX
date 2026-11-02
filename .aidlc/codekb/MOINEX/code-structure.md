@@ -46,7 +46,7 @@ src/test/kotlin/org/moinex/   service/, model/, ai/, factory/, common/ui/, ui/th
 | Ações e fundos | `ui/main/SavingsStocksFundsController.kt` + `resources/ui/main/savings_stocks_funds.fxml` |
 | Visão geral | `ui/main/SavingsOverviewController.kt` + `savings_overview.fxml` |
 | Gráficos | `common/chart/*` + `ChartFactory`; cores via `theme-chart-*` ou `ThemeColors` |
-| Rodar com dados fictícios | `make demo`; capturas com `scripts/capture-screens.sh <dir>` (home falso, não toca `~/.moinex`) |
+| Rodar com dados fictícios | `make demo`; capturas com `scripts/dev/capture-screens.sh <dir>` (home falso, não toca `~/.moinex`) |
 
 ## Atualização 2026-11-01 (intent fundamentals-and-portfolio-views, commitado em f426f361)
 | Assunto | Onde |

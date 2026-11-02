@@ -179,7 +179,11 @@ else
     exit 1
 fi
 
-if cp scripts/run.sh "$MOINEX_DIR/"; then
+RUN_SCRIPT="scripts/linux/run.sh"
+# Tags anteriores à reorganização de scripts/ guardam o run.sh na raiz da pasta
+[ -f "$RUN_SCRIPT" ] || RUN_SCRIPT="scripts/run.sh"
+
+if cp "$RUN_SCRIPT" "$MOINEX_DIR/"; then
     print_success ">> Script de execução copiado para $MOINEX_DIR/"
 else
     print_error "Erro ao copiar o script de execução"

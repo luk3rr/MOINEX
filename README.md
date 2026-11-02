@@ -107,12 +107,12 @@ Compila a versão escolhida na sua máquina e usa o Python do sistema. Não mist
 ```bash
 git clone https://github.com/luk3rr/MOINEX.git
 cd MOINEX
-sh scripts/install.sh
+sh scripts/linux/install.sh
 ```
 
 Escolha a versão: **main** (desenvolvimento, pode ser instável) ou uma **tag** estável. A aplicação é instalada em `$HOME/.moinex/`.
 
-Para desinstalar, execute `sh scripts/uninstall.sh`. Ele remove a aplicação e preserva seus dados em `$HOME/.moinex/data/`.
+Para desinstalar, execute `sh scripts/linux/uninstall.sh`. Ele remove a aplicação e preserva seus dados em `$HOME/.moinex/data/`.
 
 </details>
 

@@ -29,7 +29,7 @@ run: ## Run the application
 	$(GRADLE) bootRun $(GRADLE_FLAGS)
 
 demo: jar ## Open the app on a temporary database with mock data (real data untouched)
-	bash scripts/demo.sh
+	bash scripts/dev/demo.sh
 
 jar: ## Package to build/libs/moinex.jar
 	$(GRADLE) bootJar $(GRADLE_FLAGS)
@@ -55,14 +55,14 @@ clean: ## Remove build artifacts
 pre-commit: ## Run lint + tests (invoked by the git pre-commit hook)
 	$(GRADLE) ktlintCheck test $(GRADLE_FLAGS)
 
-install: ## Install/update Moinex system-wide (bash scripts/install.sh)
-	JAVA_HOME=$(JAVA_HOME) bash scripts/install.sh
+install: ## Install/update Moinex system-wide (bash scripts/linux/install.sh)
+	JAVA_HOME=$(JAVA_HOME) bash scripts/linux/install.sh
 
-uninstall: ## Remove Moinex system-wide (bash scripts/uninstall.sh)
-	bash scripts/uninstall.sh
+uninstall: ## Remove Moinex system-wide (bash scripts/linux/uninstall.sh)
+	bash scripts/linux/uninstall.sh
 
 log: ## Follow the app log live, any install method (ARGS="-s" snapshot, "-e" errors, "-g regex", "-n 500", "-a" rotated)
-	@bash scripts/log.sh $(ARGS)
+	@bash scripts/dev/log.sh $(ARGS)
 
 install-hooks: ## Point git at the tracked hooks in .githooks/
 	git config core.hooksPath .githooks

@@ -6,7 +6,7 @@
  * Script para obter os dados da base de dados antiga e inserir no Moinex.
  * Deve ser executado a partir da raiz do projeto para que os caminhos relativos funcionem corretamente.
  * Pode ser executado com:
- * $ sqlite3 $HOME/.moinex/data/moinex.db < scripts/sync.sql
+ * $ sqlite3 $HOME/.moinex/data/moinex.db < scripts/data/sync.sql
  *
  * Garanta que old.db esteja na raiz do projeto ou altere o caminho do arquivo abaixo.
  */

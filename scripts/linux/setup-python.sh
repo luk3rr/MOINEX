@@ -15,7 +15,7 @@ PYTHON_ARCHIVE="cpython-3.12.16+${PYTHON_RELEASE_TAG}-x86_64-unknown-linux-gnu-i
 PYTHON_SHA256="ce4f6d0a6cfdb3bed6e44c2f9affd85943c76a42e25ad3a259002f31d6fb8a20"
 PYTHON_URL="https://github.com/astral-sh/python-build-standalone/releases/download/${PYTHON_RELEASE_TAG}/cpython-3.12.16%2B${PYTHON_RELEASE_TAG}-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DOWNLOAD_DIR="${ROOT_DIR}/build/python-linux-download"
 OUTPUT_DIR="${ROOT_DIR}/build/python-linux"
 IMPORT_CHECK="import requests, yfinance, pandas, numpy"

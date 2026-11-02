@@ -29,11 +29,11 @@ flowchart LR
 [src: .github/workflows/pipeline.yml] [src: .github/workflows/build-windows-installer.yml] `.gitlab-ci.yml` é legado. [src: CLAUDE.md]
 
 ## Release
-Tag anotada `vX.Y.Z`; `scripts/install.sh` lê as tags. Windows: workflow no GitHub Release. [src: CLAUDE.md]
+Tag anotada `vX.Y.Z`; `scripts/linux/install.sh` lê as tags. Windows: workflow no GitHub Release. [src: CLAUDE.md]
 
 ## Verificação proposta para o AI-DLC
 `./gradlew ktlintCheck test` (mesmo conteúdo do hook de pré-commit), mais verificação visual manual com `./gradlew bootRun`, porque não há testes de UI. [src: .githooks/pre-commit] [inferred]
 
 ## Atualização 2026-11-01
-- `make demo` abre o app com dados fictícios em home temporário (`-Duser.home`), sem tocar em `~/.moinex`; `scripts/capture-screens.sh <dir>` gera PNG por tela e tema (`CAPTURE_ONLY`, `CAPTURE_LANGUAGE`). [src: Makefile:31] [src: scripts/demo.sh] [src: app/CapturePlan.kt]
+- `make demo` abre o app com dados fictícios em home temporário (`-Duser.home`), sem tocar em `~/.moinex`; `scripts/dev/capture-screens.sh <dir>` gera PNG por tela e tema (`CAPTURE_ONLY`, `CAPTURE_LANGUAGE`). [src: Makefile:31] [src: scripts/dev/demo.sh] [src: app/CapturePlan.kt]
 - O banco de uso real do usuário fica fora do repositório; somente leitura para qualquer trabalho do AI-DLC. [user]

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Measures how long the main window takes to appear, over several runs, with a throwaway user.home.
-# Usage: scripts/measure-startup.sh [runs]
+# Usage: scripts/dev/measure-startup.sh [runs]
 # Needs xwininfo and a graphical session. Prints one line per run and the average, in seconds.
 set -euo pipefail
 
 RUNS="${1:-5}"
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-25-openjdk-amd64}"
 JAR="$ROOT/build/libs/moinex.jar"
 TIMEOUT_SECONDS=90

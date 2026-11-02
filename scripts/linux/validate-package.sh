@@ -6,11 +6,11 @@
 #
 # Validates the packages in installer-output/ before they are published:
 # embedded Python imports, .deb contents and a 30 s launch under Xvfb with a temporary user.home.
-# Usage: scripts/validate-linux-package.sh [--no-launch]
+# Usage: scripts/linux/validate-package.sh [--no-launch]
 
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${ROOT_DIR}/installer-output"
 WORK_DIR="$(mktemp -d -t moinex-validate-XXXXXX)"
 LAUNCH=1

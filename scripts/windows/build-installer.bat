@@ -61,7 +61,7 @@ echo [SUCCESS] jpackage encontrado: !JPACKAGE_BIN!
 REM Setup embedded Python
 echo [INFO] Configurando Python embarcado...
 if not exist "python-embedded\python.exe" (
-    call scripts\setup-python-embedded.bat
+    call scripts\windows\setup-python-embedded.bat
     if %ERRORLEVEL% NEQ 0 (
         echo [ERROR] Falha ao configurar Python embarcado
         exit /b 1

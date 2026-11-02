@@ -66,11 +66,11 @@ Every app source file (`.kt` in `src/main`, `.py` scripts) starts with the heade
 
 ## Screenshots for visual checks
 
-`scripts/capture-screens.sh <dir>` renders the screens of `CapturePlan` (30 targets) from a fake home and a dummy database, never touching `~/.moinex`. Limit it with `CAPTURE_ONLY=<ids>`, `CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR`. Validation images from an AI-DLC intent go in `.aidlc/<intent>/construction/screenshots/`, which git ignores; do not commit them.
+`scripts/dev/capture-screens.sh <dir>` renders the screens of `CapturePlan` (30 targets) from a fake home and a dummy database, never touching `~/.moinex`. Limit it with `CAPTURE_ONLY=<ids>`, `CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR`. Validation images from an AI-DLC intent go in `.aidlc/<intent>/construction/screenshots/`, which git ignores; do not commit them.
 
 ## Linux packages
 
-`scripts/build-linux-package.sh` builds the `.deb` and the portable `tar.gz` (jpackage with an embedded JRE plus a standalone Python 3.12 prepared by `scripts/setup-python-linux.sh`, checksum pinned in the script). `scripts/validate-linux-package.sh` checks them (contents, Python imports, desktop entry and icon, 30 s launch under Xvfb) and runs in the `build-linux-package.yml` workflow. `scripts/test-linux-package-containers.sh` installs, upgrades, removes and runs the packages in clean Ubuntu containers (needs docker); use it on the CI artifact before a release. `make log` follows the app log (`~/.local/state/moinex/moinex.log`) for any install method. `core.fileMode` is false in this repo, so new scripts need `git update-index --chmod=+x` or the CI fails with "Permission denied".
+`scripts/linux/build-package.sh` builds the `.deb` and the portable `tar.gz` (jpackage with an embedded JRE plus a standalone Python 3.12 prepared by `scripts/linux/setup-python.sh`, checksum pinned in the script). `scripts/linux/validate-package.sh` checks them (contents, Python imports, desktop entry and icon, 30 s launch under Xvfb) and runs in the `build-linux-package.yml` workflow. `scripts/linux/test-package-containers.sh` installs, upgrades, removes and runs the packages in clean Ubuntu containers (needs docker); use it on the CI artifact before a release. `make log` follows the app log (`~/.local/state/moinex/moinex.log`) for any install method. `core.fileMode` is false in this repo, so new scripts need `git update-index --chmod=+x` or the CI fails with "Permission denied".
 
 ## Python Script Integration
 
@@ -111,13 +111,13 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On 
 The active CI is **GitHub Actions** (repo remote is `github.com/luk3rr/MOINEX`):
 
 - `.github/workflows/pipeline.yml` — on push/PR to `main`: build, `spotlessCheck`/`ktlintCheck`, `test` + Jacoco, then a SonarCloud scan.
-- `.github/workflows/build-windows-installer.yml` — on a GitHub Release being created (or manual dispatch): builds the Windows installer via `scripts/build-windows-installer.bat` (embedded Python via `scripts/setup-python-embedded.bat`), versioning it from `git describe --tags` (falls back to the `version` in `build.gradle.kts`), and uploads the `.exe` to the release.
+- `.github/workflows/build-windows-installer.yml` — on a GitHub Release being created (or manual dispatch): builds the Windows installer via `scripts/windows/build-installer.bat` (embedded Python via `scripts/windows/setup-python-embedded.bat`), versioning it from `git describe --tags` (falls back to the `version` in `build.gradle.kts`), and uploads the `.exe` to the release.
 
 A `.gitlab-ci.yml` also exists (`unit_test → quality → build → deploy`, SonarQube excludes `app/common/config/exception/model/repository/ui`) but hasn't been touched since March 2026 — treat it as legacy/a personal mirror pipeline, not the source of truth for this repo's CI.
 
 ## Releasing (version tags)
 
-Releases are plain annotated git tags on `main`, named `vX.Y.Z` — there's no separate changelog file. `scripts/install.sh` reads available versions straight from `git tag`, so a tag is what makes a version installable via `make install`.
+Releases are plain annotated git tags on `main`, named `vX.Y.Z` — there's no separate changelog file. `scripts/linux/install.sh` reads available versions straight from `git tag`, so a tag is what makes a version installable via `make install`.
 
 - **Bump rule:** follows the type of the most significant commit since the last tag — a `feat:` commit bumps minor, `fix:`/`chore:`-only ranges bump patch. This is a judgment call for commits that are typed `feat`/`fix` but are really just internal tooling — ask if it's ambiguous rather than bumping mechanically off the prefix.
 - **Tag message:** a short, human-readable title summarizing the release (not the raw commit message), e.g. `git tag -a v2.13.1 -m "Fix Yahoo Finance rate limiting and BRL currency conversion bug"`.

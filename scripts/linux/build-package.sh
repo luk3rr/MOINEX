@@ -5,12 +5,12 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 #
 # Builds the Linux packages of MOINEX with an embedded JRE (jpackage) and an embedded Python.
-# Usage: scripts/build-linux-package.sh [app-image|tar|deb|all] [--version X.Y.Z]
+# Usage: scripts/linux/build-package.sh [app-image|tar|deb|all] [--version X.Y.Z]
 # Output: installer-output/moinex-<version>-linux-x64.tar.gz and installer-output/moinex_<version>-1_amd64.deb
 
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${ROOT_DIR}/installer-output"
 STAGING_DIR="${ROOT_DIR}/build/jpackage-input"
 APP_IMAGE_DIR="${ROOT_DIR}/build/linux-app-image"
@@ -81,7 +81,7 @@ build_jar() {
 }
 
 build_app_image() {
-    "${ROOT_DIR}/scripts/setup-python-linux.sh"
+    "${ROOT_DIR}/scripts/linux/setup-python.sh"
     build_jar
     log "Preparando o conteúdo extra (lib/python)"
     rm -rf "${APP_CONTENT_DIR}"

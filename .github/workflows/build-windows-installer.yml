@@ -33,7 +33,7 @@ jobs:
       
       - name: Setup Python embedded
         run: |
-          .\scripts\setup-python-embedded.bat
+          .\scripts\windows\setup-python-embedded.bat
         shell: cmd
       
       - name: Verify Java version
@@ -44,7 +44,7 @@ jobs:
 
       - name: Build Windows installer
         run: |
-          .\scripts\build-windows-installer.bat
+          .\scripts\windows\build-installer.bat
         shell: cmd
       
       - name: Get version from Git tag

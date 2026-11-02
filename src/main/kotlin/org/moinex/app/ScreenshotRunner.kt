@@ -94,7 +94,7 @@ class ScreenshotRunner(
 
         if (CapturePlan.isRealUserHome(System.getProperty("user.home"), System.getenv("HOME"))) {
             logger.error(
-                "Capture refused: user.home is the real home. Run with a throwaway -Duser.home (see scripts/capture-screens.sh).",
+                "Capture refused: user.home is the real home. Run with a throwaway -Duser.home (see scripts/dev/capture-screens.sh).",
             )
             exitProcess(REFUSED_EXIT_CODE)
         }

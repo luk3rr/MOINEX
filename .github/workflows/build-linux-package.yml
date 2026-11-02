@@ -34,7 +34,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/python-linux-download
-          key: python-linux-${{ hashFiles('scripts/setup-python-linux.sh', 'requirements.txt') }}
+          key: python-linux-${{ hashFiles('scripts/linux/setup-python.sh', 'requirements.txt') }}
 
       - name: Resolve version
         id: version
@@ -57,10 +57,10 @@ jobs:
       - name: Build packages
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
-        run: ./scripts/build-linux-package.sh all --version "$VERSION"
+        run: ./scripts/linux/build-package.sh all --version "$VERSION"
 
       - name: Validate packages
-        run: ./scripts/validate-linux-package.sh
+        run: ./scripts/linux/validate-package.sh
 
       - name: Upload packages as artifact
         uses: actions/upload-artifact@v4
