@@ -10,8 +10,8 @@ setlocal enabledelayedexpansion
 set PYTHON_VERSION=3.12.8
 set PYTHON_EMBED_URL=https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip
 set PYTHON_DIR=python-embedded
-set GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
 set PIP_VERSION=25.3
+set PIP_WHEEL_URL=https://files.pythonhosted.org/packages/py3/p/pip/pip-%PIP_VERSION%-py3-none-any.whl
 
 echo [INFO] Configurando Python embarcado para o instalador...
 
@@ -46,21 +46,29 @@ for %%f in (python*._pth) do (
 )
 cd ..
 
-REM Download get-pip.py
-echo [INFO] Baixando get-pip.py...
-powershell -Command "Invoke-WebRequest -Uri '%GET_PIP_URL%' -OutFile '%PYTHON_DIR%\get-pip.py'"
+REM Install pip by unpacking its wheel into site-packages (get-pip.py is refused by pip's Windows self-modification guard)
+echo [INFO] Baixando pip %PIP_VERSION%...
+powershell -Command "Invoke-WebRequest -Uri '%PIP_WHEEL_URL%' -OutFile 'pip.whl'"
 
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Falha ao baixar get-pip.py
+    echo [ERROR] Falha ao baixar pip
     exit /b 1
 )
 
-REM Install pip
 echo [INFO] Instalando pip...
-"%PYTHON_DIR%\python.exe" "%PYTHON_DIR%\get-pip.py" "pip==%PIP_VERSION%"
+powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('pip.whl', '%PYTHON_DIR%\Lib\site-packages')"
 
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Falha ao instalar pip
+    exit /b 1
+)
+
+del pip.whl
+
+"%PYTHON_DIR%\python.exe" -m pip --version
+
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] pip nao funciona apos a instalacao
     exit /b 1
 )
 
@@ -81,8 +89,5 @@ if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Falha ao instalar dependencias Python
     exit /b 1
 )
-
-REM Clean up get-pip.py
-del "%PYTHON_DIR%\get-pip.py"
 
 echo [SUCCESS] Python embarcado configurado com sucesso em %PYTHON_DIR%\
