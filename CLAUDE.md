@@ -68,6 +68,10 @@ Every app source file (`.kt` in `src/main`, `.py` scripts) starts with the heade
 
 `scripts/capture-screens.sh <dir>` renders the screens of `CapturePlan` (30 targets) from a fake home and a dummy database, never touching `~/.moinex`. Limit it with `CAPTURE_ONLY=<ids>`, `CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR`. Validation images from an AI-DLC intent go in `.aidlc/<intent>/construction/screenshots/`, which git ignores; do not commit them.
 
+## Linux packages
+
+`scripts/build-linux-package.sh` builds the `.deb` and the portable `tar.gz` (jpackage with an embedded JRE plus a standalone Python 3.12 prepared by `scripts/setup-python-linux.sh`, checksum pinned in the script). `scripts/validate-linux-package.sh` checks them (contents, Python imports, desktop entry and icon, 30 s launch under Xvfb) and runs in the `build-linux-package.yml` workflow. `scripts/test-linux-package-containers.sh` installs, upgrades, removes and runs the packages in clean Ubuntu containers (needs docker); use it on the CI artifact before a release. `make log` follows the app log (`~/.local/state/moinex/moinex.log`) for any install method. `core.fileMode` is false in this repo, so new scripts need `git update-index --chmod=+x` or the CI fails with "Permission denied".
+
 ## Python Script Integration
 
 Six Python scripts in `src/main/resources/scripts/` fetch external financial data (yfinance, HTTP). They are executed by `APIUtils` as subprocesses:
