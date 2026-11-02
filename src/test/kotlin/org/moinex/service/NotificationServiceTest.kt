@@ -10,9 +10,13 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.slot
+import io.mockk.unmockkObject
 import io.mockk.verify
+import kotlinx.coroutines.Job
 import org.moinex.common.ClockProvider
+import org.moinex.common.util.FxUtils
 import org.moinex.model.Notification
 import org.moinex.model.enums.NotificationType
 import org.moinex.repository.NotificationRepository
@@ -25,6 +29,13 @@ class NotificationServiceTest :
         val service = NotificationService(repository, clockProvider)
 
         every { clockProvider.now() } returns LocalDateTime.of(2026, 11, 2, 10, 0)
+
+        beforeSpec {
+            mockkObject(FxUtils)
+            every { FxUtils.launchOnFxThread(any()) } returns mockk<Job>(relaxed = true)
+        }
+
+        afterSpec { unmockkObject(FxUtils) }
 
         Given("a notification sent with an action url") {
             When("send is called") {
