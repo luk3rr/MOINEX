@@ -62,7 +62,7 @@ O Moinex está disponível para **Linux** e **Windows**.
 - Aplicação: `%USERPROFILE%\.moinex\`
 - Base de dados: `%USERPROFILE%\.moinex\data\moinex.db`
 - Logos de ações: `%USERPROFILE%\.moinex\logos\`
-- Logs: `%LOCALAPPDATA%\moinex\state`
+- Logs: `%USERPROFILE%\.local\state\moinex`
 
 ### Linux
 

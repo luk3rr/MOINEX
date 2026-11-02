@@ -188,7 +188,10 @@ object APIUtils {
         val process =
             ProcessBuilder(command)
                 .redirectErrorStream(false)
-                .start()
+                .apply {
+                    environment()["PYTHONUTF8"] = "1"
+                    environment()["PYTHONIOENCODING"] = "utf-8"
+                }.start()
 
         registerProcess(process)
 

@@ -14,7 +14,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="${ROOT_DIR}/installer-output"
 WORK_DIR="$(mktemp -d -t moinex-validate-XXXXXX)"
 LAUNCH=1
-IMPORT_CHECK="import requests, yfinance, pandas, numpy"
+IMPORT_CHECK="import requests, yfinance, pandas, numpy, PIL"
 
 [ "${1:-}" = "--no-launch" ] && LAUNCH=0
 

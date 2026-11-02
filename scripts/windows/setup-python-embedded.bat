@@ -73,8 +73,8 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 REM Install required packages
-echo [INFO] Instalando dependencias Python (requests, yfinance, pandas)...
-"%PYTHON_DIR%\python.exe" -m pip install requests==2.32.3 yfinance==0.2.54 pandas==2.2.3
+echo [INFO] Instalando dependencias Python de requirements.txt...
+"%PYTHON_DIR%\python.exe" -m pip install -r requirements.txt
 
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Falha ao instalar dependencias Python
