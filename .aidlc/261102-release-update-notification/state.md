@@ -1,7 +1,7 @@
 # AI-DLC State — release-update-notification
 
 - Intent: 261102-release-update-notification
-- Status: COMPLETE (aguardando revisão e commit do dono)
+- Status: COMPLETE (released as v2.22.0)
 - Profile: classic   Depth: Standard   Tests: Standard
 - Project type: brownfield   Repos: MOINEX (HEAD 42d751b4; codekb em 95b19ba7)
 - Switches: collaborators=off reviewers=off plan_approval=off walking_skeleton=off autonomy=unset iteration=unit-major
