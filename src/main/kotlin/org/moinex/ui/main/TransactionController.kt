@@ -104,6 +104,11 @@ class TransactionController(
     private lateinit var transactionsTypeFilter: SegmentedFilter<WalletTransactionType?>
 
     @FXML
+    private lateinit var transactionsStatusSegment: SegmentedControl
+
+    private lateinit var transactionsStatusFilter: SegmentedFilter<WalletTransactionStatus?>
+
+    @FXML
     private lateinit var transactionsEndDatePicker: DatePicker
 
     @FXML
@@ -195,6 +200,7 @@ class TransactionController(
         yearResumeComboBox.setOnAction { updateYearResume() }
         moneyFlowFilter.onChange { updateMoneyFlow() }
         transactionsTypeFilter.onChange { updateTransactionTableView() }
+        transactionsStatusFilter.onChange { updateTransactionTableView() }
         transactionsStartDatePicker.setOnAction { updateTransactionTableView() }
         transactionsEndDatePicker.setOnAction { updateTransactionTableView() }
         transactionsSearchField.textProperty().addListener { _, _, _ -> updateTransactionTableView() }
@@ -430,6 +436,7 @@ class TransactionController(
     private fun updateTransactionTableView() {
         val similarTextOrId = transactionsSearchField.text.lowercase()
         val selectedWalletTransactionType = transactionsTypeFilter.value
+        val selectedWalletTransactionStatus = transactionsStatusFilter.value
 
         val startDate = transactionsStartDatePicker.value.atStartOfDay()
         val endDate = transactionsEndDatePicker.value.atEndOfDay()
@@ -442,6 +449,9 @@ class TransactionController(
                 .filter { transaction ->
                     selectedWalletTransactionType == null ||
                         transaction.type == selectedWalletTransactionType
+                }.filter { transaction ->
+                    selectedWalletTransactionStatus == null ||
+                        transaction.status == selectedWalletTransactionStatus
                 }
 
         val filteredTransactions =
@@ -717,6 +727,18 @@ class TransactionController(
                         WalletTransactionType.EXPENSE,
                     preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOMES) to
                         WalletTransactionType.INCOME,
+                ),
+            )
+
+        transactionsStatusFilter =
+            SegmentedFilter(
+                transactionsStatusSegment,
+                listOf(
+                    preferencesService.translate(TranslationKeys.TRANSACTION_FILTER_ALL) to null,
+                    preferencesService.translate(TranslationKeys.TRANSACTION_STATUS_PENDING) to
+                        WalletTransactionStatus.PENDING,
+                    preferencesService.translate(TranslationKeys.TRANSACTION_STATUS_CONFIRMED) to
+                        WalletTransactionStatus.CONFIRMED,
                 ),
             )
     }

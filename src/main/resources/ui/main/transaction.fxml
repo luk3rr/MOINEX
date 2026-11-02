@@ -125,6 +125,16 @@
                                                                   </VBox>
                                                                   <VBox alignment="CENTER">
                                                                      <children>
+                                                                        <Label text="%transaction.transactionList.header.status">
+                                                                           <font>
+                                                                              <Font size="10.0" />
+                                                                           </font>
+                                                                        </Label>
+                                                                        <SegmentedControl fx:id="transactionsStatusSegment" styleClass="filter-segment" />
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <VBox alignment="CENTER">
+                                                                     <children>
                                                                         <Label text="%transaction.transactionList.startDate">
                                                                            <font>
                                                                               <Font size="10.0" />
