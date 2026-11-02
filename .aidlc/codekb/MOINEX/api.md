@@ -1,6 +1,6 @@
 # API / interfaces — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: medium
+Status: human-reviewed (2026-11-02, HEAD 95b19ba7) · Confidence: medium
 
 O app não expõe API de rede; as interfaces são internas e de saída.
 

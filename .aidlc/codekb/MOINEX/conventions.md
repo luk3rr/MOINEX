@@ -38,3 +38,7 @@ Lint e testes passando no pipeline (build, spotlessCheck/ktlintCheck, test+Jacoc
 - Diálogos: `DialogForm.install` (Enter salva) e `FieldValidation` (validação inline). [src: common/ui/]
 - Testes: 128 arquivos; há testes de tokens/contraste de tema, `common/ui`, busca e `CapturePlan`, mas nenhum de controllers, charts ou `ThemeService`. [src: find src/test]
 - Antes de comitar, rodar `ktlintCheck` + `test` (hook); i18n em UTF-8 sem `\uXXXX`. [src: CLAUDE.md]
+
+## Atualização 2026-11-02: header de arquivo e TitledValue
+- Todo arquivo de código da app (`.kt` em `src/main`, `.py` de scripts) começa com o header `Filename` / `Created on: <Month D, YYYY>` / `Author`, criado junto com o arquivo (`/* */` em Kotlin, `#` em Python); arquivos migrados de Java usam a data do `.java` original. Os 98 arquivos que não tinham foram corrigidos em f426f361; testes não seguem o padrão. [user] [mem: M-012] [src: CLAUDE.md "File header"]
+- "<Título>: <Valor>" usa `common/ui/TitledValue`; telas antigas migram quando tocadas. [user] [mem: M-010]

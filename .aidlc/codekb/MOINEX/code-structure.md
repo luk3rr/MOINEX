@@ -1,6 +1,6 @@
 # Code structure — MOINEX
 
-Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: high
+Status: human-reviewed (2026-11-02, HEAD 95b19ba7) · Confidence: high
 
 ## Mapa (profundidade ≤3)
 ```
@@ -48,7 +48,7 @@ src/test/kotlin/org/moinex/   service/, model/, ai/, factory/, common/ui/, ui/th
 | Gráficos | `common/chart/*` + `ChartFactory`; cores via `theme-chart-*` ou `ThemeColors` |
 | Rodar com dados fictícios | `make demo`; capturas com `scripts/capture-screens.sh <dir>` (home falso, não toca `~/.moinex`) |
 
-## Atualização 2026-11-01 (intent fundamentals-and-portfolio-views, não commitado)
+## Atualização 2026-11-01 (intent fundamentals-and-portfolio-views, commitado em f426f361)
 | Assunto | Onde |
 |---|---|
 | Números da carteira (linhas da tabela, detalhe, proventos, rebalanceamento, maiores variações) | `service/investment/PortfolioAnalyticsService.kt` |

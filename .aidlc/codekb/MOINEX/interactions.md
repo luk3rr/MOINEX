@@ -1,6 +1,6 @@
 # Interactions — MOINEX
 
-Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium-high
+Status: human-reviewed (2026-11-02, HEAD 95b19ba7) · Confidence: medium-high
 
 ## 1. Inicialização
 ```mermaid
@@ -71,5 +71,5 @@ Só aceita ticker não arquivado do tipo STOCK ou REIT; "error" lança `APIFetch
 ## 8. Busca global
 Ctrl+S abre `GlobalSearch`; `SearchActionCatalog` lista telas, abas, lançamentos e as ações que cada tela expõe via `ScreenActionProvider`. [src: ui/main/MainController.kt:357] [src: ui/common/search/]
 
-## 8. Desempenho e detalhe do ativo (2026-11-01, não commitado)
+## 8. Desempenho e detalhe do ativo (2026-11-01, commitado em f426f361)
 `SavingsPerformanceController` pede em segundo plano `PerformanceBenchmarkService.benchmarkSeries/contributions` e `PortfolioAnalyticsService.dividendPanel`; ao abrir a aba atualiza CDI/IPCA/Ibovespa uma vez (`refreshBenchmarks`). `TickerDetailController` chama `PortfolioAnalyticsService.tickerDetail(id, meses)` e mostra o preço (aba Preço) e os proventos do ativo (aba Renda). Respostas antigas são descartadas por um contador de carregamento. [src: ui/main/SavingsPerformanceController.kt:100] [src: ui/dialog/investment/view/TickerDetailController.kt]

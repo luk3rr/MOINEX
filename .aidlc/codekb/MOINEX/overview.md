@@ -49,7 +49,7 @@ flowchart LR
 Caption: o app é local; só sai para a rede em cotações/indicadores e no chat de IA. [src: CLAUDE.md] [src: src/main/kotlin/org/moinex/ai/provider/]
 
 ## Maturidade
-- Versão 2.20.2 (tag `v2.20.2`), 670 commits, tags de release `vX.Y.Z`; exige Java 25. [src: build.gradle.kts:88] [src: git describe]
+- Versão 2.21.0 (tag `v2.21.0`), 672 commits, tags de release `vX.Y.Z`; exige Java 25. [src: build.gradle.kts:88] [src: git describe]
 - Código migrado de Java para Kotlin em 2026 (cabeçalhos "Migrated to Kotlin"); ainda aparecem arquivos Java no histórico. [src: src/main/kotlin/org/moinex/app/App.kt:1-8]
 
 ## Identidade visual a preservar

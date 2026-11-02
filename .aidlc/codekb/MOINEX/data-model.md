@@ -1,6 +1,6 @@
 # Data model — MOINEX
 
-Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium
+Status: human-reviewed (2026-11-02, HEAD 95b19ba7) · Confidence: medium
 
 ## Armazenamento
 - SQLite em `~/.moinex/data/moinex.db` (diretório configurável nas preferências, com fallback para o padrão). [src: app/SpringApp.kt:28-48] [src: CLAUDE.md]
@@ -49,7 +49,7 @@ Dados financeiros pessoais, locais. Credenciais de IA ficam em `AiCredentialStor
 - DTOs: `InvestmentPerformanceDTO`, `TickerPerformanceDTO`, `ProfitabilityMetricsDTO`, `AllocationDTO`. [src: model/dto/]
 - `Dividend` é gerido por `TickerService`; não existe `DividendService`. [src: service/investment/TickerService.kt:333]
 
-## Atualização 2026-11-01 (intent fundamentals-and-portfolio-views, não commitado)
+## Atualização 2026-11-01 (intent fundamentals-and-portfolio-views, commitado em f426f361)
 - `V035__create_benchmark_price_history.sql` cria `benchmark_price_history` (entidade `BenchmarkPrice`, repositório `BenchmarkPriceRepository`): fechamento diário do Ibovespa (`^BVSP`) para a comparação de desempenho. [src: db/migration/V035__create_benchmark_price_history.sql] [src: model/investment/BenchmarkPrice.kt]
 - `TickerPriceHistory` agora também guarda série diária de 12 meses (`TickerPriceHistoryService.syncDaily`), além do fim de mês. [src: service/investment/TickerPriceHistoryService.kt]
 - `FundamentalAnalysis.data_json` passa ao schema v2 com `reason` por métrica (por que é N/A); lido por `FundamentalParser` em `FundamentalSnapshot`. [src: service/investment/FundamentalParser.kt] [src: model/dto/FundamentalSnapshot.kt]

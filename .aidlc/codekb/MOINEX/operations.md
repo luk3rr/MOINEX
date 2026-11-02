@@ -1,6 +1,6 @@
 # Operations — MOINEX
 
-Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: high
+Status: human-reviewed (2026-11-02, HEAD 95b19ba7) · Confidence: high
 
 ## Comandos
 Requer um **JDK 25 completo** (`openjdk-25-jdk`; só o JRE não tem `javac`): `export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64`. [src: CLAUDE.md] [src: Makefile:4]
