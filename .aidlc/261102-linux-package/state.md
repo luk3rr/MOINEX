@@ -1,7 +1,7 @@
 # AI-DLC State — linux-package
 
 - Intent: 261102-linux-package
-- Status: COMPLETE (aguardando revisão e commit do dono)
+- Status: COMPLETE (released as v2.22.1)
 - Profile: custom (enxuta + Infra/CI)   Depth: Standard   Tests: Standard
 - Project type: brownfield   Repos: MOINEX (HEAD efc08298; codekb em 95b19ba7)
 - Switches: collaborators=off reviewers=off plan_approval=off walking_skeleton=off autonomy=unset iteration=unit-major

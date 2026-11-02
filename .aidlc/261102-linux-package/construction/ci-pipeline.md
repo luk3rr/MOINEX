@@ -30,3 +30,5 @@ Caption: o job é único e linear; só o evento `release` anexa assets.
 | Ação externa de Release | `softprops/action-gh-release@v2` |
 
 Não executado no GitHub ainda: a primeira execução real exige criar uma Release ou disparar o workflow manualmente, o que só será feito com o sim do dono.
+
+Teste do artifact em containers Ubuntu 22.04 e 24.04: `scripts/test-linux-package-containers.sh <pasta com os pacotes>` (precisa de docker). Primeira execução real: todos os testes passaram nas duas versões (instalar, atualizar, remover, `.tar.gz`).
