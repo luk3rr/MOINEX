@@ -66,59 +66,55 @@ O Moinex está disponível para **Linux** e **Windows**.
 
 ### Linux
 
-#### Pré-requisitos
+#### Pacote `.deb` (Debian, Ubuntu e derivadas)
 
-Certifique-se de ter instalado:
-- **Git**
-- **JDK 25** (o pacote completo, com `javac`, não apenas o runtime)
-- **Gradle** (ou use o wrapper incluído `./gradlew`)
-- **Python 3** com pip (para scripts de APIs financeiras)
+Já traz o Java e o Python com as dependências.
 
-#### Instalação via Script
-
-1. Clone o repositório:
+1. Baixe `moinex_X.X.X_amd64.deb` na [página de releases](https://github.com/luk3rr/MOINEX/releases/latest)
+2. Instale:
 ```bash
-git clone https://github.com/luk3rr/MOINEX.git
-cd MOINEX
+sudo apt install ./moinex_X.X.X_amd64.deb
+```
+3. Abra o **Moinex** pelo menu de aplicativos.
+
+Para atualizar, instale o `.deb` da versão nova do mesmo jeito. Seus dados em `$HOME/.moinex/` não são alterados.
+
+#### Pacote `.tar.gz` (qualquer distribuição)
+
+1. Baixe `moinex-X.X.X-linux-x64.tar.gz` na [página de releases](https://github.com/luk3rr/MOINEX/releases/latest)
+2. Descompacte e execute, sem precisar de root:
+```bash
+tar -xzf moinex-X.X.X-linux-x64.tar.gz
+./Moinex/bin/Moinex
 ```
 
-2. Execute o script de instalação:
-```bash
-sh scripts/install.sh
-```
-
-3. Escolha a versão:
-   - **main** - versão de desenvolvimento (pode conter recursos experimentais)
-   - **Versões estáveis (tags)** - recomendadas para uso diário
-
-#### Instalação Manual
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/luk3rr/MOINEX.git
-cd MOINEX
-```
-
-2. Instale as dependências Python (necessárias para cotação de ações e outros dados financeiros):
-```bash
-python3 -m pip install --user --break-system-packages -r requirements.txt
-```
-
-3. Compile:
-```bash
-./gradlew build
-```
-
-4. Execute a aplicação:
-```bash
-./gradlew bootRun
-```
+Os pacotes são para x86_64 e exigem glibc 2.35 ou mais nova (Ubuntu 22.04 ou equivalente).
 
 **Localização dos dados:**
-- Aplicação: `$HOME/.moinex/`
 - Base de dados: `$HOME/.moinex/data/moinex.db`
 - Logos de ações: `$HOME/.moinex/logos/`
 - Logs: `$HOME/.local/state/moinex`
+
+#### Compilação local
+
+<details>
+<summary>Compilar e instalar a partir do código (Linux)</summary>
+
+Compila a versão escolhida na sua máquina e usa o Python do sistema. Não misture com o `.deb`: os dois instalam em lugares diferentes e deixam dois atalhos no menu.
+
+**Pré-requisitos:** Git, JDK 25 (o pacote completo, com `javac`) e Python 3 com pip.
+
+```bash
+git clone https://github.com/luk3rr/MOINEX.git
+cd MOINEX
+sh scripts/install.sh
+```
+
+Escolha a versão: **main** (desenvolvimento, pode ser instável) ou uma **tag** estável. A aplicação é instalada em `$HOME/.moinex/`.
+
+Para desinstalar, execute `sh scripts/uninstall.sh`. Ele remove a aplicação e preserva seus dados em `$HOME/.moinex/data/`.
+
+</details>
 
 ## Desinstalação
 
@@ -135,14 +131,8 @@ python3 -m pip install --user --break-system-packages -r requirements.txt
 
 ### Linux
 
-Execute o script de desinstalação:
-
-```bash
-sh scripts/uninstall.sh
-```
-
-> [!WARNING]
-> Este comando irá apagar permanentemente a sua base de dados com todas as suas transações. Faça um backup do diretório `$HOME/.moinex/data/` se desejar restaurar os seus dados no futuro.
+- **`.deb`:** `sudo apt remove moinex`. Remove a aplicação de `/opt/moinex` e preserva os dados em `$HOME/.moinex/`.
+- **`.tar.gz`:** apague a pasta `Moinex` que você descompactou.
 
 ## Licença
 

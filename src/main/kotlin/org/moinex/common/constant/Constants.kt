@@ -8,8 +8,8 @@ package org.moinex.common.constant
 
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
+import org.moinex.common.util.EmbeddedPython
 import org.moinex.model.enums.AssetType
-import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -227,36 +227,15 @@ object Constants {
 
     val pythonInterpreter: String
         /**
-         * Get the Python interpreter path based on the operating system For Windows with embedded
-         * Python, use the bundled interpreter For Linux/Mac, use the system Python
+         * Get the Python interpreter path based on the operating system. When running from a
+         * jpackage installation the bundled interpreter is used (Windows and Linux); otherwise
+         * Windows falls back to `python` and Linux/Mac to the system Python.
          */
         get() {
             val os = System.getProperty("os.name").lowercase(Locale.getDefault())
 
-            if (os.contains("win")) {
-                // Check if running from jpackage installation (embedded Python)
-                val appPath = System.getProperty("jpackage.app-path")
+            EmbeddedPython.resolve(os, System.getProperty("jpackage.app-path"))?.let { return it }
 
-                if (appPath != null) {
-                    // Running from jpackage installation
-                    val appDir = File(appPath).parentFile
-
-                    if (appDir != null) {
-                        val embeddedPython =
-                            File(appDir, "python-embedded\\python.exe")
-                                .absolutePath
-
-                        if (File(embeddedPython).exists()) {
-                            return embeddedPython
-                        }
-                    }
-                }
-
-                // Fallback to system Python on Windows
-                return "python"
-            } else {
-                // Linux/Mac
-                return "/usr/bin/python3"
-            }
+            return if (os.contains("win")) "python" else "/usr/bin/python3"
         }
 }

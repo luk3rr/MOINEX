@@ -15,11 +15,12 @@ print_error() {
 MOINEX_DIR="$HOME/.moinex"
 DOT_LOCAL_DIR="$HOME/.local"
 
-# Remover JAR e diretórios relacionados
-if rm -rf "$MOINEX_DIR"; then
-    print_success ">> Diretório $MOINEX_DIR removido com sucesso"
+# Remover apenas os arquivos da aplicação; os dados (banco, logos) em $MOINEX_DIR/data ficam preservados
+if rm -rf "$MOINEX_DIR/bin" && rm -f "$MOINEX_DIR/run.sh"; then
+    print_success ">> Arquivos da aplicação removidos de $MOINEX_DIR"
+    print_success ">> Seus dados em $MOINEX_DIR/data foram preservados"
 else
-    print_error "Erro ao remover o diretório $MOINEX_DIR"
+    print_error "Erro ao remover os arquivos da aplicação em $MOINEX_DIR"
 fi
 
 # Remover ícones
