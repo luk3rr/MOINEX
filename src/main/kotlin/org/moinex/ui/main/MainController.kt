@@ -41,6 +41,7 @@ import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.Icons
 import org.moinex.common.ui.ScreenActionProvider
+import org.moinex.common.util.AppVersion
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
@@ -58,7 +59,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.io.IOException
-import java.util.Properties
 import kotlin.math.abs
 
 @Controller
@@ -144,14 +144,9 @@ class MainController(
         private const val DRAG_THRESHOLD = 4.0
     }
 
-    private fun loadAppVersion(): String =
-        javaClass.getResourceAsStream("/version.properties")?.use { stream ->
-            Properties().apply { load(stream) }.getProperty("app.version")
-        } ?: ""
-
     @FXML
     fun initialize() {
-        versionLabel.text = "v${loadAppVersion()}"
+        versionLabel.text = "v${AppVersion.installedText()}"
 
         sidebarButtons =
             arrayOf(
@@ -233,7 +228,11 @@ class MainController(
         setupScreenActionsButton()
 
         // Toast overlay must be added last to stay on top of everything (highest Z-order)
-        toastOverlay = NotificationToastOverlay(rootPane)
+        toastOverlay =
+            NotificationToastOverlay(
+                rootPane,
+                preferencesService.translate(TranslationKeys.NOTIFICATION_ACTION_OPEN_PAGE),
+            )
 
         notificationService.registerUiListener { notification ->
             toastOverlay.show(notification)

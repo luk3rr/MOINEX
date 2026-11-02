@@ -25,6 +25,8 @@ class PreferencesService {
         const val PREF_KEY_THEME = "ui.theme"
         const val PREF_KEY_DB_DIR = "db.directory"
         const val PREF_KEY_SAVINGS_RATE_TARGET = "insights.savingsRateTarget"
+        const val PREF_KEY_UPDATE_CHECK_ENABLED = "updates.checkEnabled"
+        const val PREF_KEY_LAST_NOTIFIED_VERSION = "updates.lastNotifiedVersion"
         const val DEFAULT_SAVINGS_RATE_TARGET = 20.0
         const val THEME_LIGHT = "light"
         const val THEME_DARK = "dark"
@@ -84,6 +86,20 @@ class PreferencesService {
                 it
             }
         } ?: ""
+
+    var updateCheckEnabled: Boolean
+        get() = preferences.getBoolean(PREF_KEY_UPDATE_CHECK_ENABLED, true)
+        set(value) = preferences.putBoolean(PREF_KEY_UPDATE_CHECK_ENABLED, value)
+
+    var lastNotifiedVersion: String?
+        get() = preferences[PREF_KEY_LAST_NOTIFIED_VERSION, null]
+        set(value) {
+            if (value == null) {
+                preferences.remove(PREF_KEY_LAST_NOTIFIED_VERSION)
+            } else {
+                preferences.put(PREF_KEY_LAST_NOTIFIED_VERSION, value)
+            }
+        }
 
     fun showMonetaryValues(): Boolean = !hideMonetaryValues
 

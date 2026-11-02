@@ -103,6 +103,8 @@ object TranslationKeys {
     const val SETTINGS_DATABASE_COPY_FAILED: String = "settings.database.copyFailed"
     const val SETTINGS_SAVINGS_RATE_TARGET: String = "settings.savingsRateTarget"
     const val SETTINGS_SAVINGS_RATE_TARGET_HINT: String = "settings.savingsRateTarget.hint"
+    const val SETTINGS_UPDATES_CHECK_ENABLED: String = "settings.updates.checkEnabled"
+    const val SETTINGS_UPDATES_CHECK_ENABLED_HINT: String = "settings.updates.checkEnabled.hint"
 
     // Settings - AI assistant (BYOK)
     const val SETTINGS_AI_SECTION_TITLE: String = "settings.ai.sectionTitle"
@@ -2153,6 +2155,10 @@ object TranslationKeys {
     const val NOTIFICATION_RECURRING_PROCESSED_MESSAGE: String = "notification.recurringProcessed.message"
     const val NOTIFICATION_RECURRING_CC_PROCESSED_TITLE: String = "notification.recurringCcProcessed.title"
     const val NOTIFICATION_RECURRING_CC_PROCESSED_MESSAGE: String = "notification.recurringCcProcessed.message"
+
+    const val NOTIFICATION_ACTION_OPEN_PAGE: String = "notification.action.openPage"
+    const val NOTIFICATION_UPDATE_TITLE: String = "notification.update.title"
+    const val NOTIFICATION_UPDATE_MESSAGE: String = "notification.update.message"
 
     // AI chat
     const val AI_CHAT_TITLE: String = "aichat.title"

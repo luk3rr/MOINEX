@@ -85,7 +85,7 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On 
 ## Database
 
 - **Location:** `~/.moinex/data/moinex.db`
-- **Migrations:** Flyway, `src/main/resources/db/migration/` (35 migrations, prefix `V0xx__`; `V035` adds `benchmark_price_history`, the Ibovespa series)
+- **Migrations:** Flyway, `src/main/resources/db/migration/` (36 migrations, prefix `V0xx__`; `V035` adds `benchmark_price_history`, the Ibovespa series; `V036` adds `notification.action_url`)
 - **Hibernate:** `ddl-auto: validate` — schema must exist before startup; never let Hibernate manage schema
 - **Startup order:** `FlywayConfig` is a manual bean that migrates and then runs `data.sql`, and the `entityManagerFactory` bean definition is made to depend on `flyway` so Hibernate validates an existing schema. `spring.sql.init.mode` is `never` on purpose; do not turn it back on, since Spring would run `data.sql` before the tables exist.
 - **Connection pool:** HikariCP, max 1 connection (SQLite constraint)

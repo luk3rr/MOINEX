@@ -21,6 +21,7 @@ import org.moinex.service.investment.MarketService
 import org.moinex.service.investment.PerformanceBenchmarkService
 import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.investment.TickerService
+import org.moinex.service.release.ReleaseUpdateScheduler
 import org.moinex.service.wallet.RecurringTransactionService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
@@ -38,6 +39,7 @@ class AppStartupRunner(
     private val investmentPerformanceService: InvestmentPerformanceService,
     private val marketIndicatorService: MarketIndicatorService,
     private val bondInterestCalculationService: BondInterestCalculationService,
+    private val releaseUpdateScheduler: ReleaseUpdateScheduler,
 ) : ApplicationRunner {
     private val logger = LoggerFactory.getLogger(AppStartupRunner::class.java)
 
@@ -57,6 +59,8 @@ class AppStartupRunner(
         }
 
         logger.info("AppStartupRunner started")
+
+        releaseUpdateScheduler.start()
 
         FxUtils.launchOnBackground {
             logger.info("Processing recurring wallet transactions")

@@ -8,6 +8,7 @@ package org.moinex.ui.common
 
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ListCell
 import javafx.scene.layout.HBox
@@ -19,6 +20,7 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.Notification
 import org.moinex.model.enums.NotificationStatus
 import java.time.LocalDateTime
@@ -80,7 +82,9 @@ class NotificationListCell(
             }
 
         val textBox =
-            VBox(3.0, title, message, time).apply {
+            VBox(3.0, title, message).apply {
+                n.actionUrl?.let { url -> children.add(buildOpenPageButton(url)) }
+                children.add(time)
                 HBox.setHgrow(this, Priority.ALWAYS)
                 HBox.setMargin(this, Insets(0.0, 8.0, 0.0, 14.0))
             }
@@ -104,6 +108,11 @@ class NotificationListCell(
 
         return cell
     }
+
+    private fun buildOpenPageButton(url: String): Button =
+        Button(bundle.getString(TranslationKeys.NOTIFICATION_ACTION_OPEN_PAGE)).apply {
+            setOnAction { WindowUtils.openUrl(url) }
+        }
 
     private fun relativeTime(dateTime: LocalDateTime): String {
         val minutes = ChronoUnit.MINUTES.between(dateTime, LocalDateTime.now())

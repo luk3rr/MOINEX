@@ -42,6 +42,8 @@ class Notification(
     var createdAt: LocalDateTime,
     @Column(name = "related_entity_id")
     var relatedEntityId: Int? = null,
+    @Column(name = "action_url")
+    var actionUrl: String? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

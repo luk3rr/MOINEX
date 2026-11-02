@@ -43,6 +43,7 @@ class NotificationService(
         title: String,
         message: String,
         relatedEntityId: Int? = null,
+        actionUrl: String? = null,
     ) {
         val notification =
             Notification(
@@ -51,6 +52,7 @@ class NotificationService(
                 message = message,
                 createdAt = clockProvider.now(),
                 relatedEntityId = relatedEntityId,
+                actionUrl = actionUrl,
             )
 
         notificationRepository.save(notification)

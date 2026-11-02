@@ -12,6 +12,7 @@ import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.control.Button
+import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.PasswordField
@@ -59,6 +60,9 @@ class SettingsController(
     private lateinit var themeComboBox: ComboBox<String>
 
     @FXML
+    private lateinit var updateCheckBox: CheckBox
+
+    @FXML
     private lateinit var dbPathField: TextField
 
     @FXML
@@ -98,6 +102,11 @@ class SettingsController(
 
     @FXML
     fun initialize() {
+        updateCheckBox.isSelected = preferencesService.updateCheckEnabled
+        updateCheckBox.selectedProperty().addListener { _, _, selected ->
+            preferencesService.updateCheckEnabled = selected
+        }
+
         languageComboBox.items.setAll(preferencesService.getSupportedLocales())
 
         val localeLabels = preferencesService.getSupportedLocalesWithLabels()

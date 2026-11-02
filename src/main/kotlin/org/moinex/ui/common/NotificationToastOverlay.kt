@@ -23,10 +23,12 @@ import javafx.util.Duration
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.Notification
 
 class NotificationToastOverlay(
     rootPane: AnchorPane,
+    private val openPageLabel: String,
 ) {
     private val stack =
         VBox(8.0).apply {
@@ -109,6 +111,17 @@ class NotificationToastOverlay(
                 maxWidth = TOAST_WIDTH
                 alignment = Pos.CENTER_LEFT
             }
+
+        n.actionUrl?.let { url ->
+            val openButton =
+                Button(openPageLabel).apply {
+                    setOnAction {
+                        WindowUtils.openUrl(url)
+                        dismiss(card)
+                    }
+                }
+            textBox.children.add(openButton)
+        }
 
         closeButton.setOnAction { dismiss(card) }
         card.setOnMouseClicked { dismiss(card) }

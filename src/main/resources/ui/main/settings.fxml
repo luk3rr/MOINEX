@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -41,6 +42,12 @@
                          </children>
                       </HBox>
                       <Label fx:id="restartRequiredLabel" text="%settings.database.restartRequired" visible="false" managed="false" style="-fx-text-fill: theme-warning;" />
+                      </children>
+                  </VBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
+                      <CheckBox fx:id="updateCheckBox" text="%settings.updates.checkEnabled" />
+                      <Label text="%settings.updates.checkEnabled.hint" wrapText="true" maxWidth="520.0" style="-fx-text-fill: theme-text-secondary;" />
                       </children>
                   </VBox>
                   <VBox styleClass="card" spacing="10.0">
