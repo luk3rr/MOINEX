@@ -12,6 +12,36 @@ import time
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
+WINDOWS_DNS_SERVERS = "1.1.1.1,8.8.8.8"
+
+
+def use_explicit_dns_on_windows():
+    """
+    On Windows the resolver bundled with curl_cffi (c-ares) can take ~20s per
+    lookup while the system resolver answers in milliseconds. Giving libcurl
+    explicit DNS servers avoids the stall. No-op on other platforms.
+    """
+    if sys.platform != "win32":
+        return
+    try:
+        from curl_cffi import CurlOpt
+        from curl_cffi.requests import Session
+    except ImportError:
+        return
+
+    original_init = Session.__init__
+
+    def init_with_dns(self, *args, **kwargs):
+        options = dict(kwargs.get("curl_options") or {})
+        options.setdefault(CurlOpt.DNS_SERVERS, WINDOWS_DNS_SERVERS)
+        kwargs["curl_options"] = options
+        original_init(self, *args, **kwargs)
+
+    Session.__init__ = init_with_dns
+
+
+use_explicit_dns_on_windows()
+
 DEFAULT_CURRENCY = "BRL"
 EXCHANGE_API_URL_BASE = "https://api.exchangerate-api.com/v4/latest"
 TIMEOUT_SECONDS = 20
