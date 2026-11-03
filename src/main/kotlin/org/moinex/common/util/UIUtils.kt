@@ -821,7 +821,7 @@ class UIUtils(
                 val logoPath = Paths.get(FilesConstant.LOGOS_DIR, filename)
 
                 if (Files.exists(logoPath)) {
-                    val imageUrl = "file://${logoPath.toAbsolutePath()}"
+                    val imageUrl = logoPath.toUri().toString()
                     val image = Image(imageUrl, size, size, true, true)
 
                     if (!image.isError) {

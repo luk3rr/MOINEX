@@ -15,6 +15,7 @@ import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FileUtils
+import org.moinex.exception.MoinexException
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.NotificationType
@@ -513,7 +514,14 @@ class TickerService(
 
         logger.info("Updating prices for {} active tickers", activeTickers.size)
 
-        val failed = updateTickersPriceFromApi(activeTickers)
+        val failed =
+            try {
+                updateTickersPriceFromApi(activeTickers)
+            } catch (e: MoinexException.APIFetchException) {
+                runCatching { downloadMissingLogosFromApi(activeTickers) }
+                    .onFailure { logger.warn("Failed to download missing logos: {}", it.message) }
+                throw e
+            }
 
         if (failed.isEmpty()) {
             logger.info("All ticker prices updated successfully")

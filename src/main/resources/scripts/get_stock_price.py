@@ -23,7 +23,8 @@ RETRY_INITIAL_DELAY = 1.0
 RETRY_MULTIPLIER = 1.5
 RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
 
-MAX_INFO_WORKERS = 5
+IS_WINDOWS = sys.platform == "win32"
+MAX_INFO_WORKERS = 1 if IS_WINDOWS else 5
 BATCH_SIZE = 8
 INTER_BATCH_DELAY = 2.0
 
@@ -112,7 +113,7 @@ def fetch_prices_batch(symbols):
             time.sleep(INTER_BATCH_DELAY)
 
         def _download_chunk():
-            data = yf.download(chunk, period="5d", progress=False, auto_adjust=True)
+            data = yf.download(chunk, period="5d", progress=False, auto_adjust=True, threads=not IS_WINDOWS)
             # yf.download doesn't raise on rate limit, just returns empty DataFrame
             # We need to raise manually to trigger retry
             if data.empty:

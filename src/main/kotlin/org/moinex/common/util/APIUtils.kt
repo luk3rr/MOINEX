@@ -24,12 +24,15 @@ import org.moinex.exception.MoinexException
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.PeriodType
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.PosixFilePermissions
 import java.time.LocalDate
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import kotlin.io.path.createTempFile
 import kotlin.io.path.pathString
 import org.moinex.common.constant.Files as FilesConstants
@@ -191,26 +194,28 @@ object APIUtils {
                 .apply {
                     environment()["PYTHONUTF8"] = "1"
                     environment()["PYTHONIOENCODING"] = "utf-8"
+                    environment()["PYTHONWARNINGS"] = "ignore"
                 }.start()
 
         registerProcess(process)
 
         return runCatching {
-            val (output, errorOutput) =
-                process.inputStream.bufferedReader().use { reader ->
-                    process.errorStream.bufferedReader().use { errorReader ->
-                        val completed = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
+            val stdoutFuture = CompletableFuture<String>()
+            val stderrFuture = CompletableFuture<String>()
+            drainAsync(process.inputStream, stdoutFuture)
+            drainAsync(process.errorStream, stderrFuture)
 
-                        if (!completed) {
-                            process.destroyForcibly()
-                            throw MoinexException.APIFetchException(
-                                "Script '$scriptName' timed out after $timeoutSeconds seconds",
-                            )
-                        }
+            val completed = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
 
-                        reader.readText() to errorReader.readText()
-                    }
-                }
+            if (!completed) {
+                process.destroyForcibly()
+                throw MoinexException.APIFetchException(
+                    "Script '$scriptName' timed out after $timeoutSeconds seconds",
+                )
+            }
+
+            val output = stdoutFuture.get()
+            val errorOutput = stderrFuture.get()
 
             val exitCode = process.exitValue()
 
@@ -244,6 +249,20 @@ object APIUtils {
             )
         }.also {
             removeProcess(process)
+        }
+    }
+
+    /**
+     * Reads the stream on its own thread so the child process never blocks on a full pipe buffer.
+     */
+    private fun drainAsync(
+        stream: InputStream,
+        target: CompletableFuture<String>,
+    ) {
+        thread(isDaemon = true) {
+            runCatching { stream.bufferedReader().use { it.readText() } }
+                .onSuccess { target.complete(it) }
+                .onFailure { target.completeExceptionally(it) }
         }
     }
 
