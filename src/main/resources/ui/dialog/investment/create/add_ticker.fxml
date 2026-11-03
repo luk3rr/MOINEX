@@ -65,7 +65,12 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="symbolField" promptText="%investment.promptText.symbol" />
+                        <TextField fx:id="symbolField" promptText="%investment.promptText.symbolExample" />
+                        <Label fx:id="symbolHintLabel" styleClass="text-muted" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
                      </children>
                   </VBox>
                   <VBox>
@@ -75,7 +80,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <Button fx:id="yahooLookupButton" onAction="#goToYahooLookup">
+                        <Button fx:id="yahooLookupButton" onAction="#showSymbolHelp">
                            <graphic>
                               <FontIcon iconLiteral="mdal-help_outline" styleClass="app-icon, icon-size-15" />
                            </graphic>

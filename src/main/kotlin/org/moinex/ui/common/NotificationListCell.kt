@@ -112,6 +112,7 @@ class NotificationListCell(
     private fun buildOpenPageButton(url: String): Button =
         Button(bundle.getString(TranslationKeys.NOTIFICATION_ACTION_OPEN_PAGE)).apply {
             setOnAction { WindowUtils.openUrl(url) }
+            WindowUtils.addCopyLinkMenu(this, url, bundle.getString(TranslationKeys.WISHLIST_COPY_LINK))
         }
 
     private fun relativeTime(dateTime: LocalDateTime): String {

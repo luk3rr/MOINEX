@@ -22,7 +22,7 @@ object Constants {
 
     val PYTHON_INTERPRETER: String = pythonInterpreter
 
-    const val YAHOO_LOOKUP_URL: String = "https://finance.yahoo.com/research-hub/screener/most_actives"
+    const val YAHOO_LOOKUP_URL: String = "https://finance.yahoo.com/lookup"
 
     // Top Performers Table
     const val TOP_PERFORMERS_ASSET_COLUMN_WIDTH: Double = 90.0

@@ -15,6 +15,11 @@ import javafx.scene.Scene
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.ButtonType
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.Control
+import javafx.scene.control.MenuItem
+import javafx.scene.input.Clipboard
+import javafx.scene.input.ClipboardContent
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.stage.Modality
@@ -255,5 +260,24 @@ object WindowUtils {
             logger.error("Error opening URL: {}", normalizedUrl, e)
             showErrorDialog("Error", "Could not open URL: $normalizedUrl\n\nError: ${e.message}")
         }
+    }
+
+    /**
+     * Adds a right-click menu to [control] that copies [url] to the clipboard, so the user can still reach the page
+     * when the system has no working default browser.
+     */
+    fun addCopyLinkMenu(
+        control: Control,
+        url: String,
+        copyLabel: String,
+    ) {
+        control.contextMenu =
+            ContextMenu(
+                MenuItem(copyLabel).apply {
+                    setOnAction {
+                        Clipboard.getSystemClipboard().setContent(ClipboardContent().apply { putString(url) })
+                    }
+                },
+            )
     }
 }
