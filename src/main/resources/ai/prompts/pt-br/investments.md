@@ -1,0 +1,7 @@
+Operações do mercado financeiro - compra/venda de ações, FIIs, ETFs ou cripto, recebimento de dividendos, e aplicação/resgate de CDB - nunca são um lançamento comum de receita ou despesa: sempre use as operações de investimento do propose_changes (record_stock_purchase, record_stock_sale, record_dividend, apply_to_bond, redeem_bond) para elas, nunca create_wallet_transaction, mesmo vindas de um extrato de corretora anexado.
+
+Em compras e vendas de ativos, quantity e unitPrice são obrigatórios e devem ser lidos do documento (a nota de corretagem os lista por ativo); em um dividendo, dividendAmount é obrigatório. A carteira que paga ou recebe o dinheiro (walletName) também é obrigatória: use a instituição mostrada no documento para escolher a carteira existente correspondente. Envie um item por ativo e operação, nunca duplicados.
+
+Você também pode cadastrar e manter ativos: create_ticker (símbolo, nome, assetType; não tem quantidade até uma compra ser registrada), update_ticker (apenas renomear ou mudar o tipo) e refresh_ticker_data para buscar o preço atual e sincronizar o histórico de um ativo; use rebuild true só quando o usuário pedir explicitamente para resetar e buscar o histórico de novo.
+
+Para renda fixa, create_bond cadastra o título (name, bondType e, quando souber, symbol, issuer, maturityDate, interestType, interestIndex, interestRate) e update_bond altera por assetName, enviando só os campos a mudar; a posição só aparece quando uma aplicação é registrada com apply_to_bond. Use list_records kind bonds para vê-los.

@@ -1,0 +1,7 @@
+Financial market operations - buying/selling stocks, FIIs, ETFs or crypto, receiving dividends, and applying to/redeeming a CDB (bond) - are never a plain income/expense entry: always use the investment operations of propose_changes (record_stock_purchase, record_stock_sale, record_dividend, apply_to_bond, redeem_bond) for those instead of create_wallet_transaction, even when they come from an attached brokerage statement.
+
+For stock purchases and sales, quantity and unitPrice are mandatory and must be read from the document (a brokerage note lists them per asset); for a dividend, dividendAmount is mandatory. The wallet that pays or receives the money (walletName) is also mandatory: use the institution shown in the document to pick the matching existing wallet. Send one item per asset and operation, never duplicates.
+
+You can also register and maintain assets: create_ticker (symbol, name, assetType; it holds no quantity until a purchase is recorded), update_ticker (rename or retype only) and refresh_ticker_data to fetch the current price and sync the history of one asset; set rebuild true only when the user explicitly asks to reset and fetch the history again.
+
+For fixed income, create_bond registers the asset (name, bondType, and when known symbol, issuer, maturityDate, interestType, interestIndex, interestRate) and update_bond changes it by assetName, sending only the fields to change; the position only appears when an application is recorded with apply_to_bond. Use list_records kind bonds to see them.

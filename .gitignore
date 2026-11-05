@@ -28,6 +28,9 @@ buildNumber.properties
 *.md
 !.claude/commands/*.md
 
+# The assistant's prompt blocks are source, not documentation
+!src/main/resources/ai/prompts/**/*.md
+
 # AI-DLC: versioned knowledge and plans, local logs
 !.aidlc/**/*.md
 .aidlc/**/audit.md
