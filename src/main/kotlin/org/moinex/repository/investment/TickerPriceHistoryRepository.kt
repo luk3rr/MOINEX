@@ -11,9 +11,11 @@ package org.moinex.repository.investment
 import org.moinex.model.dto.DailyPricePointDTO
 import org.moinex.model.investment.TickerPriceHistory
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Repository
@@ -127,4 +129,21 @@ interface TickerPriceHistoryRepository : JpaRepository<TickerPriceHistory, Int> 
         @Param("startDate") startDate: LocalDate,
         @Param("endDate") endDate: LocalDate,
     ): List<DailyPricePointDTO>
+
+    @Query(
+        "SELECT ph " +
+            "FROM TickerPriceHistory ph " +
+            "WHERE ph.ticker.id = :tickerId " +
+            "ORDER BY ph.priceDate ASC",
+    )
+    fun findAllByTickerId(
+        @Param("tickerId") tickerId: Int,
+    ): List<TickerPriceHistory>
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM TickerPriceHistory ph WHERE ph.ticker.id = :tickerId")
+    fun deleteAllByTickerId(
+        @Param("tickerId") tickerId: Int,
+    )
 }

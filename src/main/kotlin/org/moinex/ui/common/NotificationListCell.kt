@@ -31,6 +31,7 @@ class NotificationListCell(
     private val bundle: ResourceBundle,
 ) : ListCell<Notification>() {
     init {
+        prefWidth = 0.0
         stylesheets.add(
             NotificationListCell::class.java.getResource(Files.NOTIFICATION_CSS)!!.toExternalForm(),
         )
@@ -67,6 +68,7 @@ class NotificationListCell(
                 }
                 isWrapText = true
                 maxWidth = Double.MAX_VALUE
+                minHeight = Region.USE_PREF_SIZE
             }
 
         val message =
@@ -74,6 +76,7 @@ class NotificationListCell(
                 styleClass.add(Styles.NOTIFICATION_CELL_MESSAGE)
                 isWrapText = true
                 maxWidth = Double.MAX_VALUE
+                minHeight = Region.USE_PREF_SIZE
             }
 
         val time =

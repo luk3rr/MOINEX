@@ -96,6 +96,42 @@ class TickerPriceHistoryService(
     }
 
     /**
+     * Throws away the stored price history of [ticker] and builds it again from the API: the backfill from the first
+     * transaction (transaction dates and month ends) plus the daily window. When anything fails, the history stored
+     * before the call is put back, so a failing API never leaves the ticker with less data than it had.
+     */
+    suspend fun rebuildPriceHistory(ticker: Ticker) {
+        val tickerId = ticker.id!!
+        val previous =
+            priceHistoryRepository.findAllByTickerId(tickerId).map {
+                TickerPriceHistory(
+                    ticker = it.ticker,
+                    priceDate = it.priceDate,
+                    closingPrice = it.closingPrice,
+                    isMonthEnd = it.isMonthEnd,
+                )
+            }
+
+        logger.info("Rebuilding the price history of {}, discarding {} stored rows", ticker, previous.size)
+        priceHistoryRepository.deleteAllByTickerId(tickerId)
+
+        try {
+            processTicker(ticker, TickerPriceInitializationStatsDTO())
+            syncDaily(ticker)
+        } catch (e: Exception) {
+            logger.error(
+                "Failed to rebuild the price history of {}, restoring {} rows: {}",
+                ticker,
+                previous.size,
+                e.message,
+            )
+            priceHistoryRepository.deleteAllByTickerId(tickerId)
+            priceHistoryRepository.saveAll(previous)
+            throw e
+        }
+    }
+
+    /**
      * Fetches the trading days missing for [ticker] and upserts them. When the stored series is dense up to its last
      * day only the days since then are fetched, otherwise the whole window is.
      * @return how many rows were written

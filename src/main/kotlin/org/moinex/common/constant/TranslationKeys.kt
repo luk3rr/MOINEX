@@ -2303,4 +2303,16 @@ object TranslationKeys {
     const val INVESTMENT_SYMBOL_HINT_EQUITY: String = "investment.symbolHint.equity"
     const val INVESTMENT_SYMBOL_HINT_CRYPTO: String = "investment.symbolHint.crypto"
     const val INVESTMENT_SYMBOL_HINT_DEFAULT: String = "investment.symbolHint.default"
+    const val SAVINGS_STOCKS_FUNDS_BUTTON_REFRESH_DATA: String = "savings.stocksFunds.button.refreshData"
+    const val SAVINGS_STOCKS_FUNDS_BUTTON_RESET_HISTORY: String = "savings.stocksFunds.button.resetHistory"
+    const val SAVINGS_STOCKS_FUNDS_DIALOG_REFRESH_TICKER_SUCCESS_MESSAGE: String =
+        "savings.stocksFunds.dialog.refreshTicker.success.message"
+    const val SAVINGS_STOCKS_FUNDS_DIALOG_REFRESH_TICKER_ERROR_MESSAGE: String =
+        "savings.stocksFunds.dialog.refreshTicker.error.message"
+    const val SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_SUCCESS_MESSAGE: String =
+        "savings.stocksFunds.dialog.resetHistory.success.message"
+    const val SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_CONFIRM_TITLE: String =
+        "savings.stocksFunds.dialog.resetHistory.confirm.title"
+    const val SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_CONFIRM_MESSAGE: String =
+        "savings.stocksFunds.dialog.resetHistory.confirm.message"
 }

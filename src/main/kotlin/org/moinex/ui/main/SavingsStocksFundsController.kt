@@ -166,6 +166,12 @@ class SavingsStocksFundsController(
                     preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_EDIT),
                 ) { handleEditTicker() },
                 RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_REFRESH_DATA),
+                ) { handleRefreshTickerData() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_RESET_HISTORY),
+                ) { handleResetTickerHistory() },
+                RowAction(
                     preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_DELETE),
                 ) { handleDeleteTicker() },
                 RowAction(
@@ -394,6 +400,88 @@ class SavingsStocksFundsController(
                             type = NotificationType.ERROR,
                             title = preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                             message = e.message ?: "",
+                        )
+                    }
+
+                setOnUpdatePortfolioPricesButton()
+                updatePortfolioIndicators()
+            },
+        )
+    }
+
+    fun handleRefreshTickerData() {
+        val selectedTicker = stocksFundsTabTickerTable.selectionModel.selectedItem ?: return
+        refreshTicker(selectedTicker, rebuildHistory = false)
+    }
+
+    fun handleResetTickerHistory() {
+        val selectedTicker = stocksFundsTabTickerTable.selectionModel.selectedItem ?: return
+
+        val confirmed =
+            WindowUtils.showConfirmationDialog(
+                "${preferencesService.translate(
+                    TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_CONFIRM_TITLE,
+                )} ${selectedTicker.name} (${selectedTicker.symbol})",
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_CONFIRM_MESSAGE),
+                preferencesService.bundle,
+            )
+
+        if (confirmed) {
+            refreshTicker(selectedTicker, rebuildHistory = true)
+        }
+    }
+
+    private fun refreshTicker(
+        ticker: Ticker,
+        rebuildHistory: Boolean,
+    ) {
+        if (isUpdatingPortfolioPrices) return
+
+        setOffUpdatePortfolioPricesButton()
+
+        FxUtils.launchBackgroundThenUI(
+            background = {
+                runCatching {
+                    check(tickerService.updateTickersPriceFromApi(listOf(ticker)).isEmpty()) {
+                        preferencesService.translate(
+                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_REFRESH_TICKER_ERROR_MESSAGE,
+                        )
+                    }
+
+                    if (rebuildHistory) {
+                        tickerPriceHistoryService.rebuildPriceHistory(ticker)
+                    } else {
+                        tickerPriceHistoryService.syncDaily(ticker)
+                    }
+                }
+            },
+            onUI = { result ->
+                result
+                    .onSuccess {
+                        notificationService.send(
+                            type = NotificationType.SUCCESS,
+                            title =
+                                preferencesService.translate(
+                                    TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE,
+                                ),
+                            message =
+                                preferencesService.translate(
+                                    if (rebuildHistory) {
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_SUCCESS_MESSAGE
+                                    } else {
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_REFRESH_TICKER_SUCCESS_MESSAGE
+                                    },
+                                ) + "\n${ticker.symbol}",
+                        )
+                    }.onFailure { e ->
+                        logger.warn("Failed to refresh {}: {}", ticker.symbol, e.message)
+                        notificationService.send(
+                            type = NotificationType.ERROR,
+                            title =
+                                preferencesService.translate(
+                                    TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
+                                ),
+                            message = "${e.message.orEmpty()}\n${ticker.symbol}",
                         )
                     }
 
@@ -812,7 +900,7 @@ class SavingsStocksFundsController(
         updatePricesRotation?.stop()
         updatePricesRotation =
             RotateTransition(Duration.seconds(1.0), updatePricesButtonIcon).apply {
-                byAngle = 360.0
+                byAngle = -360.0
                 cycleCount = RotateTransition.INDEFINITE
                 interpolator = Interpolator.LINEAR
                 play()
