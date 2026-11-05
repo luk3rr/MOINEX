@@ -49,9 +49,15 @@ class CreateWalletTransactionOperation(
     private val categoryResolver: CategoryResolver,
     private val preferencesService: PreferencesService,
 ) : BaseOperation<WalletTransactionPayload>() {
-    override val name = "create_wallet_transaction"
+    override val name = NAME
     override val domain = OperationDomain.TRANSACTIONS
     override val risk = OperationRisk.LOW
+
+    override fun modelRequired() = listOf("date", "amount", "walletName", "categoryName", "movementType")
+
+    companion object {
+        const val NAME = "create_wallet_transaction"
+    }
 
     override fun modelDescription() =
         "create_wallet_transaction: a regular income or expense on a wallet (use movementType); never a card " +
@@ -106,6 +112,8 @@ class CreateWalletTransactionOperation(
 
     override fun missingFromModel(payload: WalletTransactionPayload) =
         if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+
+    override fun categoryNeeded(payload: WalletTransactionPayload) = payload.categoryName.takeIf { it.isNotBlank() }
 
     override fun summary(payload: WalletTransactionPayload) =
         "${payload.description}, ${payload.amount.toPlainString()}, ${payload.date}"

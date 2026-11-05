@@ -2,6 +2,7 @@ package org.moinex.ai.review
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.json.JSONObject
@@ -20,6 +21,7 @@ import org.moinex.ai.operation.OperationRegistry
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.ProposedChange
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.service.PreferencesService
 
 class ReviewSessionTest :
     BehaviorSpec({
@@ -57,6 +59,7 @@ class ReviewSessionTest :
             }
 
         val registry = OperationRegistry(listOf(operation))
+        val preferences = mockk<PreferencesService>().also { every { it.translate(any()) } answers { firstArg() } }
         val audit = mockk<ChangeSetAuditLogger>(relaxed = true)
 
         fun change(
@@ -67,7 +70,7 @@ class ReviewSessionTest :
         ) = ProposedChange(id, "create_note", payload, "note $payload", badge, emptyList(), 0.9, dependsOn)
 
         fun session(vararg changes: ProposedChange) =
-            ReviewSession(registry, audit).also { it.add(ChangeSet("set-1", changes.toList())) }
+            ReviewSession(registry, audit, preferences).also { it.add(ChangeSet("set-1", changes.toList())) }
 
         Given("a change set with new, matching, duplicate and low confidence changes") {
             val review =

@@ -16,8 +16,8 @@ class PromptComposerTest :
             Then("it keeps the rules of the former single prompt") {
                 prompt shouldStartWith "You are the MOINEX financial assistant"
                 prompt shouldContain "no tool that writes directly to the database"
-                prompt shouldContain "propose_transactions"
-                prompt shouldContain "propose_investment_operations"
+                prompt shouldContain "propose_changes"
+                prompt shouldContain "record_stock_purchase"
                 prompt shouldContain "ignored list"
                 prompt shouldContain "allowDuplicate"
                 prompt shouldContain "find_matching_transactions"
@@ -31,7 +31,7 @@ class PromptComposerTest :
 
             Then("it has the same rules in Portuguese") {
                 prompt shouldStartWith "Você é o assistente financeiro do MOINEX"
-                prompt shouldContain "propose_investment_operations"
+                prompt shouldContain "record_stock_purchase"
                 prompt shouldContain "lista ignored"
                 prompt shouldContain "allowDuplicate"
                 prompt shouldContain "find_matching_transactions"
@@ -50,7 +50,7 @@ class PromptComposerTest :
 
             Then("the core and the requested blocks are present and the others are not") {
                 prompt shouldContain "You are the MOINEX financial assistant"
-                prompt shouldContain "propose_transactions"
+                prompt shouldContain "propose_changes"
                 prompt shouldNotContain "Financial market operations"
                 prompt shouldNotContain "credit card purchase split into installments"
             }

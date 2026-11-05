@@ -14,7 +14,9 @@ import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
+import javafx.scene.control.RadioButton
 import javafx.scene.control.ScrollPane
+import javafx.scene.control.ToggleGroup
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
@@ -26,6 +28,7 @@ import org.moinex.ai.review.ReviewItem
 import org.moinex.ai.review.ReviewSession
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.service.PreferencesService
+import org.moinex.service.matching.Match
 import org.moinex.service.matching.MatchStatus
 import java.text.MessageFormat
 
@@ -118,6 +121,7 @@ class ReviewPanel(
         item.stateProperty.addListener(itemListener)
         item.payloadProperty.addListener(itemListener)
         item.messageProperty.addListener(itemListener)
+        item.targetIdProperty.addListener(itemListener)
         item.selectedProperty.addListener(selectionListener)
     }
 
@@ -188,6 +192,12 @@ class ReviewPanel(
             )
         }
 
+        if (open) buildCandidates(item)?.let { card.children.add(it) }
+
+        if (open) {
+            session.previewOf(item)?.lines?.forEach { card.children.add(wrapped(it, STYLE_MUTED)) }
+        }
+
         if (open) {
             session.validationOf(item).errors.forEach { card.children.add(wrapped(it, STYLE_ERROR)) }
         }
@@ -198,6 +208,59 @@ class ReviewPanel(
 
         card.children.add(buildActions(item))
         return card
+    }
+
+    private fun buildCandidates(item: ReviewItem): VBox? {
+        val candidates = item.change.matchCandidates
+        if (item.change.badge != ChangeBadge.MATCHES_EXISTING || candidates.size < 2) return null
+
+        val box = VBox(4.0)
+        box.children.add(wrapped(translate(TranslationKeys.AIPANEL_CANDIDATES_TITLE), STYLE_MUTED))
+
+        val group = ToggleGroup()
+        candidates.forEach { candidate ->
+            val text = candidateText(candidate)
+            if (candidate.status != MatchStatus.PENDING) {
+                box.children.add(wrapped(text, STYLE_MUTED))
+                return@forEach
+            }
+            val radio =
+                RadioButton(text).apply {
+                    toggleGroup = group
+                    isWrapText = true
+                    minHeight = Region.USE_PREF_SIZE
+                    isSelected = candidate.targetId == item.targetIdProperty.get()
+                    selectedProperty().addListener { _, _, selected ->
+                        if (selected && !session.retarget(item, candidate.targetId)) {
+                            item.messageProperty.set(
+                                MessageFormat.format(
+                                    translate(TranslationKeys.AIPANEL_RETARGET_FAILED),
+                                    candidate.targetId,
+                                ),
+                            )
+                        }
+                    }
+                }
+            box.children.add(radio)
+        }
+        return box
+    }
+
+    private fun candidateText(candidate: Match): String {
+        val key =
+            if (candidate.status == MatchStatus.PENDING) {
+                TranslationKeys.AIPANEL_CANDIDATE
+            } else {
+                TranslationKeys.AIPANEL_CANDIDATE_CONFIRMED
+            }
+        return MessageFormat.format(
+            translate(key),
+            candidate.targetId.toString(),
+            candidate.existingDescription,
+            candidate.date,
+            candidate.amount.toPlainString(),
+            Math.round(candidate.score * PERCENT),
+        )
     }
 
     private fun buildActions(item: ReviewItem): HBox {
@@ -217,14 +280,19 @@ class ReviewPanel(
             ChangeState.REJECTED ->
                 actions.children.add(button(TranslationKeys.AIPANEL_ACTION_UNDO_REJECT) { session.undoReject(item) })
             ChangeState.APPROVED -> Unit
-            else ->
+            else -> {
+                if (session.draftSpecOf(item).isNotEmpty()) {
+                    actions.children.add(
+                        button(TranslationKeys.AIPANEL_ACTION_EDIT, STYLE_BUTTON_EDIT) { onEdit(item) },
+                    )
+                }
                 actions.children.addAll(
-                    button(TranslationKeys.AIPANEL_ACTION_EDIT, STYLE_BUTTON_EDIT) { onEdit(item) },
                     button(TranslationKeys.AIPANEL_ACTION_REJECT, STYLE_BUTTON_DANGER) { session.reject(item) },
                     button(TranslationKeys.AIPANEL_ACTION_APPROVE, STYLE_BUTTON_PRIMARY) {
                         session.approve(listOf(item))
                     },
                 )
+            }
         }
         return actions
     }
@@ -247,9 +315,10 @@ class ReviewPanel(
             ChangeBadge.NEW -> translate(TranslationKeys.AIPANEL_BADGE_NEW) to STYLE_BADGE_NEW
             ChangeBadge.MATCHES_EXISTING -> {
                 val id =
-                    item.change.matchCandidates
-                        .firstOrNull { it.status == MatchStatus.PENDING }
-                        ?.targetId
+                    item.targetIdProperty.get()
+                        ?: item.change.matchCandidates
+                            .firstOrNull { it.status == MatchStatus.PENDING }
+                            ?.targetId
                 MessageFormat.format(translate(TranslationKeys.AIPANEL_BADGE_MATCHES), id ?: "") to STYLE_BADGE_MATCH
             }
             ChangeBadge.POSSIBLE_DUPLICATE -> translate(TranslationKeys.AIPANEL_BADGE_DUPLICATE) to STYLE_BADGE_WARNING
@@ -272,6 +341,7 @@ class ReviewPanel(
 
     companion object {
         private const val PANEL_WIDTH = 400.0
+        private const val PERCENT = 100
         private const val STYLE_PANEL = "ai-review-panel"
         private const val STYLE_TITLE = "ai-review-title"
         private const val STYLE_SCROLL = "ai-review-scroll"

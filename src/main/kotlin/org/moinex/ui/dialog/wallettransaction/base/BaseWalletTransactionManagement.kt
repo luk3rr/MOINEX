@@ -16,6 +16,8 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.stage.Stage
+import org.moinex.ai.operation.DraftValues
+import org.moinex.ai.operation.transactions.CreateWalletTransactionOperation
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
@@ -37,6 +39,7 @@ import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.CalculatorController
 import org.springframework.context.ConfigurableApplicationContext
 import java.math.BigDecimal
+import java.time.LocalDate
 
 /**
  * Base class for the wallet transaction dialog controllers
@@ -83,6 +86,8 @@ abstract class BaseWalletTransactionManagement(
     protected lateinit var walletTransactionType: WalletTransactionType
 
     private var transactionValueListener: ChangeListener<String>? = null
+    private var draftSavedCallback: ((DraftValues) -> Unit)? = null
+    private var draftExistingTransactionId: Int? = null
 
     protected val validation = FieldValidation(preferencesService::translate)
 
@@ -284,6 +289,53 @@ abstract class BaseWalletTransactionManagement(
             walletCurrentBalanceValueLabel,
         )
         walletAfterBalance()
+    }
+
+    /** Puts the assistant's proposal in the fields; what the app cannot match is left empty for the user to pick. */
+    protected fun fillFromDraft(values: DraftValues) {
+        val fields = values.fields
+
+        (fields["date"] as? LocalDate)?.let { transactionDatePicker.value = it }
+        (fields["description"] as? String)?.let(::prefillDescription)
+        (fields["amount"] as? BigDecimal)?.let { prefillTransactionValue(it) }
+        (fields["walletId"] as? Number)
+            ?.let { id -> wallets.firstOrNull { it.id == id.toInt() } }
+            ?.let(::setWalletComboBox)
+        (fields["categoryName"] as? String)
+            ?.let { name -> categories.firstOrNull { it.name.equals(name, ignoreCase = true) } }
+            ?.let(::prefillCategory)
+
+        statusComboBox.value = WalletTransactionStatus.CONFIRMED
+        draftExistingTransactionId = (fields["existingTransactionId"] as? Number)?.toInt()
+    }
+
+    protected fun registerDraftCallback(callback: (DraftValues) -> Unit) {
+        draftSavedCallback = callback
+    }
+
+    /**
+     * In draft mode the validated fields go to the review panel instead of the database.
+     * @return true when the dialog was in draft mode and has handed the values over and closed
+     */
+    protected fun saveAsDraftIfRequested(): Boolean {
+        val callback = draftSavedCallback ?: return false
+
+        callback(
+            DraftValues(
+                CreateWalletTransactionOperation.NAME,
+                mapOf(
+                    "date" to transactionDatePicker.value,
+                    "description" to descriptionField.text,
+                    "amount" to transactionValueField.text.toBigDecimal(),
+                    "movementType" to walletTransactionType.name.lowercase(),
+                    "walletId" to walletComboBox.value.id,
+                    "categoryName" to categoryComboBox.value.name,
+                    "existingTransactionId" to draftExistingTransactionId,
+                ),
+            ),
+        )
+        (descriptionField.scene.window as Stage).close()
+        return true
     }
 
     fun disableTransactionValueListener() {

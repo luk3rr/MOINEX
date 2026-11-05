@@ -22,6 +22,8 @@ enum class DraftChoices {
     TICKERS,
     BONDS,
     MOVEMENT_TYPES,
+    FREQUENCIES,
+    WALLET_TYPES,
 }
 
 /**

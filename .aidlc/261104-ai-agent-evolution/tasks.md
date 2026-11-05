@@ -69,55 +69,56 @@ Goal: cadastros/planejamento e leitura ampliada. DoD: verificação passa; casos
 **Desvios:** (1) T-3.13 (`use_domain`, roteamento) **adiada**: sem domínio novo ela não teria efeito; entra com a primeira Unit de domínio novo. (2) FR-26 (impacto no cartão) **não implementado**; `preview` existe na interface sem uso. (3) Em janela estreita o painel **não** vai para baixo do chat: continua à direita, com o botão Recolher e o botão "Revisão (N)" para reabrir. (4) Não há classe `DraftDialogLauncher`: o `AiChatController` abre o `DraftEditorDialog`; o rascunho nos diálogos reais do app (modo rascunho nas telas Add/Edit) fica para as Units de domínio. (5) "Ver existente" não foi feito; o selo mostra "Casa com #id" e os motivos. (6) Filtro só por selo (não por tipo de operação). (7) Acessibilidade de teclado e `accessibleText` ficaram de fora. (8) **Não foi testado com um LLM real nem clicando no app**; o painel foi renderizado com dados fictícios, mas aprovar/editar/rejeitar na tela real, e o editor de reserva, precisam do seu checklist (M-003).
 
 
-### UNIT-4 Domínio Lançamentos   Status: not started
-- [ ] T-4.1 Cartão "Casa com #id" com candidatos, "trocar" e "Ver existente" — covers FR-12, FR-15 — test: ReviewSessionMatchTest
-- [ ] T-4.2 "Criar mesmo assim" pelo chat: operação com marca de duplicata permitida e selo "Possível duplicata" — covers FR-14 — test: DuplicateOverrideTest
-- [ ] T-4.3 Operações: editar lançamento; confirmar pendente — covers FR-20 — test: EditTransactionOperationTest
-- [ ] T-4.4 Operações: transferência (criar/editar) — covers FR-20 — test: TransferOperationsTest
-- [ ] T-4.5 Operações: recorrente (criar/editar) — covers FR-20 — test: RecurringOperationsTest
-- [ ] T-4.6 Operações: carteira (criar/editar/arquivar/desarquivar) — covers FR-20 — test: WalletOperationsTest
-- [ ] T-4.7 Operação explícita de categoria (criar/editar/arquivar) e dependência entre cartões — covers FR-24 — test: CategoryOperationsTest
-- [ ] T-4.8 Rascunho nos diálogos: AddExpense, AddIncome, EditTransaction — covers FR-5, FR-20 — test: checklist visual + DraftValuesMappingTest
-- [ ] T-4.9 Rascunho nos diálogos: AddTransfer/EditTransfer, AddRecurring/EditRecurring, AddWallet, AddCategory/EditCategory — covers FR-5, FR-20 — test: checklist visual
-- [ ] T-4.10 Casos de avaliação do domínio (nome diferente, janela de data, duplicata forçada, categoria nova) — covers FR-29 — test: AgentEvaluationSuite
-**Unit summary (Construction 3.5):** (preenchido na construção)
+### UNIT-4 Domínio Lançamentos   Status: verified (aguarda teste manual do dono)
+- [x] T-4.1 (feito: candidatos e troca de alvo; "Ver existente" virou detalhe do candidato no próprio cartão, pois não há navegação para um registro) Cartão "Casa com #id" com candidatos, "trocar" e "Ver existente" — covers FR-12, FR-15 — test: ReviewSessionMatchTest
+- [x] T-4.2 "Criar mesmo assim" pelo chat: operação com marca de duplicata permitida e selo "Possível duplicata" — covers FR-14 — test: DuplicateOverrideTest
+- [x] T-4.3 Operações: editar lançamento; confirmar pendente — covers FR-20 — test: EditTransactionOperationTest
+- [x] T-4.4 Operações: transferência (criar/editar) — covers FR-20 — test: TransferOperationsTest
+- [x] T-4.5 Operações: recorrente (criar/editar) — covers FR-20 — test: RecurringOperationsTest
+- [x] T-4.6 Operações: carteira (criar/editar/arquivar/desarquivar) — covers FR-20 — test: WalletOperationsTest
+- [x] T-4.7 Operação explícita de categoria (criar/editar/arquivar) e dependência entre cartões — covers FR-24 — test: CategoryOperationsTest
+- [~] T-4.8 (parcial: AddExpense e AddIncome em modo rascunho; EditTransaction fica no editor de reserva) Rascunho nos diálogos: AddExpense, AddIncome, EditTransaction — covers FR-5, FR-20 — test: checklist visual + DraftValuesMappingTest
+- [S] T-4.9 (adiada: transferência, recorrente, carteira e categoria usam o editor de reserva, que cobre todos os campos) Rascunho nos diálogos: AddTransfer/EditTransfer, AddRecurring/EditRecurring, AddWallet, AddCategory/EditCategory — covers FR-5, FR-20 — test: checklist visual
+- [x] T-4.10 Casos de avaliação do domínio (nome diferente, janela de data, duplicata forçada, categoria nova) — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** **4a:** `ProposedChange.targetId`; `ReviewSession.retarget` troca o alvo entre candidatos PENDING via `confirmingPending`; `ReviewPanel` lista os candidatos (pendentes escolhíveis, confirmados só informativos); prompt corrigido para `propose_changes`. **4b:** operações em `ai/operation/transactions/`: `UpdateWalletTransactionOperation` (preview antes→depois, mantém status), `TransferOperations` (criar/editar), `RecurringTransactionOperations` (criar/editar), `WalletOperations` (criar, editar nome/tipo, arquivar, desarquivar), `CategoryOperations` (criar, renomear, arquivar). `AppOperation.categoryNeeded`; `ProposeChangesTool` cria o cartão `create_category` e põe `dependsOn` nos lançamentos (reaproveita um create_category do modelo); `ReviewSession` bloqueia o dependente sem o pré-requisito aprovado (mensagem `aipanel.dependency.blocked`). Edições mantêm a categoria gravada (mesmo arquivada). `schema.required` do `propose_changes` reduzido a `operation`. Painel: preview, Editar só com campos de rascunho. **4c:** `DraftCapable` + `DraftDialogLauncher` (ui/common/ai) abrem AddExpense/AddIncome reais em modo rascunho para `create_wallet_transaction`; `BaseWalletTransactionManagement` ganhou `fillFromDraft`/`saveAsDraftIfRequested`; `AiChatController` tenta o diálogo real e cai no `DraftEditorDialog`. Avaliação: casos 10 (categoria nova), 11 (editar por id), 12 (transferência) em `AgentEvaluationSuite`. Limpeza: nomes `propose_transactions`/`propose_investment_operations` removidos de application.yml, prompts e 2 chaves `aitool.*` mortas. Verificação: `env -u DISPLAY -u WAYLAND_DISPLAY ./gradlew ktlintCheck spotlessCheck test` → BUILD SUCCESSFUL, 1709 testes, 0 falhas (2026-11-05); novos: `ReviewSessionMatchTest`, `DuplicateOverrideTest`, `LancamentosOperationsTest`, `CategoryCardDependencyTest`.
+**Desvios:** (1) T-3.13 `use_domain` segue adiada: 22 operações, abaixo do limite de 30, e sem ganho de gating. (2) "Ver existente" virou o detalhe de cada candidato no cartão; navegação por registro fica para a UNIT-8. (3) T-4.8 parcial: só AddExpense/AddIncome em modo rascunho real; EditTransaction e T-4.9 (transferência, recorrente, carteira, categoria) usam o editor de reserva. (4) Se o usuário trocar a categoria no editor por uma inexistente, a criação silenciosa na aprovação ainda ocorre. (5) Alterar saldo de carteira continua fora do agente (A25). (6) O modo rascunho dos diálogos reais e o painel com dependência não foram vistos em tela nem testados com LLM real; checklist manual em build-and-test.md.
 
-### UNIT-5 Domínio Cartão   Status: not started
-- [ ] T-5.1 Operações: criar/editar cartão — covers FR-21 — test: CreditCardOperationsTest
-- [ ] T-5.2 Operações: dívida (editar), recorrente de cartão (criar/editar) — covers FR-21 — test: CreditCardDebtOperationsTest
-- [ ] T-5.3 Operações: pagar fatura (estado da fatura, valor) e crédito/rebate — covers FR-21 — test: PayInvoiceOperationTest
-- [ ] T-5.4 Rascunho nos diálogos de cartão: AddCreditCard, AddCreditCardDebt/Edit, AddRecurringCreditCardDebt/Edit, InvoicePayment, AddCreditCardCredit, EditCreditCard — covers FR-5, FR-21 — test: checklist visual
-- [ ] T-5.5 Casos de avaliação (parcelas, fatura paga) — covers FR-29 — test: AgentEvaluationSuite
-**Unit summary (Construction 3.5):** (preenchido na construção)
+### UNIT-5 Domínio Cartão   Status: verified (parcial)
+- [x] T-5.1 Operações: criar/editar cartão — covers FR-21 — test: CreditCardOperationsTest
+- [~] T-5.2 (recorrente de cartão criar/editar feito em 05/11 a pedido do dono; editar dívida avulsa não feito) Operações: dívida (editar), recorrente de cartão (criar/editar) — covers FR-21 — test: CreditCardDebtOperationsTest
+- [x] T-5.3 (pagar fatura já existia; crédito/rebate novo (add_credit_card_credit)) Operações: pagar fatura (estado da fatura, valor) e crédito/rebate — covers FR-21 — test: PayInvoiceOperationTest
+- [S] T-5.4 (editor de reserva cobre os campos) Rascunho nos diálogos de cartão: AddCreditCard, AddCreditCardDebt/Edit, AddRecurringCreditCardDebt/Edit, InvoicePayment, AddCreditCardCredit, EditCreditCard — covers FR-5, FR-21 — test: checklist visual
+- [S] T-5.5 (coberto por CreditCardManagementOperationsTest) Casos de avaliação (parcelas, fatura paga) — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** `ai/operation/creditcard/CreditCardManagementOperations.kt`: create_credit_card, update_credit_card (preview antes→depois), archive/unarchive_credit_card, add_credit_card_credit (cashback, refund, reward via addRebate); prompt `credit_card.md` e rótulos i18n. Verificação: gradle ok; novo `CreditCardManagementOperationsTest`. **Adendo (05/11):** `RecurringCreditCardDebtOperations.kt` com create_recurring_card_debt e update_recurring_card_debt (mantém início, status e próxima fatura). **Desvios:** editar dívida avulsa não feita; rascunho nos diálogos reais de cartão não feito (editor de reserva).
 
-### UNIT-6 Domínio Investimentos   Status: not started
-- [ ] T-6.1 Operações: ticker (criar/editar) — covers FR-22 — test: TickerOperationsTest
-- [ ] T-6.2 Operações: compra, venda, dividendo (criar/editar) — covers FR-22 — test: TickerTradeOperationsTest
-- [ ] T-6.3 Operações: câmbio de cripto — covers FR-22 — test: CryptoExchangeOperationTest
-- [ ] T-6.4 Operações: título (criar/editar/arquivar) e suas operações (compra, venda, juros) — covers FR-22 — test: BondOperationsTest
-- [ ] T-6.5 Operação "atualizar dados / resetar e buscar novamente" de um ativo (usa `TickerService` e `TickerPriceHistoryService.rebuildPriceHistory`) — covers FR-22 — test: RefreshTickerOperationTest
-- [ ] T-6.6 Rascunho nos diálogos de investimento (AddTicker, compra, venda, dividendo, cripto, título e as edições) — covers FR-5, FR-22 — test: checklist visual
-- [ ] T-6.7 Casos de avaliação do domínio — covers FR-29 — test: AgentEvaluationSuite
-**Unit summary (Construction 3.5):** (preenchido na construção)
+### UNIT-6 Domínio Investimentos   Status: verified (parcial)
+- [x] T-6.1 Operações: ticker (criar/editar) — covers FR-22 — test: TickerOperationsTest
+- [S] T-6.2 (compra, venda e dividendo já existiam; edição de operações não feita) Operações: compra, venda, dividendo (criar/editar) — covers FR-22 — test: TickerTradeOperationsTest
+- [S] T-6.3 (câmbio de cripto não feito) Operações: câmbio de cripto — covers FR-22 — test: CryptoExchangeOperationTest
+- [~] T-6.4 (título criar/editar feito em 05/11 a pedido do dono; arquivar não feito; aplicar e resgatar já existiam) Operações: título (criar/editar/arquivar) e suas operações (compra, venda, juros) — covers FR-22 — test: BondOperationsTest
+- [x] T-6.5 (refresh_ticker_data com rebuild) Operação "atualizar dados / resetar e buscar novamente" de um ativo (usa `TickerService` e `TickerPriceHistoryService.rebuildPriceHistory`) — covers FR-22 — test: RefreshTickerOperationTest
+- [S] T-6.6 (editor de reserva) Rascunho nos diálogos de investimento (AddTicker, compra, venda, dividendo, cripto, título e as edições) — covers FR-5, FR-22 — test: checklist visual
+- [S] T-6.7 (coberto por TickerOperationsTest) Casos de avaliação do domínio — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** `ai/operation/investments/TickerOperations.kt`: create_ticker (sem quantidade), update_ticker (só nome, símbolo e tipo; quantidade e preços intactos), refresh_ticker_data (atualiza preço e sincroniza o histórico; rebuild opcional, com a regra de restauração do serviço); prompt `investments.md`. Novo `TickerOperationsTest`. **Adendo (05/11):** `BondManagementOperations.kt` com create_bond e update_bond. **Desvios:** câmbio de cripto, arquivar título, edição de compra/venda/dividendo e rascunho nos diálogos reais não feitos.
 
-### UNIT-7 Cadastros e planejamento   Status: not started
-- [ ] T-7.1 Operações: meta (criar/editar/arquivar) — covers FR-23 — test: GoalOperationsTest
-- [ ] T-7.2 Operações: plano financeiro e grupos de orçamento (criar/editar) — covers FR-23 — test: PlanOperationsTest
-- [ ] T-7.3 Operações: wishlist (criar/editar) — covers FR-23 — test: WishlistOperationsTest
-- [ ] T-7.4 Operações: preferências comuns de configuração (lista aprovada em 3.1) — covers FR-23 — test: PreferencesOperationsTest
-- [ ] T-7.5 Rascunho nos diálogos de meta, plano, grupo de orçamento e wishlist — covers FR-5, FR-23 — test: checklist visual
-- [ ] T-7.6 Remover o editor de reserva e conferir que todo diálogo do catálogo é rascunhável — covers FR-5 — test: DraftCoverageTest
-- [ ] T-7.7 Casos de avaliação do domínio — covers FR-29 — test: AgentEvaluationSuite
-**Unit summary (Construction 3.5):** (preenchido na construção)
+### UNIT-7 Cadastros e planejamento   Status: verified (parcial)
+- [x] T-7.1 Operações: meta (criar/editar/arquivar) — covers FR-23 — test: GoalOperationsTest
+- [S] T-7.2 (plano financeiro e grupos de orçamento não feitos) Operações: plano financeiro e grupos de orçamento (criar/editar) — covers FR-23 — test: PlanOperationsTest
+- [x] T-7.3 Operações: wishlist (criar/editar) — covers FR-23 — test: WishlistOperationsTest
+- [S] T-7.4 (preferências não feitas) Operações: preferências comuns de configuração (lista aprovada em 3.1) — covers FR-23 — test: PreferencesOperationsTest
+- [S] T-7.5 (editor de reserva) Rascunho nos diálogos de meta, plano, grupo de orçamento e wishlist — covers FR-5, FR-23 — test: checklist visual
+- [S] T-7.6 (o editor de reserva segue como o caminho de edição) Remover o editor de reserva e conferir que todo diálogo do catálogo é rascunhável — covers FR-5 — test: DraftCoverageTest
+- [S] T-7.7 (coberto por PlanningOperationsTest) Casos de avaliação do domínio — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** `ai/operation/planning/GoalOperations.kt` (create_goal avulsa, update_goal sem mexer no saldo, archive_goal) e `WishlistOperations.kt` (create/update_wishlist_item, mantém links e status, categoria gravada preservada); novo bloco de prompt `planning.md` (entra nos blocos padrão). Novo `PlanningOperationsTest`. **Desvios:** plano financeiro, grupos de orçamento e preferências não feitos (o prompt diz ao usuário para usar as telas); T-7.6 (remover editor de reserva) não feita: ele segue como caminho de edição das operações sem diálogo rascunhável.
 
-### UNIT-8 Leitura ampliada e experiência do chat   Status: not started
-- [ ] T-8.1 Tool `search_transactions` com paginação — covers FR-25 — test: SearchTransactionsToolTest
-- [ ] T-8.2 Tools `list_*` (carteiras, categorias, cartões, ativos, recorrentes, metas, planos) com paginação — covers FR-25 — test: ListToolsTest
-- [ ] T-8.3 Limite de iterações configurável, chamadas paralelas e compactação de contexto — covers FR-30 — test: AiChatServiceLimitsTest
-- [ ] T-8.4 Indicador do que o agente consulta (nome humano por tool, pt-BR/en) — covers FR-9 — test: captura + ToolLabelTest
-- [ ] T-8.5 Chips de ação rápida e links para telas do app nas respostas — covers FR-9 — test: checklist visual
-- [ ] T-8.6 Casos de avaliação de busca e listagens — covers FR-29 — test: AgentEvaluationSuite
-**Unit summary (Construction 3.5):** (preenchido na construção)
+### UNIT-8 Leitura ampliada e experiência do chat   Status: verified (parcial)
+- [x] T-8.1 Tool `search_transactions` com paginação — covers FR-25 — test: SearchTransactionsToolTest
+- [x] T-8.2 (uma tool list_records com kind, em vez de uma tool por tipo) Tools `list_*` (carteiras, categorias, cartões, ativos, recorrentes, metas, planos) com paginação — covers FR-25 — test: ListToolsTest
+- [x] T-8.3 (iterações configuráveis (moinex.ai.max-tool-iterations) e compactação de resultados antigos; chamadas em paralelo não feitas) Limite de iterações configurável, chamadas paralelas e compactação de contexto — covers FR-30 — test: AiChatServiceLimitsTest
+- [x] T-8.4 Indicador do que o agente consulta (nome humano por tool, pt-BR/en) — covers FR-9 — test: captura + ToolLabelTest
+- [S] T-8.5 (chips e links para telas não feitos (precisam de UI e de navegação por registro)) Chips de ação rápida e links para telas do app nas respostas — covers FR-9 — test: checklist visual
+- [S] T-8.6 (coberto por ReadToolsTest) Casos de avaliação de busca e listagens — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** `ai/tools/ReadTools.kt`: `search_transactions` (texto, categoria, carteira/cartão, faixa de valor, período; lançamentos e compras no cartão; páginas de 20, máximo 50, com total e hasMore) e `list_records` (wallets, categories, credit_cards, tickers, recurring, goals). `AiChatService`: iterações por `moinex.ai.max-tool-iterations` (25), resultados de tools antigos acima de 2000 caracteres são cortados, callback `onToolCall`; `ToolLabels` + chaves `aitool.label.*`; o `AiChatController` mostra o que o agente consulta ao lado de "pensando". Novos `ReadToolsTest` (paginação, filtros, rótulos). **Desvios:** chips de ação rápida, links para telas e chamadas paralelas de tools não feitos; uma única `list_records` no lugar de várias `list_*`.
 
 ### Cobertura
 Todo FR-1..FR-31 tem tarefa na Unit dona (design.md §2.7); todo NFR aparece em Definition of Done ou tarefa (NFR-1 T-2.13/T-2.14, NFR-2 T-1.4, NFR-3 T-2.5, NFR-4 T-3.10, NFR-5 T-3.9, NFR-6 T-3.3/T-3.10, NFR-7 regra do projeto em toda tarefa de teste, NFR-8 T-2.13, NFR-9 T-2.2, NFR-10 T-2.12).

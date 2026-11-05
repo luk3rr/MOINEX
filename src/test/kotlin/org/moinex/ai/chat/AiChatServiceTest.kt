@@ -19,6 +19,7 @@ import org.moinex.ai.tools.FindMatchingTransactionsTool
 import org.moinex.ai.tools.LlmTool
 import org.moinex.ai.tools.ProposeChangesTool
 import org.moinex.ai.tools.QueryFinanceTool
+import org.moinex.ai.tools.ReadTools
 import org.moinex.common.ClockProvider
 import org.moinex.config.AiPromptProperties
 import org.moinex.model.dto.ai.IgnoredLine
@@ -33,6 +34,7 @@ class AiChatServiceTest :
         val queryFinanceTool = mockk<QueryFinanceTool>()
         val findMatchingTransactionsTool = mockk<FindMatchingTransactionsTool>()
         val proposeChangesTool = mockk<ProposeChangesTool>()
+        val readTools = mockk<ReadTools>()
         val clockProvider = mockk<ClockProvider>()
         val provider = mockk<LlmProvider>()
         val preferencesService = mockk<PreferencesService>(relaxed = true)
@@ -54,6 +56,7 @@ class AiChatServiceTest :
 
         /** Stubs the calls [AiChatService] makes on every turn to build the system message. */
         fun stubTurnContext() {
+            every { readTools.tools() } returns emptyList()
             every { proposeChangesTool.describeAvailableContext() } returns
                 "Existing categories: Groceries\nExisting tickers: PETR4"
             every { clockProvider.today() } returns LocalDate.of(2026, 9, 21)
@@ -65,6 +68,7 @@ class AiChatServiceTest :
                 llmProviderFactory,
                 queryFinanceTool,
                 findMatchingTransactionsTool,
+                readTools,
                 proposeChangesTool,
                 aiPromptProperties,
                 PromptComposer(),

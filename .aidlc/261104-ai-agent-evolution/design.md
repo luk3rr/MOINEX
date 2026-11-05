@@ -625,3 +625,83 @@ Lista observável de `ProposedChange` com estado (`PENDING`, `EDITED`, `APPROVED
 - A27: dividir a UNIT-3 em 3a (núcleo) e 3b (UI) mantém o plano de FRs: 3a cobre FR-19, FR-28 (roteamento), FR-6 (aprovação em lote, parte lógica), FR-4 (seleção) e NFR-3; 3b cobre FR-1, FR-2, FR-3, FR-5, FR-7, FR-8, FR-26 e NFR-4/NFR-6. — confirmed: no
 - A28: entre 3a e 3b o app **não terá revisão de propostas** se removermos as tools antigas na 3a. Alternativa: 3a mantém as tools antigas registradas em paralelo e só a 3b troca tudo; custo é duplicação temporária. — confirmed: no (pergunta ao dono)
 - A29: o modelo continua usando nomes, não ids (menor risco de regressão). — confirmed: no
+
+### UNIT-4 — Functional design (domínio Lançamentos)
+
+**Divisão (decisão do dono, 2026-11-05):** 4a duplicata e correlação no painel (T-4.1, T-4.2); 4b operações novas (T-4.3 a T-4.7); 4c rascunho nos diálogos reais e avaliação (T-4.8 a T-4.10). Cada parte é verificada com o comando aprovado antes da seguinte; sem uso intermediário.
+
+**Ponto de partida (verificado no código):** `CreateWalletTransactionOperation` já faz criar e confirmar pendente (`existingTransactionId`, `confirmingPending`); `ProposeChangesTool` já aceita `allowDuplicate` e emite o selo `POSSIBLE_DUPLICATE`; `ProposedChange.matchCandidates` já carrega todos os candidatos. Logo, T-4.2 é sobretudo teste e prompt, e T-4.1 é a UI de troca de alvo.
+
+```mermaid
+flowchart LR
+  subgraph 4a[4a Duplicata]
+    A1[matchCandidates] --> A2[Cartão: candidatos + Trocar alvo]
+    A2 --> A3[confirmingPending com o alvo escolhido]
+    A4[allowDuplicate] --> A5[Selo Possível duplicata]
+  end
+  subgraph 4b[4b Operações]
+    B1[update_wallet_transaction]
+    B2[create/update_transfer]
+    B3[create/update_recurring_transaction]
+    B4[create/update/archive_wallet]
+    B5[create/update/archive_category]
+  end
+  subgraph 4c[4c Rascunho + avaliação]
+    C1[DraftCapable nos diálogos] --> C2[DraftValues ↔ payload]
+    C3[AgentEvaluationSuite]
+  end
+  4a --> 4b --> 4c
+```
+
+#### 4a — Duplicata e correlação
+- **Troca de alvo (FR-15):** o cartão "Casa com #id" lista os `matchCandidates` com pontuação e motivo; escolher outro candidato recalcula o payload com `confirmingPending(payload, novoId)`. Se devolver null (alvo não é mais PENDING), o cartão mostra erro de validação e mantém o alvo anterior. Só candidatos `PENDING` são oferecidos como alvo; os `CONFIRMED` aparecem como informação.
+- **"Ver existente":** abre a tela do registro casado (lançamento na tela da carteira; parcela na tela do cartão) via navegação existente; só leitura.
+- **Criar mesmo assim (FR-14):** sem botão (A12). O usuário pede no chat, o modelo reenvia a linha com `allowDuplicate=true` e o cartão sai com selo `POSSIBLE_DUPLICATE`, não selecionado por padrão. Trabalho: teste `DuplicateOverrideTest` e linha no bloco `transactions.md` do prompt.
+- **Regra:** trocar o alvo só altera o payload do cartão; nada grava até Aprovar.
+
+#### 4b — Operações (todas `OperationDomain.TRANSACTIONS`, `risk` conforme tabela; nenhuma exclusão)
+
+| Operação | Serviço | Campos (por nome) | Risco |
+|---|---|---|---|
+| `update_wallet_transaction` | `WalletService.updateWalletTransaction` | id do lançamento, e os campos a mudar (data, descrição, valor, tipo, carteira, categoria) | MEDIUM |
+| `create_transfer` / `update_transfer` | `createTransfer` / `updateTransfer` | carteira de origem, de destino, data, valor, descrição, categoria | LOW / MEDIUM |
+| `create_recurring_transaction` / `update_recurring_transaction` | `RecurringTransactionService` | início, fim, frequência, tipo, valor, carteira, categoria, descrição, incluir no patrimônio | LOW / MEDIUM |
+| `create_wallet` / `update_wallet` / `archive_wallet` / `unarchive_wallet` | `WalletService.createWallet/renameWallet/changeWalletType/archiveWallet/unarchiveWallet` | nome, tipo, saldo inicial | LOW / MEDIUM |
+| `create_category` / `update_category` / `archive_category` | `CategoryService` | nome, arquivada | LOW / MEDIUM |
+
+- **Edição:** o modelo informa o id (vindo de `get_transactions_in_period`/`find_matching_transactions`) e só os campos a mudar; `fromModelArguments` carrega o registro e monta o payload completo, então o cartão e o rascunho sempre mostram o estado final. Id inexistente → erro de validação. O cartão mostra "antes → depois" via `preview` (esta é a primeira operação a usar `preview`).
+- **Confirmar pendente** continua em `create_wallet_transaction` + `existingTransactionId` (FR-12), sem operação nova; `update_wallet_transaction` não muda status.
+- **Arquivar carteira:** só `risk=MEDIUM`, validação reaproveita as regras do `WalletService` (erro devolvido no cartão). **Alterar saldo** fica fora (a tela existe, mas é correção contábil sensível) — anotado como pergunta aberta.
+- **Roteamento:** esta é a primeira Unit de domínio novo, então T-3.13 (`use_domain`, limite de 30 definições por turno) **entra aqui**, junto de `transactions.md` ampliado no prompt. Domínio ativo por conversa; `TRANSACTIONS` ativo por padrão.
+
+#### Categoria nova (FR-24, decisão do dono)
+Proposta com categoria inexistente gera um cartão `create_category` e o lançamento ganha `dependsOn` apontando para ele. `ReviewSession` já aplica por dependência: aprovar o lançamento sem o cartão da categoria devolve erro "falta a categoria X" e não cria nada; rejeitar a categoria impede o lançamento dependente. `CategoryResolver.resolveOrCreate` deixa de criar em silêncio no caminho do chat (continua criando nos diálogos antigos, fora do agente).
+
+```mermaid
+stateDiagram-v2
+  [*] --> PENDING
+  PENDING --> EDITED: Editar / Salvar rascunho
+  PENDING --> APPROVED: Aprovar (dependências ok)
+  PENDING --> REJECTED: Rejeitar
+  REJECTED --> PENDING: Desfazer rejeição
+  EDITED --> APPROVED
+  PENDING --> ERROR: falha de validação ou gravação
+  note right of PENDING: lançamento depende do cartão "criar categoria X"
+```
+
+#### 4c — Rascunho nos diálogos reais (FR-5)
+Implementa `DraftCapable` (contrato C-D) em: `AddExpense`, `AddIncome`, `EditTransaction`, `AddTransfer`, `EditTransfer`, `AddRecurringTransaction`, `EditRecurringTransaction`, `AddWallet`, e em `AddCategory`/`EditCategory`. `handleSave` em modo rascunho valida como sempre, chama o callback e fecha; título e botão dizem "Rascunho". `DraftDialogLauncher.open(operationName, values, onSaved)` resolve o diálogo pelo nome da operação; sem diálogo rascunhável, cai para o `DraftEditorDialog` de reserva já existente. Mapeamento `DraftValues ↔ payload` testado em `DraftValuesMappingTest`.
+
+#### Casos de avaliação (FR-29, T-4.10)
+Nome diferente no extrato, janela de data (±3 dias), duplicata forçada, categoria nova (gera 2 cartões com dependência), editar lançamento por id, transferência entre duas carteiras, recorrente mensal.
+
+#### Regras e erros
+- O modelo nunca grava; erros de validação voltam ao modelo em `errors`; falha de gravação vira estado `ERROR` no cartão (modelo de erro da seção 2.8).
+- Todo texto novo em pt-BR e en (somente chaves acrescentadas, nada de reescrever o `.properties`; se a edição falhar, peço a você as chaves).
+- Sem comentários `//` no código; KDoc nas classes e funções; cabeçalho de arquivo nos novos.
+
+#### Assumptions & open questions
+- A24: `ReviewSession` aplica a dependência categoria → lançamento sem mudança de contrato (`dependsOn` já existe). — confirmed: no
+- A25: alterar saldo de carteira, mudar o tipo da carteira e vincular carteira virtual ficam **fora** do agente nesta Unit. — confirmed: no
+- A26: "Ver existente" usa a navegação já disponível entre telas, sem tela nova. — confirmed: no
+- A27: T-3.13 (`use_domain`) entra na 4b por ser a primeira Unit com domínio novo. — confirmed: no

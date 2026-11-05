@@ -235,3 +235,15 @@
   -fx-font-weight: bold;
   -fx-text-fill: theme-text-secondary;
 }
+
+.ai-chat-input-hint {
+  -fx-text-fill: theme-text-secondary;
+  -fx-font-size: 11px;
+  -fx-padding: 0 0 0 4;
+}
+
+.ai-chat-input-growing .scroll-bar:vertical {
+  -fx-opacity: 0;
+  -fx-pref-width: 0;
+  -fx-max-width: 0;
+}

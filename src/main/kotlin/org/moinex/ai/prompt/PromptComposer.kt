@@ -17,7 +17,7 @@ class PromptComposer {
     companion object {
         const val FALLBACK_LOCALE = "en"
         const val CORE_BLOCK = "core"
-        val DEFAULT_BLOCKS = listOf("transactions", "credit_card", "investments")
+        val DEFAULT_BLOCKS = listOf("transactions", "credit_card", "investments", "planning")
         private const val BASE_PATH = "/ai/prompts"
     }
 

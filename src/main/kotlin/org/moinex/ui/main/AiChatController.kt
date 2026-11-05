@@ -16,8 +16,10 @@ import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
-import javafx.scene.control.TextField
+import javafx.scene.control.TextArea
 import javafx.scene.control.Tooltip
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
@@ -34,6 +36,7 @@ import org.moinex.ai.chat.ChatRole
 import org.moinex.ai.chat.ChatTurnResult
 import org.moinex.ai.chat.EmojiRenderer
 import org.moinex.ai.chat.MarkdownRenderer
+import org.moinex.ai.chat.ToolLabels
 import org.moinex.ai.ingest.StatementIngestService
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.review.ReviewItem
@@ -42,9 +45,11 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.ThemeColors
 import org.moinex.common.util.FxUtils
+import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.dto.ai.IgnoredLine
+import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
@@ -52,6 +57,7 @@ import org.moinex.service.investment.BondService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ai.DraftChoice
+import org.moinex.ui.common.ai.DraftDialogLauncher
 import org.moinex.ui.common.ai.DraftEditorDialog
 import org.moinex.ui.common.ai.ReviewPanel
 import org.moinex.ui.dialog.ai.FilePasswordController
@@ -71,6 +77,7 @@ class AiChatController(
     private val preferencesService: PreferencesService,
     private val springContext: ConfigurableApplicationContext,
     private val reviewSession: ReviewSession,
+    private val draftLauncher: DraftDialogLauncher,
     private val walletService: WalletService,
     private val creditCardService: CreditCardService,
     private val categoryService: CategoryService,
@@ -84,7 +91,7 @@ class AiChatController(
     private lateinit var messagesContainer: VBox
 
     @FXML
-    private lateinit var inputField: TextField
+    private lateinit var inputField: TextArea
 
     @FXML
     private lateinit var sendButton: Button
@@ -111,6 +118,9 @@ class AiChatController(
     private val pendingAttachments = mutableListOf<ChatAttachment>()
     private var busy = false
     private var requestStartNanos = 0L
+
+    @Volatile
+    private var currentActivity: String? = null
     private var thinkingTimeline: Timeline? = null
 
     private var draftInput: String = ""
@@ -118,6 +128,8 @@ class AiChatController(
     companion object {
         private val logger = LoggerFactory.getLogger(AiChatController::class.java)
         private const val BUBBLE_MAX_WIDTH = 480.0
+        private const val INPUT_MAX_ROWS = 5
+        private const val STYLE_INPUT_GROWING = "ai-chat-input-growing"
         private const val MIN_BUBBLE_HEIGHT = 30.0
         private const val MAX_BUBBLE_HEIGHT = 2000.0
         private const val BUBBLE_CORNER_RADIUS = 28.0
@@ -146,7 +158,23 @@ class AiChatController(
         setBusy(busy)
         inputField.text = draftInput
         inputField.textProperty().addListener { _, _, newValue -> draftInput = newValue }
-        inputField.setOnAction { handleSend() }
+        inputField.styleClass.add(STYLE_INPUT_GROWING)
+        inputField.addEventFilter(KeyEvent.KEY_PRESSED) { event ->
+            if (event.code == KeyCode.ENTER) {
+                event.consume()
+                if (event.isShiftDown) inputField.insertText(inputField.caretPosition, "\n") else handleSend()
+            }
+        }
+        inputField.textProperty().addListener { _, _, text ->
+            val lines = text.count { it == '\n' } + 1
+            inputField.prefRowCount = lines.coerceIn(1, INPUT_MAX_ROWS)
+            val grows = lines <= INPUT_MAX_ROWS
+            if (grows) {
+                if (STYLE_INPUT_GROWING !in inputField.styleClass) inputField.styleClass.add(STYLE_INPUT_GROWING)
+            } else {
+                inputField.styleClass.remove(STYLE_INPUT_GROWING)
+            }
+        }
         history.forEachIndexed { index, message ->
             appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
         }
@@ -178,10 +206,15 @@ class AiChatController(
         inputField.clear()
         clearAttachments()
         requestStartNanos = System.nanoTime()
+        currentActivity = null
         setBusy(true)
 
         FxUtils.launchBackgroundThenUI(
-            background = { aiChatService.sendMessage(history.toList()) },
+            background = {
+                aiChatService.sendMessage(history.toList()) { toolName ->
+                    currentActivity = ToolLabels.of(toolName, preferencesService)
+                }
+            },
             onUI = { result -> handleResult(result) },
         )
     }
@@ -393,6 +426,8 @@ class AiChatController(
 
     private fun editProposal(item: ReviewItem) {
         val initial = reviewSession.draftOf(item) ?: return
+        if (draftLauncher.open(initial) { reviewSession.applyDraft(item, it) }) return
+
         val edited =
             DraftEditorDialog(preferencesService, ::draftChoices).show(
                 preferencesService.translate(TranslationKeys.AIPANEL_DRAFT_TITLE),
@@ -413,6 +448,12 @@ class AiChatController(
             DraftChoices.TICKERS ->
                 tickerService.getAllNonArchivedTickers().map { DraftChoice(it.id, "${it.symbol} - ${it.name}") }
             DraftChoices.BONDS -> bondService.getAllNonArchivedBonds().map { DraftChoice(it.id, it.name) }
+            DraftChoices.FREQUENCIES ->
+                RecurringTransactionFrequency.entries.map {
+                    DraftChoice(it.name.lowercase(), UIUtils.translateRecurringTransactionFrequency(it))
+                }
+            DraftChoices.WALLET_TYPES ->
+                walletService.getAllWalletTypes().map { DraftChoice(it.name, it.name) }
             DraftChoices.MOVEMENT_TYPES ->
                 listOf(
                     DraftChoice("income", preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOME)),
@@ -446,7 +487,8 @@ class AiChatController(
             val word = words[(tick / TICKS_PER_WORD) % words.size]
             val dots = ".".repeat(tick % (THINKING_MAX_DOTS + 1))
             val elapsed = formatElapsed((System.nanoTime() - requestStartNanos) / NANOS_PER_MILLI)
-            thinkingLabel.text = "$word$dots  ·  $elapsed"
+            val activity = currentActivity?.let { "  ·  $it" }.orEmpty()
+            thinkingLabel.text = "$word$dots$activity  ·  $elapsed"
         }
 
         render()
@@ -488,7 +530,8 @@ class AiChatController(
     ) {
         val bubbleStyle = if (role == ChatRole.USER) STYLE_BUBBLE_USER else STYLE_BUBBLE_ASSISTANT
         val (background, textColor) = bubbleColors(bubbleStyle)
-        val bubble = createMarkdownBubble(text, background, textColor)
+        val shown = if (role == ChatRole.USER) text.replace("\n", "  \n") else text
+        val bubble = createMarkdownBubble(shown, background, textColor)
         val content: Node =
             if (responseTimeMillis != null && role == ChatRole.ASSISTANT) {
                 val meta =

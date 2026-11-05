@@ -11,6 +11,7 @@ package org.moinex.ui.dialog.wallettransaction.create
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.stage.Stage
+import org.moinex.ai.operation.DraftValues
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionType
@@ -19,6 +20,7 @@ import org.moinex.service.CalculatorService
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
+import org.moinex.ui.common.ai.DraftCapable
 import org.moinex.ui.dialog.wallettransaction.base.BaseWalletTransactionManagement
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -37,10 +39,15 @@ class AddIncomeController(
         calculatorService,
         preferencesService,
         springContext,
-    ) {
+    ),
+    DraftCapable {
     init {
         walletTransactionType = WalletTransactionType.INCOME
     }
+
+    override fun applyDraft(values: DraftValues) = fillFromDraft(values)
+
+    override fun onDraftSaved(callback: (DraftValues) -> Unit) = registerDraftCallback(callback)
 
     @FXML
     override fun handleSave() {
@@ -52,6 +59,7 @@ class AddIncomeController(
         val incomeDate = transactionDatePicker.value
 
         if (!validation.validate()) return
+        if (saveAsDraftIfRequested()) return
 
         runCatching {
             val incomeValue = incomeValueString.toBigDecimal()

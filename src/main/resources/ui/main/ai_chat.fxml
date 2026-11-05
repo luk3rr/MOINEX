@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
@@ -32,7 +32,7 @@
       <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-16" />
    </graphic>
 </Label>
-            <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="ai-chat-scroll">
+            <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" prefHeight="0.0" minHeight="0.0" VBox.vgrow="ALWAYS" styleClass="ai-chat-scroll">
                <content>
                   <VBox fx:id="messagesContainer" spacing="12.0" styleClass="ai-chat-messages">
                      <padding>
@@ -43,10 +43,15 @@
             </ScrollPane>
             <Label fx:id="thinkingLabel" text="%aichat.thinking" styleClass="ai-chat-thinking" />
             <FlowPane fx:id="attachmentsContainer" hgap="6.0" vgap="6.0" visible="false" managed="false" />
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <HBox spacing="10.0" alignment="TOP_LEFT" minHeight="-Infinity">
                <children>
                   <Button fx:id="attachButton" text="%aichat.attach.button" onAction="#handleAttach" styleClass="ai-chat-attach-button" />
-                  <TextField fx:id="inputField" promptText="%aichat.input.placeholder" HBox.hgrow="ALWAYS" />
+                  <VBox spacing="2.0" minHeight="-Infinity" HBox.hgrow="ALWAYS">
+                     <children>
+                        <TextArea fx:id="inputField" styleClass="ai-chat-input" promptText="%aichat.input.placeholder" wrapText="true" prefRowCount="1" minHeight="34" />
+                        <Label text="%aichat.input.hint" styleClass="ai-chat-input-hint" />
+                     </children>
+                  </VBox>
                   <Button fx:id="sendButton" text="%aichat.send" onAction="#handleSend" styleClass="ai-chat-send-button" />
                </children>
             </HBox>

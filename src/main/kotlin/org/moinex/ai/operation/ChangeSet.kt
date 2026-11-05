@@ -38,6 +38,7 @@ data class ProposedChange(
     val confidence: Double,
     val dependsOn: List<String> = emptyList(),
     val matchCandidates: List<Match> = emptyList(),
+    val targetId: Int? = null,
 )
 
 /** What one turn of the assistant proposed: [changes] to review and [ignored] lines already recorded. */

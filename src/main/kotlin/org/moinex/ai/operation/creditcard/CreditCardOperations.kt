@@ -67,6 +67,8 @@ class CreateCreditCardDebtOperation(
     override val domain = OperationDomain.CREDIT_CARD
     override val risk = OperationRisk.LOW
 
+    override fun modelRequired() = listOf("date", "amount", "creditCardName", "categoryName")
+
     override fun modelDescription() =
         "create_credit_card_debt: a purchase on a credit card (use creditCardName); amount is always the value of " +
             "ONE installment as printed, and the app multiplies it by the installments left."
@@ -125,6 +127,8 @@ class CreateCreditCardDebtOperation(
 
     override fun missingFromModel(payload: CreditCardDebtPayload) =
         if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+
+    override fun categoryNeeded(payload: CreditCardDebtPayload) = payload.categoryName.takeIf { it.isNotBlank() }
 
     override fun summary(payload: CreditCardDebtPayload) =
         "${payload.description}, ${installmentValue(payload).toPlainString()}, ${payload.date}"
@@ -211,6 +215,8 @@ class PayCreditCardInvoiceOperation(
     override val name = "pay_credit_card_invoice"
     override val domain = OperationDomain.CREDIT_CARD
     override val risk = OperationRisk.MEDIUM
+
+    override fun modelRequired() = listOf("date", "amount", "creditCardName")
 
     override fun modelDescription() =
         "pay_credit_card_invoice: paying a card's bill in full - use this INSTEAD of a wallet expense for a " +

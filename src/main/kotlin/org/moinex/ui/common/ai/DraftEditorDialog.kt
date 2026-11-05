@@ -239,6 +239,7 @@ class DraftEditorDialog(
             )
             dialogPane.prefWidth = CONTENT_WIDTH + GAP * 4
             dialogPane.content = VBox(GAP * 1.5, banner, grid, error, buttons).apply { padding = Insets(GAP) }
+            setResultConverter { dialog.result }
             dialogPane.buttonTypes.add(ButtonType.CANCEL)
             dialogPane.lookupButton(ButtonType.CANCEL).apply {
                 isVisible = false

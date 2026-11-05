@@ -19,7 +19,7 @@ TESTS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run demo jar build test coverage lint format clean pre-commit install-hooks install uninstall log
+.PHONY: help run run-debug demo jar build test coverage lint format clean pre-commit install-hooks install uninstall log
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -27,6 +27,9 @@ help: ## Show this help
 
 run: ## Run the application
 	$(GRADLE) bootRun $(GRADLE_FLAGS)
+
+run-debug: ## Run the application with DEBUG logs (LOG_PACKAGE=org.moinex.ai to limit, default org.moinex)
+	LOGGING_LEVEL_$(shell echo $(or $(LOG_PACKAGE),org.moinex) | tr 'a-z.' 'A-Z_')=DEBUG $(GRADLE) bootRun $(GRADLE_FLAGS)
 
 demo: jar ## Open the app on a temporary database with mock data (real data untouched)
 	bash scripts/dev/demo.sh

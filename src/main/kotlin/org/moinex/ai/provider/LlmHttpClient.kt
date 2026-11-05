@@ -22,6 +22,11 @@ internal class LlmHttpClient(
         private val logger: Logger = LoggerFactory.getLogger(LlmHttpClient::class.java)
         private val DEFAULT_TIMEOUT: Duration = Duration.ofSeconds(60)
 
+        private const val LOG_LIMIT = 20_000
+
+        private fun clip(text: String): String =
+            if (text.length <= LOG_LIMIT) text else text.take(LOG_LIMIT) + "…[${text.length - LOG_LIMIT} more chars]"
+
         internal fun sanitizePath(endpoint: String): String = endpoint.substringBefore("?")
     }
 
@@ -39,7 +44,7 @@ internal class LlmHttpClient(
                 .applyHeaders(headers)
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build()
-        return send("POST", model, endpoint, request)
+        return send("POST", model, endpoint, request, body)
     }
 
     fun get(
@@ -68,13 +73,22 @@ internal class LlmHttpClient(
         model: String,
         endpoint: String,
         request: HttpRequest,
+        body: String? = null,
     ): String {
         val path = sanitizePath(endpoint)
         logger.info("Sending {} request to {} (model={}, path={})", method, providerName, model, path)
+        if (body != null) logger.debug("Request body to {} ({} chars): {}", providerName, body.length, clip(body))
 
         val startNanos = System.nanoTime()
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         val elapsedMs = (System.nanoTime() - startNanos) / 1_000_000
+
+        logger.debug(
+            "Response body from {} (status {}): {}",
+            providerName,
+            response.statusCode(),
+            clip(response.body()),
+        )
 
         if (response.statusCode() !in 200..299) {
             logger.warn(

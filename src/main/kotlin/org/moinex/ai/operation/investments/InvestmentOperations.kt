@@ -72,6 +72,10 @@ abstract class InvestmentOperation(
     protected open val usesBond = false
     protected open val usesFees = false
 
+    override fun modelRequired() =
+        listOf("date", "categoryName", "assetName", "walletName") +
+            if (usesQuantityAndPrice) listOf("quantity", "unitPrice") else listOf("amount")
+
     override fun modelProperties(): Map<String, JSONObject> =
         mapOf(
             "assetName" to
@@ -147,6 +151,8 @@ abstract class InvestmentOperation(
                 add("dividendAmount must be greater than 0")
             }
         }
+
+    override fun categoryNeeded(payload: InvestmentPayload) = payload.context.categoryName.takeIf { it.isNotBlank() }
 
     override fun summary(payload: InvestmentPayload) =
         "${payload.assetLabel.ifBlank { payload.context.description }}, ${payload.context.date}"

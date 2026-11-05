@@ -22,13 +22,19 @@ import org.moinex.ai.operation.creditcard.CreateCreditCardDebtOperation
 import org.moinex.ai.operation.creditcard.CreditCardDebtPayload
 import org.moinex.ai.operation.creditcard.PayCreditCardInvoiceOperation
 import org.moinex.ai.operation.investments.RecordStockPurchaseOperation
+import org.moinex.ai.operation.transactions.CreateCategoryOperation
+import org.moinex.ai.operation.transactions.CreateTransferOperation
 import org.moinex.ai.operation.transactions.CreateWalletTransactionOperation
+import org.moinex.ai.operation.transactions.TransferPayload
+import org.moinex.ai.operation.transactions.UpdateWalletTransactionOperation
+import org.moinex.ai.operation.transactions.UpdateWalletTransactionPayload
 import org.moinex.ai.operation.transactions.WalletTransactionPayload
 import org.moinex.ai.prompt.PromptComposer
 import org.moinex.ai.provider.LlmProviderFactory
 import org.moinex.ai.tools.FindMatchingTransactionsTool
 import org.moinex.ai.tools.ProposeChangesTool
 import org.moinex.ai.tools.QueryFinanceTool
+import org.moinex.ai.tools.ReadTools
 import org.moinex.common.ClockProvider
 import org.moinex.config.AiPromptProperties
 import org.moinex.factory.CategoryFactory
@@ -105,10 +111,15 @@ class AgentEvaluationSuite :
                     CreateCreditCardDebtOperation(creditCardService, categoryResolver, preferencesService),
                     PayCreditCardInvoiceOperation(creditCardService, preferencesService),
                     RecordStockPurchaseOperation(tickerService, walletService, categoryResolver, preferencesService),
+                    UpdateWalletTransactionOperation(walletService, categoryResolver),
+                    CreateTransferOperation(walletService, categoryResolver),
+                    CreateCategoryOperation(categoryService),
                 ),
             )
         val catalog =
             EntityCatalogProvider(walletService, creditCardService, tickerService, bondService, categoryService)
+        val readTools = mockk<ReadTools>()
+        every { readTools.tools() } returns emptyList()
         val proposeTool = ProposeChangesTool(registry, catalog, matching, preferencesService)
         val findTool = FindMatchingTransactionsTool(matching, walletService, creditCardService, preferencesService)
 
@@ -150,6 +161,7 @@ class AgentEvaluationSuite :
                     llmProviderFactory,
                     queryFinanceTool,
                     findTool,
+                    readTools,
                     proposeTool,
                     AiPromptProperties(),
                     PromptComposer(),
@@ -362,5 +374,78 @@ class AgentEvaluationSuite :
                     names shouldNotContain "create_wallet_transaction"
                 }
             }
+        }
+
+        Given("case 10: a statement line in a category that does not exist yet") {
+            stored()
+            val line =
+                """{"changes":[{"operation":"create_wallet_transaction","date":"2026-10-14","description":"Pet shop",
+                    "amount":80.00,"walletName":"Bank","movementType":"expense","categoryName":"Pets",
+                    "confidence":0.9}]}"""
+
+            When("the model proposes it") {
+                val (result, _) = run(ProposeChangesTool.NAME, line)
+
+                Then("the category is a visible card and the transaction waits for it") {
+                    val changes = (result as ChatTurnResult.Success).changeSet!!.changes
+                    changes.map { it.operationName } shouldBe
+                        listOf("create_category", "create_wallet_transaction")
+                    changes[1].dependsOn shouldBe listOf(changes[0].id)
+                }
+            }
+        }
+
+        Given("case 11: the user asks to change the amount of a recorded transaction") {
+            stored()
+            every { walletService.getWalletTransactionById(198) } returns gym(198, WalletTransactionStatus.CONFIRMED)
+
+            When("the model proposes an update with only the id and the new amount") {
+                val (result, _) =
+                    run(
+                        ProposeChangesTool.NAME,
+                        """{"changes":[{"operation":"update_wallet_transaction","transactionId":198,"amount":89.90}]}""",
+                    )
+
+                Then("the card carries the whole transaction with the other fields unchanged") {
+                    val payload =
+                        (result as ChatTurnResult.Success)
+                            .changeSet!!
+                            .changes
+                            .single()
+                            .payload as UpdateWalletTransactionPayload
+                    payload.transactionId shouldBe 198
+                    payload.description shouldBe "Academia"
+                    payload.amount.compareTo(BigDecimal("89.90")) shouldBe 0
+                }
+            }
+        }
+
+        Given("case 12: the user moves money between two of their wallets") {
+            stored()
+            val savings = WalletFactory.create(id = 2, name = "Savings")
+            every { walletService.getAllNonArchivedWalletsOrderedByName() } returns listOf(bank, savings)
+
+            When("the model proposes a transfer") {
+                val (result, _) =
+                    run(
+                        ProposeChangesTool.NAME,
+                        """{"changes":[{"operation":"create_transfer","date":"2026-10-15","amount":500,
+                            "fromWalletName":"Bank","toWalletName":"Savings","description":"Reserve"}]}""",
+                    )
+
+                Then("it is a transfer, not an income plus an expense, and nothing is ignored") {
+                    val success = result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    val payload =
+                        success.changeSet!!
+                            .changes
+                            .single()
+                            .payload as TransferPayload
+                    payload.senderWalletId shouldBe 1
+                    payload.receiverWalletId shouldBe 2
+                    success.changeSet!!.ignored.size shouldBe 0
+                }
+            }
+
+            every { walletService.getAllNonArchivedWalletsOrderedByName() } returns listOf(bank)
         }
     })

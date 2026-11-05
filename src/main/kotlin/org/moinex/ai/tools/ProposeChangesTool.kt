@@ -7,6 +7,7 @@
 package org.moinex.ai.tools
 
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import org.moinex.ai.operation.AppOperation
 import org.moinex.ai.operation.ChangeBadge
@@ -15,6 +16,7 @@ import org.moinex.ai.operation.EntityCatalog
 import org.moinex.ai.operation.EntityCatalogProvider
 import org.moinex.ai.operation.OperationRegistry
 import org.moinex.ai.operation.ProposedChange
+import org.moinex.ai.operation.transactions.CategoryPayload
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.model.dto.ai.IgnoredLine
 import org.moinex.service.PreferencesService
@@ -22,6 +24,7 @@ import org.moinex.service.matching.Match
 import org.moinex.service.matching.MatchStatus
 import org.moinex.service.matching.MatchTargetType
 import org.moinex.service.matching.TransactionMatchingService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.text.MessageFormat
 import java.util.UUID
@@ -41,7 +44,9 @@ class ProposeChangesTool(
     companion object {
         const val NAME = "propose_changes"
         const val LOW_CONFIDENCE_THRESHOLD = 0.6
-        private const val DEFAULT_CONFIDENCE = 0.5
+        private const val DEFAULT_CONFIDENCE = 1.0
+        private const val CREATE_CATEGORY = "create_category"
+        private val logger = LoggerFactory.getLogger(ProposeChangesTool::class.java)
     }
 
     data class ErrorItem(
@@ -59,7 +64,7 @@ class ProposeChangesTool(
     override val description: String
         get() =
             preferencesService.translate(TranslationKeys.AI_TOOL_PROPOSE_CHANGES_DESCRIPTION) +
-                "\n" + registry.all().joinToString("\n") { "- " + it.modelDescription() }
+                "\n" + registry.all().joinToString("\n") { "- " + it.modelDescription() + requiredNote(it) }
 
     override val jsonSchema: String
         get() = buildJsonSchema().toString()
@@ -107,8 +112,17 @@ class ProposeChangesTool(
                         ),
                 ).put("creditCardName", JSONObject().put("type", "string"))
                 .put("categoryName", JSONObject().put("type", "string"))
-                .put("confidence", JSONObject().put("type", "number"))
                 .put(
+                    "confidence",
+                    JSONObject()
+                        .put("type", "number")
+                        .put(
+                            "description",
+                            "Optional, 0 to 1: how sure you are that this item is right. Leave it out when you are " +
+                                "confident; send a value below 0.6 only when the item is a guess (an unreadable " +
+                                "line, a doubtful amount or a wallet/category you had to assume).",
+                        ),
+                ).put(
                     "allowDuplicate",
                     JSONObject()
                         .put("type", "boolean")
@@ -126,13 +140,29 @@ class ProposeChangesTool(
             JSONObject()
                 .put("type", "object")
                 .put("properties", properties)
-                .put("required", JSONArray(listOf("operation", "date", "description", "categoryName")))
+                .put("required", JSONArray(listOf("operation")))
+                .put("anyOf", JSONArray(registry.all().sortedBy { it.name }.map { variantOf(it) }))
 
         return JSONObject()
             .put("type", "object")
             .put("properties", JSONObject().put("changes", JSONObject().put("type", "array").put("items", item)))
             .put("required", JSONArray(listOf("changes")))
     }
+
+    private fun requiredNote(operation: AppOperation<*>): String =
+        operation
+            .modelRequired()
+            .takeIf { it.isNotEmpty() }
+            ?.let { " Required fields: " + it.joinToString() + "." }
+            .orEmpty()
+
+    /** One alternative of the item schema: this operation by name with the fields it needs. */
+    private fun variantOf(operation: AppOperation<*>): JSONObject =
+        JSONObject()
+            .put(
+                "properties",
+                JSONObject().put("operation", JSONObject().put("enum", JSONArray(listOf(operation.name)))),
+            ).put("required", JSONArray(listOf("operation") + operation.modelRequired()))
 
     fun describeAvailableContext(): String {
         val catalog = catalogProvider.snapshot()
@@ -157,6 +187,7 @@ class ProposeChangesTool(
     )
 
     fun propose(argumentsJson: String): Outcome {
+        logger.debug("propose_changes arguments: {}", argumentsJson)
         val items = JSONObject(argumentsJson).optJSONArray("changes") ?: JSONArray()
         val catalog = catalogProvider.snapshot()
         val errors = mutableListOf<ErrorItem>()
@@ -180,8 +211,62 @@ class ProposeChangesTool(
             decide(item, matches, ignored)?.let { changes += it }
         }
 
-        return Outcome(ChangeSet(UUID.randomUUID().toString(), changes, ignored), errors)
+        val outcome =
+            Outcome(ChangeSet(UUID.randomUUID().toString(), withCategoryCards(changes, catalog), ignored), errors)
+        logger.debug(
+            "propose_changes outcome: {} items received, accepted={}, ignored={}, errors={}",
+            items.length(),
+            outcome.changeSet.changes.map { "${it.operationName}:${it.badge}" },
+            outcome.changeSet.ignored.map { "${it.targetType}#${it.targetId}" },
+            errors.map { "#${it.index}: ${it.message}" },
+        )
+        return outcome
     }
+
+    /**
+     * A category the changes use but that does not exist yet becomes its own card, put before the changes that need
+     * it; those changes depend on it, so it is created only when the user approves it. A "create_category" the model
+     * sent itself for the same name is reused instead of duplicated.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun withCategoryCards(
+        changes: List<ProposedChange>,
+        catalog: EntityCatalog,
+    ): List<ProposedChange> {
+        val categoryOperation = registry.find(CREATE_CATEGORY) as? AppOperation<Any> ?: return changes
+        val cards = linkedMapOf<String, ProposedChange>()
+        changes
+            .filter { it.operationName == CREATE_CATEGORY }
+            .forEach { cards.putIfAbsent(categoryKey((it.payload as CategoryPayload).name), it) }
+
+        val extra = mutableListOf<ProposedChange>()
+        val linked =
+            changes.map { change ->
+                val needed =
+                    (registry.find(change.operationName) as? AppOperation<Any>)
+                        ?.categoryNeeded(change.payload)
+                        ?.takeIf { catalog.category(it) == null }
+                        ?: return@map change
+
+                val card =
+                    cards.getOrPut(categoryKey(needed)) {
+                        val payload = CategoryPayload(needed.trim())
+                        ProposedChange(
+                            id = UUID.randomUUID().toString(),
+                            operationName = CREATE_CATEGORY,
+                            payload = payload,
+                            summary = categoryOperation.summary(payload),
+                            badge = ChangeBadge.NEW,
+                            reasons = emptyList(),
+                            confidence = 1.0,
+                        ).also { extra += it }
+                    }
+                change.copy(dependsOn = change.dependsOn + card.id)
+            }
+        return extra + linked
+    }
+
+    private fun categoryKey(name: String) = name.trim().lowercase()
 
     private fun parse(
         index: Int,
@@ -193,7 +278,24 @@ class ProposeChangesTool(
         @Suppress("UNCHECKED_CAST")
         val operation =
             registry.find(operationName) as? AppOperation<Any> ?: error("unknown operation: $operationName")
-        val payload = operation.fromModelArguments(arguments, catalog)
+        val payload =
+            try {
+                operation.fromModelArguments(arguments, catalog)
+            } catch (e: JSONException) {
+                val received = arguments.keySet().sorted()
+                logger.info(
+                    "Item {} of propose_changes ({}) arrived with fields {}: {}",
+                    index,
+                    operationName,
+                    received,
+                    e.message,
+                )
+                error(
+                    "$operationName could not be read (${e.message}). The item arrived with only these fields: " +
+                        "$received. Put every field of the operation flat inside the item, next to \"operation\", " +
+                        "and resend it.",
+                )
+            }
         val missing = operation.missingFromModel(payload)
         require(missing.isEmpty()) {
             "$operationName is missing: ${missing.joinToString("; ")}. Resend it with the values from the document."
@@ -227,6 +329,7 @@ class ProposeChangesTool(
                     pending?.reasons.orEmpty(),
                     confidence,
                     matches,
+                    llmExistingId ?: pending?.targetId,
                 )
             confirmed != null && !allowDuplicate -> {
                 ignored += ignoredLine(item, confirmed)
@@ -247,6 +350,7 @@ class ProposeChangesTool(
         reasons: List<String>,
         confidence: Double,
         matches: List<Match>,
+        targetId: Int? = null,
     ) = ProposedChange(
         id = UUID.randomUUID().toString(),
         operationName = item.operation.name,
@@ -256,6 +360,7 @@ class ProposeChangesTool(
         reasons = reasons,
         confidence = confidence,
         matchCandidates = matches,
+        targetId = targetId,
     )
 
     private fun ignoredLine(

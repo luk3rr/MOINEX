@@ -11,4 +11,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "moinex.ai")
 class AiPromptProperties(
     val attachmentInstructionTemplate: String = "",
+    val maxToolIterations: Int = 25,
 )

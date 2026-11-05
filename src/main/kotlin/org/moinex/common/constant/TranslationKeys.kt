@@ -2188,7 +2188,6 @@ object TranslationKeys {
     const val AI_TOOL_NET_WORTH_MONTH_PARAM: String = "aitool.netWorth.monthParam"
     const val AI_TOOL_SPENDING_DESCRIPTION: String = "aitool.spendingByCategory.description"
     const val AI_TOOL_SPENDING_MONTH_PARAM: String = "aitool.spendingByCategory.monthParam"
-    const val AI_TOOL_PROPOSE_TRANSACTIONS_DESCRIPTION: String = "aitool.proposeTransactions.description"
     const val AI_TOOL_TRANSACTIONS_IN_PERIOD_DESCRIPTION: String = "aitool.transactionsInPeriod.description"
     const val AI_TOOL_TRANSACTIONS_START_PARAM: String = "aitool.transactionsInPeriod.startParam"
     const val AI_TOOL_TRANSACTIONS_END_PARAM: String = "aitool.transactionsInPeriod.endParam"
@@ -2204,8 +2203,6 @@ object TranslationKeys {
     const val AI_TOOL_BUDGET_VS_ACTUAL_DESCRIPTION: String = "aitool.budgetVsActual.description"
     const val AI_TOOL_BUDGET_VS_ACTUAL_MONTH_PARAM: String = "aitool.budgetVsActual.monthParam"
     const val AI_TOOL_PORTFOLIO_SUMMARY_DESCRIPTION: String = "aitool.portfolioSummary.description"
-    const val AI_TOOL_PROPOSE_INVESTMENT_OPERATIONS_DESCRIPTION: String =
-        "aitool.proposeInvestmentOperations.description"
 
     // AI transaction review
     const val AI_REVIEW_TITLE: String = "aireview.title"
@@ -2364,6 +2361,11 @@ object TranslationKeys {
     const val AIPANEL_DRAFT_SAVE: String = "aipanel.draft.save"
     const val AIPANEL_DRAFT_INVALID: String = "aipanel.draft.invalid"
     const val AIPANEL_REASONS: String = "aipanel.reasons"
+    const val AIPANEL_CANDIDATES_TITLE: String = "aipanel.candidates.title"
+    const val AIPANEL_CANDIDATE: String = "aipanel.candidate"
+    const val AIPANEL_CANDIDATE_CONFIRMED: String = "aipanel.candidate.confirmed"
+    const val AIPANEL_RETARGET_FAILED: String = "aipanel.retarget.failed"
+    const val AIPANEL_DEPENDENCY_BLOCKED: String = "aipanel.dependency.blocked"
     const val AIOPERATION_CREATE_WALLET_TRANSACTION: String = "aioperation.create_wallet_transaction"
     const val AIOPERATION_CREATE_CREDIT_CARD_DEBT: String = "aioperation.create_credit_card_debt"
     const val AIOPERATION_PAY_CREDIT_CARD_INVOICE: String = "aioperation.pay_credit_card_invoice"

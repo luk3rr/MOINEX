@@ -198,6 +198,9 @@ class ProposeChangesToolTest :
                 payload.description shouldBe "Academia"
                 outcome.changeSet.changes
                     .single()
+                    .targetId shouldBe 214
+                outcome.changeSet.changes
+                    .single()
                     .badge shouldBe ChangeBadge.MATCHES_EXISTING
             }
         }
@@ -478,6 +481,41 @@ class ProposeChangesToolTest :
                     true
                 schema.getJSONArray("required").toList() shouldBe listOf("changes")
                 tool.name shouldBe "propose_changes"
+            }
+        }
+
+        Given("each operation's own required fields") {
+            val schema = JSONObject(tool.jsonSchema)
+            val item = schema.getJSONObject("properties").getJSONObject("changes").getJSONObject("items")
+            val known = item.getJSONObject("properties").keySet()
+            val variants = item.getJSONArray("anyOf")
+
+            Then("the item schema has one alternative per operation, naming it and what it needs") {
+                variants.length() shouldBe registry.all().size
+                val wallet =
+                    (0 until variants.length())
+                        .map { variants.getJSONObject(it) }
+                        .first {
+                            it
+                                .getJSONObject(
+                                    "properties",
+                                ).getJSONObject("operation")
+                                .getJSONArray("enum")
+                                .getString(0) ==
+                                "create_wallet_transaction"
+                        }
+                wallet.getJSONArray("required").toList() shouldContain "categoryName"
+                wallet.getJSONArray("required").toList() shouldContain "operation"
+            }
+
+            Then("every required field is a field the tool declares, so none is a typo") {
+                registry.all().forEach { operation ->
+                    operation.modelRequired().forEach { field -> known shouldContain field }
+                }
+            }
+
+            Then("the description tells the model the required fields of each operation") {
+                tool.description shouldContain "Required fields: date, amount, walletName, categoryName, movementType"
             }
         }
 

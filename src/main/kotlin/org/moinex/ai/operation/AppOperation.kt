@@ -24,6 +24,12 @@ interface AppOperation<P : Any> {
     /** The fields of this operation in the proposal tool, by name; the tool merges the fields of all operations. */
     fun modelProperties(): Map<String, JSONObject>
 
+    /**
+     * The fields of [modelProperties] (and of the shared ones such as date or amount) the model must send for this
+     * operation, so the proposal tool can tell each operation's own required fields to the model.
+     */
+    fun modelRequired(): List<String> = emptyList()
+
     /** Builds the payload from what the model sent, resolving the names it used to records through [catalog]. */
     fun fromModelArguments(
         arguments: JSONObject,
@@ -51,6 +57,12 @@ interface AppOperation<P : Any> {
         payload: P,
         existingTransactionId: Int,
     ): P? = null
+
+    /**
+     * The name of a category the payload uses, so that a category that does not exist yet becomes a visible card the
+     * payload depends on instead of being created silently on approval. Null when the operation uses none.
+     */
+    fun categoryNeeded(payload: P): String? = null
 
     /** The fields the fallback editor shows for this operation. */
     fun draftSpec(): List<DraftField> = emptyList()

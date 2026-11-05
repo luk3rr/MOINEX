@@ -40,10 +40,11 @@ moinex:
   ai:
     attachment-instruction-template: >
       The user attached the following file(s): {0}. Extract every transaction and investment
-      operation you can find across all of them. Call propose_transactions with one entry per
-      regular wallet/credit-card transaction, and propose_investment_operations with one entry per
-      stock/FII/crypto purchase or sale, dividend, or CDB application/redemption - never mix the
-      two into propose_transactions. Match categories, wallets, credit cards, tickers and bonds
+      operation you can find across all of them. Call propose_changes with one entry per
+      regular wallet/credit-card transaction (create_wallet_transaction, create_credit_card_debt,
+      pay_credit_card_invoice) and one entry per stock/FII/crypto purchase or sale, dividend, or CDB
+      application/redemption (record_stock_purchase, record_stock_sale, record_dividend,
+      apply_to_bond, redeem_bond) - a market operation is never a create_wallet_transaction. Match categories, wallets, credit cards, tickers and bonds
       against the existing ones listed in context when they fit; otherwise propose a new category
       name (tickers/bonds cannot be invented - leave unmatched if none fits). Amounts must always
       be positive, even for statement lines shown with a minus sign - use movementType ("income" or
