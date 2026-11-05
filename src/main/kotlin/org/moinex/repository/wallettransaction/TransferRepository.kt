@@ -124,4 +124,16 @@ interface TransferRepository : JpaRepository<Transfer, Int> {
         @Param("walletIds") walletIds: List<Int>,
         @Param("date") date: LocalDateTime,
     ): List<Transfer>
+
+    @Query(
+        "SELECT t " +
+            "FROM Transfer t " +
+            "WHERE t.date >= :startDate " +
+            "AND t.date <= :endDate " +
+            "ORDER BY t.date ASC",
+    )
+    fun findBetweenDates(
+        @Param("startDate") startDate: LocalDateTime,
+        @Param("endDate") endDate: LocalDateTime,
+    ): List<Transfer>
 }

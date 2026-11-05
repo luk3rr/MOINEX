@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups refinados: painel de revisão do agente</title>
+<style>
+:root{--bg:#21222C;--card:#282A36;--pane:#383a52;--hover:#44475A;--border:#44475A;--text:#F8F8F2;--muted:#BFBFC3;--accent:#BD93F9;--green:#40A66A;--side:#0a614e;--cyan:#8BE9FD;--orange:#FFB86C;--red:#FF5555;--yellow:#F1FA8C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,sans-serif;padding:16px}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:16px;margin:24px 0 8px}h3{font-size:13px;margin:0 0 6px;color:var(--muted);font-weight:600}
+.lead{color:var(--muted);margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.app{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;min-height:430px;background:var(--card)}
+.side{width:48px;background:var(--side)}
+.chat{flex:1;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.msg{max-width:85%;padding:8px 12px;border-radius:14px}
+.user{align-self:flex-end;background:var(--pane)}.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--border)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:12px}
+.panel{width:400px;max-width:50%;background:var(--bg);border-left:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:8px}
+.cardp{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}
+.cardp.sel{border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.title{font-weight:600}.amount{font-weight:700}.exp{color:var(--red)}.inc{color:var(--green)}
+.meta{color:var(--muted);font-size:12px}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+.new{color:var(--green);border-color:var(--green)}.match{color:var(--cyan);border-color:var(--cyan)}
+.dup{color:var(--orange);border-color:var(--orange)}.low{color:var(--yellow);border-color:var(--yellow)}
+.ok{color:var(--green);border-color:var(--green);background:rgba(64,166,106,.12)}.err{color:var(--red);border-color:var(--red)}.rej{color:var(--muted);border-color:var(--border)}
+.why{font-size:12px;color:var(--muted);background:var(--bg);border-radius:8px;padding:5px 8px}
+.impact{font-size:12px;color:var(--cyan)}
+.btn{border:2px solid var(--border);background:transparent;color:var(--text);border-radius:20px;padding:3px 12px;font-size:12px;cursor:pointer}
+.btn.pri{border-color:var(--green);color:var(--green)}.btn.warn{border-color:var(--red);color:var(--red)}.btn.ed{border-color:var(--accent);color:var(--accent)}
+.bar{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--pane);border-radius:12px;padding:6px 10px}
+.counters{display:flex;gap:6px;flex-wrap:wrap}
+.dialog{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.draft{background:rgba(189,147,249,.15);border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:12px}
+.field{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}.field span{font-size:12px;color:var(--muted)}
+.field div{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 8px}
+.field.changed div{border-color:var(--accent)}
+.note{background:var(--pane);border-left:4px solid var(--accent);padding:8px 12px;border-radius:8px;margin:10px 0;color:var(--muted)}
+.note b{color:var(--text)}
+.narrow{max-width:420px}
+.narrow .app{flex-direction:column}.narrow .panel{width:100%;max-width:100%;border-left:0;border-top:1px solid var(--border)}.narrow .side{width:100%;height:14px}
+.tag{display:inline-block;font-size:11px;color:var(--muted);border:1px dashed var(--border);border-radius:6px;padding:0 6px;margin-left:6px}
+</style>
+</head>
+<body>
+<h1>Painel de revisão: estados e variações</h1>
+<p class="lead">Dados fictícios, paleta Dracula do app. Complementa <code>review-layouts.html</code> (layout 2, painel lateral, escolhido no gate 1.6).</p>
+
+<h2>1 · Visão geral com a resposta que lista as linhas ignoradas</h2>
+<div class="app">
+  <div class="side"></div>
+  <div class="chat">
+    <div class="msg user">Lançar o extrato do Banco Azul de outubro</div>
+    <div class="msg bot">Li 6 linhas. <b>3 propostas</b> estão no painel. <b>2 foram ignoradas</b> por já estarem registradas:<br>
+      · UBER *TRIP, R$ 23,50, 09/10 → já registrada <b>#198</b> "Transporte app" (valor, data e carteira iguais)<br>
+      · NETFLIX, R$ 55,90, 05/10 → já registrada <b>#187</b> "Streaming" (valor e carteira iguais, data +1 dia)<br>
+      Se quiser lançar alguma mesmo assim, é só pedir.
+      <div class="chips" style="margin-top:6px"><span class="chip">Criar o Uber mesmo assim</span><span class="chip">Ver #198</span><span class="chip">Resumo do mês</span></div>
+    </div>
+    <div class="msg bot meta">consultando lançamentos de outubro…</div>
+  </div>
+  <div class="panel">
+    <div class="row"><b>Revisão</b><span class="meta">filtro: Todas ▾</span></div>
+    <div class="counters"><span class="badge new">3 pendentes</span><span class="badge ok">0 aprovadas</span><span class="badge rej">0 rejeitadas</span><span class="badge err">0 com erro</span></div>
+    <div class="cardp sel">
+      <div class="row"><span class="title">☑ Mercado Central</span><span class="amount exp">− R$ 187,40</span></div>
+      <div class="row"><span class="meta">12/10 · Banco Azul · Alimentação</span><span class="badge new">Nova</span></div>
+      <div class="impact">Saldo do Banco Azul após: R$ 1.912,60</div>
+      <div class="row"><span></span><span><button class="btn ed">Editar</button> <button class="btn warn">Rejeitar</button> <button class="btn pri">Aprovar</button></span></div>
+    </div>
+    <div class="cardp sel">
+      <div class="row"><span class="title">☑ PIX ACADEMIA FIT</span><span class="amount exp">− R$ 99,90</span></div>
+      <div class="row"><span class="meta">10/10 · Banco Azul</span><span class="badge match">Casa com #214 (pendente)</span></div>
+      <div class="why">Valor exato, data igual, mesma carteira. Mantém o nome cadastrado "Academia". Outro candidato: #203 (−1 pt: data 3 dias antes) <a style="color:var(--accent)">trocar</a></div>
+      <div class="row"><span><button class="btn">Ver existente</button></span><span><button class="btn warn">Rejeitar</button> <button class="btn pri">Confirmar pendente</button></span></div>
+    </div>
+    <div class="cardp">
+      <div class="row"><span class="title">☐ Padaria Boa Massa</span><span class="amount exp">− R$ 31,00</span></div>
+      <div class="row"><span class="meta">08/10 · Banco Azul · Alimentação?</span><span class="badge low">Baixa confiança</span></div>
+      <div class="why">Categoria incerta. Não vem marcado no lote.</div>
+      <div class="row"><span></span><span><button class="btn ed">Editar</button> <button class="btn warn">Rejeitar</button> <button class="btn pri">Aprovar</button></span></div>
+    </div>
+    <div class="bar"><span class="meta">2 selecionadas</span><button class="btn pri">Aprovar selecionadas</button></div>
+  </div>
+</div>
+<div class="note"><b>Linhas ignoradas</b> não viram cartão; aparecem na resposta do chat com id e motivo (FR-13). Pedir "criar mesmo assim" no chat gera um cartão com selo "Possível duplicata" (FR-14).</div>
+
+<h2>2 · Estados do cartão</h2>
+<div class="grid">
+  <div class="cardp"><h3>Pendente</h3><div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div><div class="row"><span class="meta">12/10 · Banco Azul</span><span class="badge new">Nova</span></div></div>
+  <div class="cardp"><h3>Editada (rascunho alterado)</h3><div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div><div class="row"><span class="meta">12/10 · Banco Azul · <b style="color:var(--accent)">Mercado</b></span><span><span class="badge new">Nova</span> <span class="badge" style="color:var(--accent);border-color:var(--accent)">Editada</span></span></div></div>
+  <div class="cardp" style="opacity:.8"><h3>Aprovada</h3><div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div><div class="row"><span class="meta">Gravada como #231</span><span class="badge ok">Aprovada ✓</span></div></div>
+  <div class="cardp" style="opacity:.6"><h3>Rejeitada</h3><div class="row"><span class="title">Padaria Boa Massa</span><span class="amount exp">− R$ 31,00</span></div><div class="row"><span class="meta">Não será gravada</span><span><span class="badge rej">Rejeitada</span> <button class="btn">Desfazer rejeição</button></span></div></div>
+  <div class="cardp" style="border-color:var(--red)"><h3>Com erro</h3><div class="row"><span class="title">Compra parcelada</span><span class="amount exp">− R$ 50,00 ×10</span></div><div class="why" style="color:var(--red)">Cartão "Nubank" sem limite disponível.</div><div class="row"><span class="badge err">Erro</span><span><button class="btn ed">Editar</button> <button class="btn pri">Tentar de novo</button></span></div></div>
+</div>
+
+<h2>3 · Cartões por tipo de operação</h2>
+<div class="grid">
+  <div class="cardp"><h3>Transferência</h3><div class="row"><span class="title">Banco Azul → Poupança</span><span class="amount">R$ 500,00</span></div><div class="row"><span class="meta">15/10 · transferência</span><span class="badge new">Nova</span></div><div class="impact">Banco Azul: R$ 1.412,60 · Poupança: R$ 3.500,00</div></div>
+  <div class="cardp"><h3>Dívida de cartão parcelada</h3><div class="row"><span class="title">Notebook</span><span class="amount exp">R$ 300,00 × 10</span></div><div class="row"><span class="meta">Cartão Roxo · 1ª fatura: 11/2026 · Eletrônicos</span><span class="badge new">Nova</span></div><div class="impact">Total R$ 3.000,00 · fatura 11/2026 passa a R$ 1.120,00</div></div>
+  <div class="cardp"><h3>Pagar fatura</h3><div class="row"><span class="title">Fatura 09/2026 · Cartão Roxo</span><span class="amount exp">R$ 842,10</span></div><div class="row"><span class="meta">Pago pela carteira Banco Azul</span><span class="badge new">Nova</span></div><div class="why">Fatura em aberto; não paga anteriormente.</div></div>
+  <div class="cardp"><h3>Compra de ativo</h3><div class="row"><span class="title">Compra · EXMP3</span><span class="amount exp">100 × R$ 12,30</span></div><div class="row"><span class="meta">Corretora Alfa · 13/10</span><span class="badge new">Nova</span></div><div class="impact">Posição: 300 → 400 cotas</div></div>
+  <div class="cardp"><h3>Atualizar preço e histórico</h3><div class="row"><span class="title">EXMP3</span><span class="meta">manutenção</span></div><div class="row"><span class="meta">Atualizar dados · ou Resetar e buscar novamente</span><span class="badge new">Ação</span></div></div>
+  <div class="cardp"><h3>Criar categoria (explícita)</h3><div class="row"><span class="title">Nova categoria "Pets"</span></div><div class="row"><span class="meta">Usada por 2 propostas neste conjunto</span><span class="badge new">Nova</span></div><div class="why">Aprovar a categoria antes das propostas que a usam.</div></div>
+  <div class="cardp"><h3>Meta / plano / wishlist</h3><div class="row"><span class="title">Meta "Viagem"</span><span class="amount">R$ 8.000,00</span></div><div class="row"><span class="meta">Prazo 12/2027 · aporte sugerido R$ 570/mês</span><span class="badge new">Nova</span></div></div>
+</div>
+<div class="note"><b>Dependência entre cartões:</b> criar uma categoria ou carteira nova deve ser aprovado antes das propostas que a usam; o painel ordena e marca "depende de".</div>
+
+<h2>4 · Editar abre a tela real em modo rascunho</h2>
+<div class="grid">
+  <div class="dialog">
+    <div class="row"><b>Adicionar despesa</b><span class="meta">tela real do app</span></div>
+    <div class="draft">Rascunho vindo do agente: Salvar atualiza a proposta no painel; nada é gravado até Aprovar.</div>
+    <div class="field"><span>Carteira</span><div>Banco Azul</div></div>
+    <div class="field"><span>Descrição</span><div>Mercado Central</div></div>
+    <div class="field changed"><span>Categoria</span><div>Mercado <small style="color:var(--accent)">(alterado)</small></div></div>
+    <div class="field"><span>Valor</span><div>187,40</div></div>
+    <div class="field"><span>Data</span><div>12/10/2026</div></div>
+    <div class="field"><span>Status</span><div>Confirmada</div></div>
+    <div class="field"><span>Incluir na análise</span><div>Sim</div></div>
+    <div class="row"><button class="btn">Cancelar</button><button class="btn pri">Salvar rascunho</button></div>
+  </div>
+  <div>
+    <div class="note"><b>Regras do rascunho</b><br>· Mesmos campos, listas e validações da tela normal.<br>· O botão vira "Salvar rascunho"; o título indica a origem.<br>· Cancelar não altera o cartão; Salvar marca o cartão como "Editada" e destaca o que mudou.<br>· Aprovar grava com os valores do rascunho, pelo service do domínio.</div>
+  </div>
+</div>
+
+<h2>5 · Janela estreita</h2>
+<div class="narrow">
+  <div class="app">
+    <div class="side"></div>
+    <div class="chat"><div class="msg bot">3 propostas prontas no painel abaixo.</div></div>
+    <div class="panel">
+      <div class="row"><b>Revisão (3)</b><button class="btn">Recolher ▴</button></div>
+      <div class="cardp"><div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div><div class="row"><span class="badge new">Nova</span><span><button class="btn pri">Aprovar</button></span></div></div>
+    </div>
+  </div>
+</div>
+<div class="note"><b>Responsivo:</b> em janela estreita o painel passa para baixo do chat, recolhível; sem propostas pendentes ele fica oculto e um botão "Revisão (N)" reabre.</div>
+</body>
+</html>

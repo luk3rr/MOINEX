@@ -114,4 +114,19 @@ interface CreditCardDebtRepository : JpaRepository<CreditCardDebt, Int> {
         @Param("startDate") startDate: LocalDateTime,
         @Param("endDate") endDate: LocalDateTime,
     ): List<CreditCardDebt>
+
+    /**
+     * Debts whose purchase date falls in the given range, used to match statement lines against stored purchases.
+     */
+    @Query(
+        "SELECT ccd " +
+            "FROM CreditCardDebt ccd " +
+            "WHERE ccd.date >= :startDate " +
+            "AND ccd.date <= :endDate " +
+            "ORDER BY ccd.date ASC",
+    )
+    fun findByDateBetween(
+        @Param("startDate") startDate: LocalDateTime,
+        @Param("endDate") endDate: LocalDateTime,
+    ): List<CreditCardDebt>
 }

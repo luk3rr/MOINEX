@@ -26,8 +26,6 @@ object Files {
     const val UI_DIALOG_AI_PATH: String = UI_DIALOG_PATH + "ai/"
 
     // UI ai package
-    const val TRANSACTION_REVIEW_FXML: String = UI_DIALOG_AI_PATH + "transaction_review.fxml"
-    const val INVESTMENT_OPERATION_REVIEW_FXML: String = UI_DIALOG_AI_PATH + "investment_operation_review.fxml"
     const val FILE_PASSWORD_FXML: String = UI_DIALOG_AI_PATH + "file_password.fxml"
 
     // UI creditcard package

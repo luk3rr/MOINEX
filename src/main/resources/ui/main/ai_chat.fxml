@@ -14,12 +14,19 @@
 
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.AiChatController">
    <children>
-      <VBox spacing="10.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <HBox AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+      <VBox spacing="10.0" HBox.hgrow="ALWAYS" minWidth="0.0">
          <padding>
             <Insets top="20.0" right="30.0" bottom="20.0" left="30.0" />
          </padding>
          <children>
-            <Label text="%aichat.title" styleClass="ai-chat-title" />
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <children>
+                  <Label text="%aichat.title" styleClass="ai-chat-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                  <Button fx:id="reopenReviewButton" visible="false" managed="false" styleClass="ai-chat-attach-button" />
+               </children>
+            </HBox>
             <Label text="%aichat.disclaimer" wrapText="true" prefWidth="0.0" minHeight="-Infinity" maxWidth="Infinity" styleClass="ai-chat-disclaimer">
    <graphic>
       <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-16" />
@@ -45,5 +52,8 @@
             </HBox>
          </children>
       </VBox>
+      <VBox fx:id="reviewContainer" visible="false" managed="false" />
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

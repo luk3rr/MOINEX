@@ -1,0 +1,123 @@
+# Tasks — 261104-ai-agent-evolution
+
+## 2.9 Delivery plan
+- **Verification command:** `export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 && env -u DISPLAY -u WAYLAND_DISPLAY ./gradlew ktlintCheck spotlessCheck test`  (approved 2026-11-05 by human). Roda sem display para imitar o CI [mem: M-013]. Comandos extras por Unit ficam no Definition of Done (`make demo` e capturas para UI, M-003/M-006).
+- Ordem segue o DAG de design.md §2.7: UNIT-1 ∥ UNIT-2 → UNIT-3 → UNIT-4 → UNIT-5 → UNIT-6 → UNIT-7; UNIT-8 após UNIT-2.
+- **Walking skeleton:** on. A UNIT-1 é a primeira fatia fim a fim: serviço de correlação + tool + aviso no chat, já corrigindo as duplicatas no fluxo atual.
+- Regras do dono aplicadas: direto na `main` (M-014), sem commit antes de ele ver o diff (M-004), dados fictícios (M-006, M-011), cabeçalho nos `.kt` novos (M-012), sem comentários `//` explicativos, chaves de i18n só acrescentadas, sem release (C-8).
+
+### BOLT-1 — Units: UNIT-1, UNIT-2
+Goal: parar as duplicatas e deixar a base pronta (framework, prompt modular, auditoria, avaliação). DoD: verificação passa; testes, mocks e casos de avaliação usam só dados fictícios (NFR-7, M-011); extrato fictício com nomes diferentes não gera duplicata; nenhuma gravação em `ui/dialog/ai`; teste arquitetural de não exclusão; suíte de avaliação roda. Confiança: média-alta; risco: migrar as duas tools atuais sem regressão (NFR-8) → casos de regressão primeiro.
+### BOLT-2 — Units: UNIT-3
+Goal: o painel de revisão substitui os modais e o rascunho funciona com editor de reserva. DoD: verificação passa; checklist visual nos dois temas e janela estreita; fluxo atual funciona pelo painel. Confiança: média; risco: complexidade de UI JavaFX sem testes automáticos → capturas e checklist.
+### BOLT-3 — Units: UNIT-4
+Goal: MVP interno completo (base + lançamentos). DoD: verificação passa; fluxos de duplicata ponta a ponta; diálogos de carteira em rascunho. Confiança: média; risco: adaptar ~12 diálogos (R-3).
+### BOLT-4 — Units: UNIT-5, UNIT-6
+Goal: cartão e investimentos. DoD: verificação passa; casos de parcelas, fatura, compra/venda/dividendo/título; diálogos em rascunho.
+### BOLT-5 — Units: UNIT-7, UNIT-8
+Goal: cadastros/planejamento e leitura ampliada. DoD: verificação passa; casos de avaliação; chips e indicador conferidos visualmente.
+
+## Tasks
+
+### UNIT-1 Correlação determinística   Status: verified (2026-11-05, exit 0)
+- [x] T-1.1 `MatchQuery`/`Match` e `TransactionMatchingService.findMatches` para lançamentos de carteira pendentes e confirmados (valor exato, ±3 dias, mesma carteira) — covers FR-10, FR-11 — files: service/matching/ — test: TransactionMatchingServiceWalletTest (nome diferente casa; valor diferente não; 4 dias não)
+- [x] T-1.2 Normalização da descrição (minúsculas, sem acentos, ruído "PIX/COMPRA") só para desempate — covers FR-10 — test: casos de empate no mesmo teste
+- [x] T-1.3 Casamento com dívidas e parcelas de cartão e com transferências — covers FR-11 — test: TransactionMatchingServiceCreditCardTest (parcela 3/10 casa com a compra original)
+- [x] T-1.4 Desempenho: 200 linhas contra 10.000 lançamentos < 1 s (consulta por faixa de data/valor, sem varredura completa) — covers NFR-2 — test: TransactionMatchingPerformanceTest com dados gerados
+- [x] T-1.5 Tool de leitura `find_matching_transactions` (esquema, execução, textos pt-BR/en) — covers FR-16 — files: ai/tools/ — test: FindMatchingTransactionsToolTest
+- [x] T-1.6 `ProposeTransactionTool` aplica a correlação no código: pendente → `existingTransactionId`; confirmado → linha ignorada com id e motivo — covers FR-13, FR-16 — test: ProposeTransactionToolMatchingTest
+- [x] T-1.7 `AiChatService`/chat mostram a lista de linhas ignoradas com motivo na resposta (texto pt-BR/en) — covers FR-13 — test: AiChatServiceTest (resultado traz ignoradas) + captura do chat
+- [x] T-1.8 Ajuste do prompt atual para delegar o casamento à tool e não ao palpite — covers FR-16 — test: revisão dos casos existentes de prompt
+**Unit summary (Construction 3.5):** criados `service/matching/` (`MatchModels.kt`, `DescriptionSimilarity.kt`, `TransactionMatchingService.kt`), `ai/tools/FindMatchingTransactionsTool.kt`, `model/dto/ai/IgnoredLine.kt` e `ProposalResult.kt`. `TransactionMatchingService.findMatches(queries)` lê **uma vez** a janela de datas (lançamentos de carteira, transferências, dívidas de cartão), indexa por valor e casa em memória: valor exato (2 casas; dívida compara a parcela, com os centavos vizinhos), data ±3 dias, mesma carteira/cartão, direção receita/despesa; a descrição só desempata (similaridade 1,0 para tokens iguais, 0,9 quando uma contém a outra). `ProposeTransactionTool` passou a aplicar a correlação: casa com **pendente** → `existingTransactionId` (mantém a descrição dele); casa só com **confirmado/cartão/transferência** → linha ignorada (volta em `ignored` com id e motivos); `allowDuplicate` força a proposta; `credit_card_payment` não é correlacionado. O resultado da tool agora é `{proposals, ignored}`; `AiChatService` repassa `ignoredLines` e o chat mostra um aviso com o texto do app. Prompt do sistema (pt-br e en) e o template de anexo trocaram a checagem manual por "o app confere sozinho". Novos métodos de repositório: `CreditCardDebtRepository.findByDateBetween`, `TransferRepository.findBetweenDates`. Chaves de i18n só acrescentadas (en e pt-BR); as duas descrições de `propose_transactions` ganharam uma frase (edição das chaves existentes). Verificação: `ktlintCheck spotlessCheck test` sem display, BUILD SUCCESSFUL, 1615 testes, 0 falhas (1584 antes; +31: `TransactionMatchingServiceTest`, `DescriptionSimilarityTest`, `TransactionMatchingPerformanceTest` (200 linhas × 10.000 registros < 1 s), `FindMatchingTransactionsToolTest`, 5 casos novos em `ProposeTransactionToolTest`, 1 em `AiChatServiceTest`; os testes antigos dessas duas classes foram adaptados ao novo formato).
+**Desvios:** (1) `Match` ganhou `date` e `amount` (úteis para exibir o alvo); `MatchTargetType` não tem `CREDIT_CARD_INSTALLMENT` (a parcela é casada pela dívida, com `installments` no motivo). (2) `ProposeTransactionToolTest` já existia e foi atualizado (construtor e `.proposals`). (3) O aviso das linhas ignoradas é um balão de aviso (`appendNotice`) renderizado em Markdown; **não foi conferido visualmente** e a correlação **não foi exercitada com um LLM real** (precisa da sua chave; D-1). (4) A consulta de lançamentos usa `findTransactionsBetweenDates`, que inclui carteiras e categorias arquivadas, o que é o desejado para detectar duplicatas. (5) Se o LLM enviar um `existingTransactionId` válido e pendente, ele prevalece sobre o pendente achado pelo app.
+
+
+### UNIT-2 Framework de operações, prompt modular e auditoria   Status: verified (2026-11-05, exit 0)
+- [x] T-2.1 Interface `AppOperation`, `ApplyResult`, `ValidationResult`, `Preview`, `DraftValues`, `OperationDomain/Risk` — covers FR-18 — files: ai/operation/ — test: compilação + OperationContractTest com operação de exemplo
+- [x] T-2.2 `OperationRegistry` (Spring) com consulta por nome/domínio e geração das definições de tool — covers FR-18, NFR-9 — test: OperationRegistryTest
+- [S] T-2.3 movida para a UNIT-3 como T-3.11 (gate 3.1 da UNIT-2, 2026-11-05)
+- [S] T-2.4 movida para a UNIT-3 como T-3.12
+- [S] T-2.5 movida para a UNIT-3 como T-3.13
+- [x] T-2.6 Migrar `create_wallet_transaction` (receita/despesa) para operações, com `apply` via `WalletService` (inclui confirmar pendente) — covers FR-27 — files: ai/operation/transactions/ — test: CreateTransactionOperationTest
+- [x] T-2.7 Migrar dívida de cartão (à vista e parcelada) e pagamento de fatura para operações — covers FR-27 — test: CreditCardOperationsTest (regras de parcela preservadas)
+- [x] T-2.8 Migrar compra/venda de ação, dividendo e aplicação/resgate de CDB para operações — covers FR-27 — test: InvestmentOperationsTest
+- [x] T-2.9 Telas de revisão antigas passam a chamar `apply`; remover escrita de `ui/dialog/ai` — covers FR-27 — test: teste arquitetural "ui/dialog/ai não chama escrita de domínio"
+- [x] T-2.10 `PromptComposer` e blocos `core.md` + por domínio em pt-BR e en, migrando o prompt de `application.yml` — covers FR-28 — files: resources/ai/prompts/ — test: PromptComposerTest (domínio inativo fora do prompt; fallback `en`)
+- [x] T-2.11 `ChangeSetAuditLogger` e integração no ponto de decisão — covers FR-31 — test: ChangeSetAuditLoggerTest (formato C-E)
+- [x] T-2.12 Teste arquitetural: nenhuma `LlmTool`/operação expõe exclusão e nenhuma tool chama escrita de service — covers FR-17, FR-19, NFR-10 — test: AiArchitectureTest
+- [x] T-2.13 `ScriptedLlmProvider` + suíte de avaliação base (correlação, parcelas, fatura, recusa de exclusão) com dados fictícios sobre H2 — covers FR-29, NFR-1, NFR-8 — test: AgentEvaluationSuite
+- [x] T-2.14 Revisar os 4 codecs para o novo conjunto de tools (esquemas) — covers NFR-1 — test: codecs existentes + novos casos
+**Unit summary (Construction 3.5):** criados `ai/operation/` (`OperationModels.kt`, `AppOperation.kt`, `BaseOperation.kt`, `OperationRegistry.kt`, `CategoryResolver.kt`, `transactions/CreateWalletTransactionOperation.kt`, `creditcard/CreditCardOperations.kt` com dívida e pagamento de fatura, `investments/InvestmentOperations.kt` com compra, venda, dividendo, aplicação e resgate de título), `ai/audit/ChangeSetAuditLogger.kt`, `ai/prompt/PromptComposer.kt` e os blocos `src/main/resources/ai/prompts/{pt-br,en}/{core,transactions,credit_card,investments}.md`. A gravação saiu de `ui/dialog/ai`: `TransactionReviewController.persist` e `InvestmentOperationReviewController.persist` montam o payload da linha revisada e chamam `apply` (resultado vira o mesmo erro de antes, e cada linha é auditada em `org.moinex.ai.audit`). `AiChatService` usa `PromptComposer` e `AiPromptProperties` perdeu `systemPrompt` (o `application.yml` guarda só o modelo de anexo). `OperationRegistry` recusa nomes duplicados e nomes iniciados em delete/remove/drop/purge. Testes novos: operações de carteira/cartão (7 casos) e investimentos, `OperationRegistryTest`, `PromptComposerTest` (paridade das regras pt-BR e en, fallback `en`, blocos opcionais), `ChangeSetAuditLoggerTest`, `AiArchitectureTest` (varredura do código: tools, chat e revisão não escrevem; operações sem exclusão) e a `AgentEvaluationSuite` com `ScriptedLlmProvider` (9 casos: nome diferente, pendente, parcela já registrada, compra nova, "criar mesmo assim", pagamento de fatura, consulta de duplicata, sem tool de exclusão, tools oferecidas). Verificação: `env -u DISPLAY -u WAYLAND_DISPLAY ./gradlew ktlintCheck spotlessCheck test` → BUILD SUCCESSFUL, 1655 testes, 0 falhas (1615 antes, +40).
+**Desvios:** (1) T-2.3, T-2.4, T-2.5 foram para a UNIT-3 (T-3.11..T-3.13), aprovado no gate 3.1. (2) `preview`, `toDraft` e `fromDraft` ficam com implementação padrão vazia até a UNIT-3. (3) Os blocos de prompt ficam todos ativos; o roteamento por domínio chega com `use_domain`. (4) O teste arquitetural é uma varredura de texto do código-fonte (não há ArchUnit no projeto); cobre os padrões `xxxService.create|update|pay|...(`. (5) Sem mudança no contrato de tools dos provedores, então os testes de codec existentes continuam valendo (T-2.14 sem alteração de código). (6) O comportamento visível dos diálogos de revisão não mudou, mas **não foi conferido com um LLM real nem pela interface**: vale um teste manual de aprovar uma linha de cada família (carteira, cartão, fatura, ação, título).
+
+
+### UNIT-3 Painel de revisão e rascunho   Status: verified (2026-11-05, exit 0; dividida em 3a núcleo e 3b UI)
+- [x] T-3.1 `ReviewSession` observável (estados, seleção, contadores, dependências) — covers FR-4, FR-6, FR-7 — files: ui/common/ai/ — test: ReviewSessionTest
+- [x] T-3.2 Aprovação em lote: aplica em ordem de dependência, falha isolada por cartão, auditoria — covers FR-4, FR-6 — test: ReviewSessionApproveTest
+- [x] T-3.3 `ReviewPanel` (layout lateral, recolhível, oculto sem pendências, responsivo) e CSS por tokens — covers FR-1, NFR-6 — test: captura dos dois temas
+- [x] T-3.4 `CardRenderer` genérico + selos, motivo, confiança, impacto — covers FR-2, FR-26 — test: captura + CardViewModelTest
+- [x] T-3.5 Ações do cartão: Aprovar, Rejeitar/Desfazer rejeição, Ver existente — covers FR-3 — test: ReviewSessionTest
+- [x] T-3.6 Filtro por selo e tipo; contadores no cabeçalho — covers FR-7, FR-8 — test: ReviewSessionFilterTest
+- [x] T-3.7 `DraftCapable`, `DraftValues` e `DraftDialogLauncher` com editor mínimo de reserva — covers FR-5 — test: DraftDialogLauncherTest (reserva quando o diálogo não é rascunhável)
+- [x] T-3.8 `AiChatController` enxuto usando o painel; remover botões "Revisar (N)" e os controllers de revisão modal — covers FR-1 — test: captura + checklist
+- [~] T-3.9 (parcial: textos pt-BR/en e tokens de tema; faltam atalhos de teclado e accessibleText) Acessibilidade (Tab/Espaço/Enter, `accessibleText`) e textos pt-BR/en — covers NFR-5, NFR-6 — test: checklist manual
+- [x] T-3.11 `ChangeSet`, `ProposedChange`, `ChangeBadge/State` e `ChatTurnResult.Success(changeSet)` (vinda de T-2.3) — covers FR-19 — test: AiChatServiceTest adaptado
+- [x] T-3.12 Tool `propose_changes` (valida, aplica correlação, devolve aceitas/ignoradas/erros; nunca grava), substituindo `propose_transactions`/`propose_investment_operations` (vinda de T-2.4) — covers FR-19 — test: ProposeChangesToolTest + AgentEvaluationSuite
+- [S] T-3.13 (adiada para a primeira Unit com domínio novo, UNIT-4/7: hoje todas as operações existentes ficam disponíveis desde o início, então `use_domain` não teria efeito) Tool `use_domain`, ativação por conversa, roteamento dos blocos de prompt por domínio e limite de 30 definições por turno (vinda de T-2.5) — covers FR-28, NFR-3 — test: DomainActivationTest
+- [x] T-3.10 Validação com `make demo` e capturas em `construction/screenshots/` (não commitar) — covers NFR-4, NFR-6 — test: checklist M-003
+**Unit summary (Construction 3.5):** **3a (núcleo):** `ai/operation/ChangeSet.kt` (`ProposedChange`, `ChangeSet`, selos e estados), `EntityCatalog.kt` (nomes → registros), `DraftSpec.kt`; `AppOperation` ganhou `modelDescription`, `modelProperties`, `fromModelArguments` (nomes → ids, regras de parcela como antes), `validate`, `summary`, `matchQuery`, `confirmingPending`, `draftSpec/toDraft/fromDraft`; as 8 operações migraram para o novo contrato, com ids anuláveis (carteira/cartão/ativo não resolvidos viram erro de validação para o usuário corrigir). `ai/tools/ProposeChangesTool.kt` substitui `ProposeTransactionTool` e `ProposeInvestmentOperationTool` (removidos, assim como `ExtractedTransactionDTO` e `ExtractedInvestmentOperationDTO`): mesmo vocabulário por nomes, correlação da UNIT-1, selos NEW / MATCHES_EXISTING / POSSIBLE_DUPLICATE / LOW_CONFIDENCE, erros de validação devolvidos ao modelo. `ChatTurnResult.Success` agora traz `changeSet`; `AiChatService` usa só `propose_changes` e `MAX_TOOL_ITERATIONS` subiu para 8. `ai/review/ReviewSession.kt` guarda o estado da revisão (aprovar em lote com falha isolada e ordem de dependência, rejeitar/desfazer, aplicar rascunho, contadores, auditoria por decisão). **3b (UI):** `ui/common/ai/ReviewPanel.kt` (painel à direita do chat: cabeçalho, filtro por selo, contadores, cartões com selo, motivo, erros de validação e ações Aprovar/Editar/Rejeitar/Desfazer rejeição, rodapé "Aprovar selecionadas"), `DraftEditorDialog.kt` (editor de reserva gerado de `DraftSpec`, sem gravar), `AiChatController` enxuto (painel, botão "Revisão (N)" para reabrir, aviso das linhas ignoradas); `ai_chat.fxml` ganhou o contêiner do painel; CSS por tokens em `ai_chat.css`; removidos `TransactionReviewController`, `InvestmentOperationReviewController`, seus FXML e CSS. Textos pt-BR/en acrescentados (`aipanel.*`, `aioperation.*`, `aidraft.*`, `aitool.proposeChanges.description`). Verificação: `env -u DISPLAY -u WAYLAND_DISPLAY ./gradlew ktlintCheck spotlessCheck test` → BUILD SUCCESSFUL, 1661 testes, 0 falhas; novos: `ProposeChangesToolTest` (porte dos casos das duas tools antigas e da UNIT-1), `ReviewSessionTest`, ajustes em `AiChatServiceTest`, `AgentEvaluationSuite`, testes das operações e do registro. Visual: capturas do chat vazio (layout novo carrega) e de um painel com propostas fictícias nos temas escuro e claro em `construction/screenshots/` (fora do git).
+**Desvios:** (1) T-3.13 (`use_domain`, roteamento) **adiada**: sem domínio novo ela não teria efeito; entra com a primeira Unit de domínio novo. (2) FR-26 (impacto no cartão) **não implementado**; `preview` existe na interface sem uso. (3) Em janela estreita o painel **não** vai para baixo do chat: continua à direita, com o botão Recolher e o botão "Revisão (N)" para reabrir. (4) Não há classe `DraftDialogLauncher`: o `AiChatController` abre o `DraftEditorDialog`; o rascunho nos diálogos reais do app (modo rascunho nas telas Add/Edit) fica para as Units de domínio. (5) "Ver existente" não foi feito; o selo mostra "Casa com #id" e os motivos. (6) Filtro só por selo (não por tipo de operação). (7) Acessibilidade de teclado e `accessibleText` ficaram de fora. (8) **Não foi testado com um LLM real nem clicando no app**; o painel foi renderizado com dados fictícios, mas aprovar/editar/rejeitar na tela real, e o editor de reserva, precisam do seu checklist (M-003).
+
+
+### UNIT-4 Domínio Lançamentos   Status: not started
+- [ ] T-4.1 Cartão "Casa com #id" com candidatos, "trocar" e "Ver existente" — covers FR-12, FR-15 — test: ReviewSessionMatchTest
+- [ ] T-4.2 "Criar mesmo assim" pelo chat: operação com marca de duplicata permitida e selo "Possível duplicata" — covers FR-14 — test: DuplicateOverrideTest
+- [ ] T-4.3 Operações: editar lançamento; confirmar pendente — covers FR-20 — test: EditTransactionOperationTest
+- [ ] T-4.4 Operações: transferência (criar/editar) — covers FR-20 — test: TransferOperationsTest
+- [ ] T-4.5 Operações: recorrente (criar/editar) — covers FR-20 — test: RecurringOperationsTest
+- [ ] T-4.6 Operações: carteira (criar/editar/arquivar/desarquivar) — covers FR-20 — test: WalletOperationsTest
+- [ ] T-4.7 Operação explícita de categoria (criar/editar/arquivar) e dependência entre cartões — covers FR-24 — test: CategoryOperationsTest
+- [ ] T-4.8 Rascunho nos diálogos: AddExpense, AddIncome, EditTransaction — covers FR-5, FR-20 — test: checklist visual + DraftValuesMappingTest
+- [ ] T-4.9 Rascunho nos diálogos: AddTransfer/EditTransfer, AddRecurring/EditRecurring, AddWallet, AddCategory/EditCategory — covers FR-5, FR-20 — test: checklist visual
+- [ ] T-4.10 Casos de avaliação do domínio (nome diferente, janela de data, duplicata forçada, categoria nova) — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** (preenchido na construção)
+
+### UNIT-5 Domínio Cartão   Status: not started
+- [ ] T-5.1 Operações: criar/editar cartão — covers FR-21 — test: CreditCardOperationsTest
+- [ ] T-5.2 Operações: dívida (editar), recorrente de cartão (criar/editar) — covers FR-21 — test: CreditCardDebtOperationsTest
+- [ ] T-5.3 Operações: pagar fatura (estado da fatura, valor) e crédito/rebate — covers FR-21 — test: PayInvoiceOperationTest
+- [ ] T-5.4 Rascunho nos diálogos de cartão: AddCreditCard, AddCreditCardDebt/Edit, AddRecurringCreditCardDebt/Edit, InvoicePayment, AddCreditCardCredit, EditCreditCard — covers FR-5, FR-21 — test: checklist visual
+- [ ] T-5.5 Casos de avaliação (parcelas, fatura paga) — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** (preenchido na construção)
+
+### UNIT-6 Domínio Investimentos   Status: not started
+- [ ] T-6.1 Operações: ticker (criar/editar) — covers FR-22 — test: TickerOperationsTest
+- [ ] T-6.2 Operações: compra, venda, dividendo (criar/editar) — covers FR-22 — test: TickerTradeOperationsTest
+- [ ] T-6.3 Operações: câmbio de cripto — covers FR-22 — test: CryptoExchangeOperationTest
+- [ ] T-6.4 Operações: título (criar/editar/arquivar) e suas operações (compra, venda, juros) — covers FR-22 — test: BondOperationsTest
+- [ ] T-6.5 Operação "atualizar dados / resetar e buscar novamente" de um ativo (usa `TickerService` e `TickerPriceHistoryService.rebuildPriceHistory`) — covers FR-22 — test: RefreshTickerOperationTest
+- [ ] T-6.6 Rascunho nos diálogos de investimento (AddTicker, compra, venda, dividendo, cripto, título e as edições) — covers FR-5, FR-22 — test: checklist visual
+- [ ] T-6.7 Casos de avaliação do domínio — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** (preenchido na construção)
+
+### UNIT-7 Cadastros e planejamento   Status: not started
+- [ ] T-7.1 Operações: meta (criar/editar/arquivar) — covers FR-23 — test: GoalOperationsTest
+- [ ] T-7.2 Operações: plano financeiro e grupos de orçamento (criar/editar) — covers FR-23 — test: PlanOperationsTest
+- [ ] T-7.3 Operações: wishlist (criar/editar) — covers FR-23 — test: WishlistOperationsTest
+- [ ] T-7.4 Operações: preferências comuns de configuração (lista aprovada em 3.1) — covers FR-23 — test: PreferencesOperationsTest
+- [ ] T-7.5 Rascunho nos diálogos de meta, plano, grupo de orçamento e wishlist — covers FR-5, FR-23 — test: checklist visual
+- [ ] T-7.6 Remover o editor de reserva e conferir que todo diálogo do catálogo é rascunhável — covers FR-5 — test: DraftCoverageTest
+- [ ] T-7.7 Casos de avaliação do domínio — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** (preenchido na construção)
+
+### UNIT-8 Leitura ampliada e experiência do chat   Status: not started
+- [ ] T-8.1 Tool `search_transactions` com paginação — covers FR-25 — test: SearchTransactionsToolTest
+- [ ] T-8.2 Tools `list_*` (carteiras, categorias, cartões, ativos, recorrentes, metas, planos) com paginação — covers FR-25 — test: ListToolsTest
+- [ ] T-8.3 Limite de iterações configurável, chamadas paralelas e compactação de contexto — covers FR-30 — test: AiChatServiceLimitsTest
+- [ ] T-8.4 Indicador do que o agente consulta (nome humano por tool, pt-BR/en) — covers FR-9 — test: captura + ToolLabelTest
+- [ ] T-8.5 Chips de ação rápida e links para telas do app nas respostas — covers FR-9 — test: checklist visual
+- [ ] T-8.6 Casos de avaliação de busca e listagens — covers FR-29 — test: AgentEvaluationSuite
+**Unit summary (Construction 3.5):** (preenchido na construção)
+
+### Cobertura
+Todo FR-1..FR-31 tem tarefa na Unit dona (design.md §2.7); todo NFR aparece em Definition of Done ou tarefa (NFR-1 T-2.13/T-2.14, NFR-2 T-1.4, NFR-3 T-2.5, NFR-4 T-3.10, NFR-5 T-3.9, NFR-6 T-3.3/T-3.10, NFR-7 regra do projeto em toda tarefa de teste, NFR-8 T-2.13, NFR-9 T-2.2, NFR-10 T-2.12).

@@ -7,19 +7,22 @@
 package org.moinex.ai.chat
 
 import org.json.JSONObject
+import org.moinex.ai.operation.ChangeSet
+import org.moinex.ai.operation.ProposedChange
+import org.moinex.ai.prompt.PromptComposer
 import org.moinex.ai.provider.LlmProviderFactory
+import org.moinex.ai.tools.FindMatchingTransactionsTool
 import org.moinex.ai.tools.LlmTool
-import org.moinex.ai.tools.ProposeInvestmentOperationTool
-import org.moinex.ai.tools.ProposeTransactionTool
+import org.moinex.ai.tools.ProposeChangesTool
 import org.moinex.ai.tools.QueryFinanceTool
 import org.moinex.common.ClockProvider
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.config.AiPromptProperties
-import org.moinex.model.dto.ai.ExtractedInvestmentOperationDTO
-import org.moinex.model.dto.ai.ExtractedTransactionDTO
+import org.moinex.model.dto.ai.IgnoredLine
 import org.moinex.service.PreferencesService
 import org.springframework.stereotype.Service
 import java.text.MessageFormat
+import java.util.UUID
 
 /**
  * Orchestrates one chat turn: sends the conversation to the configured provider, executes any
@@ -29,25 +32,25 @@ import java.text.MessageFormat
 class AiChatService(
     private val llmProviderFactory: LlmProviderFactory,
     private val queryFinanceTool: QueryFinanceTool,
-    private val proposeTransactionTool: ProposeTransactionTool,
-    private val proposeInvestmentOperationTool: ProposeInvestmentOperationTool,
+    private val findMatchingTransactionsTool: FindMatchingTransactionsTool,
+    private val proposeChangesTool: ProposeChangesTool,
     private val aiPromptProperties: AiPromptProperties,
+    private val promptComposer: PromptComposer,
     private val preferencesService: PreferencesService,
     private val clockProvider: ClockProvider,
 ) {
     companion object {
-        private const val MAX_TOOL_ITERATIONS = 5
-        private const val FALLBACK_PROMPT_LOCALE = "en"
+        private const val MAX_TOOL_ITERATIONS = 25
     }
 
     suspend fun sendMessage(history: List<ChatMessage>): ChatTurnResult {
         val provider = llmProviderFactory.currentProvider() ?: return ChatTurnResult.NoProviderConfigured
-        val tools = queryFinanceTool.availableTools() + proposeTransactionTool + proposeInvestmentOperationTool
+        val tools = queryFinanceTool.availableTools() + findMatchingTransactionsTool + proposeChangesTool
 
         var conversation = listOf(systemMessage()) + history
         var iterations = 0
-        val proposedTransactions = mutableListOf<ExtractedTransactionDTO>()
-        val proposedInvestmentOperations = mutableListOf<ExtractedInvestmentOperationDTO>()
+        val proposedChanges = mutableListOf<ProposedChange>()
+        val ignoredLines = mutableListOf<IgnoredLine>()
 
         while (true) {
             val response =
@@ -59,17 +62,21 @@ class AiChatService(
                     }
 
             if (response.toolCalls.isEmpty()) {
-                return ChatTurnResult.Success(
-                    reply = response.text.orEmpty(),
-                    proposedTransactions = proposedTransactions,
-                    proposedInvestmentOperations = proposedInvestmentOperations,
-                )
+                val changeSet =
+                    ChangeSet(UUID.randomUUID().toString(), proposedChanges, ignoredLines)
+                        .takeUnless { it.isEmpty }
+                return ChatTurnResult.Success(reply = response.text.orEmpty(), changeSet = changeSet)
             }
 
             if (iterations >= MAX_TOOL_ITERATIONS) {
-                return ChatTurnResult.Error(
-                    preferencesService.translate(TranslationKeys.AI_CHAT_SERVICE_TOOL_LIMIT_EXCEEDED),
-                )
+                val limitMessage = preferencesService.translate(TranslationKeys.AI_CHAT_SERVICE_TOOL_LIMIT_EXCEEDED)
+                val changeSet =
+                    ChangeSet(UUID.randomUUID().toString(), proposedChanges, ignoredLines).takeUnless { it.isEmpty }
+                return if (changeSet != null) {
+                    ChatTurnResult.Success(reply = limitMessage, changeSet = changeSet)
+                } else {
+                    ChatTurnResult.Error(limitMessage)
+                }
             }
 
             val assistantMessage =
@@ -81,17 +88,12 @@ class AiChatService(
 
             val toolResultMessages =
                 response.toolCalls.map { call ->
-                    val result = executeTool(tools, call.toolName, call.argumentsJson)
-                    when (call.toolName) {
-                        ProposeTransactionTool.NAME ->
-                            runCatching { ProposeTransactionTool.parseResultJson(result) }
-                                .getOrNull()
-                                ?.let { proposedTransactions.addAll(it) }
-                        ProposeInvestmentOperationTool.NAME ->
-                            runCatching { ProposeInvestmentOperationTool.parseResultJson(result) }
-                                .getOrNull()
-                                ?.let { proposedInvestmentOperations.addAll(it) }
-                    }
+                    val result =
+                        if (call.toolName == ProposeChangesTool.NAME) {
+                            proposeChanges(call.argumentsJson, proposedChanges, ignoredLines)
+                        } else {
+                            executeTool(tools, call.toolName, call.argumentsJson)
+                        }
 
                     ChatMessage(
                         role = ChatRole.TOOL,
@@ -120,19 +122,32 @@ class AiChatService(
     }
 
     private fun systemMessage(): ChatMessage {
-        val localeKey = preferencesService.locale.toLanguageTag().lowercase()
-        val basePrompt =
-            aiPromptProperties.systemPrompt[localeKey]
-                ?: aiPromptProperties.systemPrompt[FALLBACK_PROMPT_LOCALE]
-                ?: ""
+        val basePrompt = promptComposer.compose(preferencesService.locale.toLanguageTag())
 
         val context =
-            "Today's date: ${clockProvider.today()}\n" +
-                "${proposeTransactionTool.describeAvailableContext()}\n" +
-                proposeInvestmentOperationTool.describeAvailableContext()
+            "Today's date: ${clockProvider.today()}\n" + proposeChangesTool.describeAvailableContext()
 
         return ChatMessage(role = ChatRole.SYSTEM, content = "$basePrompt\n\n$context")
     }
+
+    private fun proposeChanges(
+        argumentsJson: String,
+        proposedChanges: MutableList<ProposedChange>,
+        ignoredLines: MutableList<IgnoredLine>,
+    ): String =
+        runCatching {
+            val outcome = proposeChangesTool.propose(argumentsJson)
+            outcome.changeSet.changes.forEach { change ->
+                val repeated =
+                    proposedChanges.any {
+                        it.operationName == change.operationName &&
+                            it.payload == change.payload
+                    }
+                if (!repeated) proposedChanges += change
+            }
+            ignoredLines.addAll(outcome.changeSet.ignored)
+            proposeChangesTool.toModelJson(outcome)
+        }.getOrElse { e -> JSONObject().put("error", e.message ?: "tool_execution_failed").toString() }
 
     private fun executeTool(
         tools: List<LlmTool>,

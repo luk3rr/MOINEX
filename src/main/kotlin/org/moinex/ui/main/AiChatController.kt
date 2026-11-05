@@ -8,6 +8,7 @@ package org.moinex.ui.main
 
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
+import javafx.collections.ListChangeListener
 import javafx.concurrent.Worker
 import javafx.fxml.FXML
 import javafx.geometry.Pos
@@ -19,6 +20,7 @@ import javafx.scene.control.TextField
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.shape.Rectangle
 import javafx.scene.web.WebEngine
@@ -33,18 +35,26 @@ import org.moinex.ai.chat.ChatTurnResult
 import org.moinex.ai.chat.EmojiRenderer
 import org.moinex.ai.chat.MarkdownRenderer
 import org.moinex.ai.ingest.StatementIngestService
+import org.moinex.ai.operation.DraftChoices
+import org.moinex.ai.review.ReviewItem
+import org.moinex.ai.review.ReviewSession
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.ThemeColors
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
-import org.moinex.model.dto.ai.ExtractedInvestmentOperationDTO
-import org.moinex.model.dto.ai.ExtractedTransactionDTO
+import org.moinex.model.dto.ai.IgnoredLine
+import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
+import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.investment.BondService
+import org.moinex.service.investment.TickerService
+import org.moinex.service.wallet.WalletService
+import org.moinex.ui.common.ai.DraftChoice
+import org.moinex.ui.common.ai.DraftEditorDialog
+import org.moinex.ui.common.ai.ReviewPanel
 import org.moinex.ui.dialog.ai.FilePasswordController
-import org.moinex.ui.dialog.ai.InvestmentOperationReviewController
-import org.moinex.ui.dialog.ai.TransactionReviewController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -54,22 +64,18 @@ import java.net.URI
 import java.text.MessageFormat
 import java.util.Base64
 
-private class PendingTransactionReview(
-    var transactions: List<ExtractedTransactionDTO>,
-    val historyIndex: Int,
-)
-
-private class PendingInvestmentReview(
-    var operations: List<ExtractedInvestmentOperationDTO>,
-    val historyIndex: Int,
-)
-
 @Controller
 class AiChatController(
     private val aiChatService: AiChatService,
     private val statementIngestService: StatementIngestService,
     private val preferencesService: PreferencesService,
     private val springContext: ConfigurableApplicationContext,
+    private val reviewSession: ReviewSession,
+    private val walletService: WalletService,
+    private val creditCardService: CreditCardService,
+    private val categoryService: CategoryService,
+    private val tickerService: TickerService,
+    private val bondService: BondService,
 ) {
     @FXML
     private lateinit var messagesScrollPane: ScrollPane
@@ -92,9 +98,16 @@ class AiChatController(
     @FXML
     private lateinit var thinkingLabel: Label
 
+    @FXML
+    private lateinit var reviewContainer: VBox
+
+    @FXML
+    private lateinit var reopenReviewButton: Button
+
+    private var reviewPanel: ReviewPanel? = null
+    private var reviewHidden = false
+
     private val history = mutableListOf<ChatMessage>()
-    private val pendingReviews = mutableListOf<PendingTransactionReview>()
-    private val pendingInvestmentReviews = mutableListOf<PendingInvestmentReview>()
     private val pendingAttachments = mutableListOf<ChatAttachment>()
     private var busy = false
     private var requestStartNanos = 0L
@@ -129,14 +142,13 @@ class AiChatController(
 
     @FXML
     fun initialize() {
+        setupReviewPanel()
         setBusy(busy)
         inputField.text = draftInput
         inputField.textProperty().addListener { _, _, newValue -> draftInput = newValue }
         inputField.setOnAction { handleSend() }
         history.forEachIndexed { index, message ->
             appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
-            pendingReviews.filter { it.historyIndex == index }.forEach { renderReviewButton(it) }
-            pendingInvestmentReviews.filter { it.historyIndex == index }.forEach { renderInvestmentReviewButton(it) }
         }
         refreshAttachmentsUI()
     }
@@ -308,17 +320,20 @@ class AiChatController(
                 history.add(
                     ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
                 )
-                val messageIndex = history.lastIndex
-                val hasProposals =
-                    result.proposedTransactions.isNotEmpty() || result.proposedInvestmentOperations.isNotEmpty()
+                val changeSet = result.changeSet
+                val hasProposals = changeSet?.changes?.isNotEmpty() == true
                 if (result.reply.isNotBlank() || !hasProposals) {
                     appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
                 }
-                if (result.proposedTransactions.isNotEmpty()) {
-                    appendReviewButton(result.proposedTransactions, messageIndex)
-                }
-                if (result.proposedInvestmentOperations.isNotEmpty()) {
-                    appendInvestmentReviewButton(result.proposedInvestmentOperations, messageIndex)
+                if (changeSet != null) {
+                    if (changeSet.ignored.isNotEmpty()) {
+                        appendNotice(ignoredLinesText(changeSet.ignored))
+                    }
+                    if (hasProposals) {
+                        reviewSession.add(changeSet)
+                        reviewHidden = false
+                        updateReviewVisibility()
+                    }
                 }
             }
             is ChatTurnResult.NoProviderConfigured ->
@@ -332,111 +347,78 @@ class AiChatController(
         }
     }
 
-    private fun appendReviewButton(
-        transactions: List<ExtractedTransactionDTO>,
-        historyIndex: Int,
-    ) {
-        val pending = PendingTransactionReview(transactions, historyIndex)
-        pendingReviews.add(pending)
-        renderReviewButton(pending)
-    }
+    private fun ignoredLinesText(ignored: List<IgnoredLine>): String =
+        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_IGNORED_HEADER), ignored.size) +
+            "\n\n" + ignored.joinToString("\n\n") { it.display }
 
-    private fun renderReviewButton(pending: PendingTransactionReview) {
-        val button =
-            Button(reviewButtonText(pending.transactions.size)).apply {
-                styleClass.add(STYLE_ATTACH_BUTTON)
-            }
-        val row = HBox(button).apply { alignment = Pos.CENTER_LEFT }
-        button.setOnAction { openTransactionReview(pending, button, row) }
-        messagesContainer.children.add(row)
-        scrollToBottom()
-    }
-
-    private fun reviewButtonText(count: Int): String =
-        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_REVIEW_BUTTON), count)
-
-    private fun openTransactionReview(
-        pending: PendingTransactionReview,
-        button: Button,
-        row: HBox,
-    ) {
-        var controllerRef: TransactionReviewController? = null
-        WindowUtils.openModalWindow(
-            Files.TRANSACTION_REVIEW_FXML,
-            preferencesService.translate(TranslationKeys.AI_REVIEW_TITLE),
-            springContext,
-            { controller: TransactionReviewController ->
-                controllerRef = controller
-                controller.setProposedTransactions(pending.transactions)
-            },
-            listOf(
-                Runnable {
-                    val remaining = controllerRef?.getRemainingTransactions() ?: return@Runnable
-                    pending.transactions = remaining
-                    if (remaining.isEmpty()) {
-                        pendingReviews.remove(pending)
-                        messagesContainer.children.remove(row)
-                    } else {
-                        button.text = reviewButtonText(remaining.size)
-                    }
+    private fun setupReviewPanel() {
+        val panel =
+            ReviewPanel(
+                session = reviewSession,
+                preferencesService = preferencesService,
+                onEdit = ::editProposal,
+                onHide = {
+                    reviewHidden = true
+                    updateReviewVisibility()
                 },
-            ),
-            preferencesService.bundle,
-        )
+            )
+        reviewPanel = panel
+        VBox.setVgrow(panel, Priority.ALWAYS)
+        panel.maxHeight = Double.MAX_VALUE
+        reviewContainer.children.setAll(panel)
+        reviewSession.items.addListener(ListChangeListener { updateReviewVisibility() })
+        reviewSession.items.forEach { item -> item.stateProperty.addListener { _, _, _ -> updateReviewVisibility() } }
+        reopenReviewButton.setOnAction {
+            reviewHidden = false
+            updateReviewVisibility()
+        }
+        updateReviewVisibility()
     }
 
-    private fun appendInvestmentReviewButton(
-        operations: List<ExtractedInvestmentOperationDTO>,
-        historyIndex: Int,
-    ) {
-        val pending = PendingInvestmentReview(operations, historyIndex)
-        pendingInvestmentReviews.add(pending)
-        renderInvestmentReviewButton(pending)
+    private fun updateReviewVisibility() {
+        val hasItems = reviewSession.items.isNotEmpty()
+        val showPanel = hasItems && !reviewHidden
+        reviewContainer.isVisible = showPanel
+        reviewContainer.isManaged = showPanel
+
+        val showReopen = hasItems && reviewHidden
+        reopenReviewButton.isVisible = showReopen
+        reopenReviewButton.isManaged = showReopen
+        reopenReviewButton.text =
+            MessageFormat.format(
+                preferencesService.translate(TranslationKeys.AIPANEL_REOPEN),
+                reviewSession.openCount(),
+            )
     }
 
-    private fun renderInvestmentReviewButton(pending: PendingInvestmentReview) {
-        val button =
-            Button(investmentReviewButtonText(pending.operations.size)).apply {
-                styleClass.add(STYLE_ATTACH_BUTTON)
-            }
-        val row = HBox(button).apply { alignment = Pos.CENTER_LEFT }
-        button.setOnAction { openInvestmentOperationReview(pending, button, row) }
-        messagesContainer.children.add(row)
-        scrollToBottom()
+    private fun editProposal(item: ReviewItem) {
+        val initial = reviewSession.draftOf(item) ?: return
+        val edited =
+            DraftEditorDialog(preferencesService, ::draftChoices).show(
+                preferencesService.translate(TranslationKeys.AIPANEL_DRAFT_TITLE),
+                reviewSession.draftSpecOf(item),
+                initial,
+            ) ?: return
+        reviewSession.applyDraft(item, edited)
     }
 
-    private fun investmentReviewButtonText(count: Int): String =
-        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_REVIEW_INVESTMENT_BUTTON), count)
-
-    private fun openInvestmentOperationReview(
-        pending: PendingInvestmentReview,
-        button: Button,
-        row: HBox,
-    ) {
-        var controllerRef: InvestmentOperationReviewController? = null
-        WindowUtils.openModalWindow(
-            Files.INVESTMENT_OPERATION_REVIEW_FXML,
-            preferencesService.translate(TranslationKeys.AI_REVIEW_INV_TITLE),
-            springContext,
-            { controller: InvestmentOperationReviewController ->
-                controllerRef = controller
-                controller.setProposedOperations(pending.operations)
-            },
-            listOf(
-                Runnable {
-                    val remaining = controllerRef?.getRemainingOperations() ?: return@Runnable
-                    pending.operations = remaining
-                    if (remaining.isEmpty()) {
-                        pendingInvestmentReviews.remove(pending)
-                        messagesContainer.children.remove(row)
-                    } else {
-                        button.text = investmentReviewButtonText(remaining.size)
-                    }
-                },
-            ),
-            preferencesService.bundle,
-        )
-    }
+    private fun draftChoices(kind: DraftChoices): List<DraftChoice> =
+        when (kind) {
+            DraftChoices.WALLETS ->
+                walletService.getAllNonArchivedWalletsOrderedByName().map { DraftChoice(it.id, it.name) }
+            DraftChoices.CREDIT_CARDS ->
+                creditCardService.getAllNonArchivedCreditCardsOrderedByName().map { DraftChoice(it.id, it.name) }
+            DraftChoices.CATEGORIES ->
+                categoryService.getNonArchivedCategoriesOrderedByName().map { DraftChoice(it.name, it.name) }
+            DraftChoices.TICKERS ->
+                tickerService.getAllNonArchivedTickers().map { DraftChoice(it.id, "${it.symbol} - ${it.name}") }
+            DraftChoices.BONDS -> bondService.getAllNonArchivedBonds().map { DraftChoice(it.id, it.name) }
+            DraftChoices.MOVEMENT_TYPES ->
+                listOf(
+                    DraftChoice("income", preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOME)),
+                    DraftChoice("expense", preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_EXPENSE)),
+                )
+        }
 
     private fun setBusy(isBusy: Boolean) {
         busy = isBusy

@@ -108,3 +108,130 @@
   -fx-padding: 0 2px;
   -fx-cursor: hand;
 }
+
+.ai-review-panel {
+  -fx-background-color: theme-bg-base;
+  -fx-border-color: theme-border;
+  -fx-border-width: 0 0 0 1px;
+}
+
+.ai-review-title {
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-title;
+}
+
+.ai-review-scroll {
+  -fx-background-color: transparent;
+  -fx-background: transparent;
+}
+
+.ai-review-scroll > .viewport {
+  -fx-background-color: transparent;
+}
+
+.ai-review-footer {
+  -fx-padding: 8px 0 0 0;
+}
+
+.ai-review-card {
+  -fx-background-color: theme-bg-card;
+  -fx-background-radius: 12px;
+  -fx-border-color: theme-border;
+  -fx-border-radius: 12px;
+  -fx-padding: 10px 12px;
+}
+
+.ai-review-card-selected {
+  -fx-border-color: theme-accent;
+}
+
+.ai-review-card-title {
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-primary;
+}
+
+.ai-review-card-summary {
+  -fx-text-fill: theme-text-primary;
+}
+
+.ai-review-muted {
+  -fx-font-size: 12px;
+  -fx-text-fill: theme-text-muted;
+}
+
+.ai-review-error {
+  -fx-font-size: 12px;
+  -fx-text-fill: theme-negative;
+}
+
+.ai-review-badge {
+  -fx-font-size: 11px;
+  -fx-padding: 2px 8px;
+  -fx-background-radius: 20px;
+  -fx-border-radius: 20px;
+  -fx-border-width: 1px;
+}
+
+.ai-review-badge-new,
+.ai-review-badge-approved {
+  -fx-text-fill: theme-positive;
+  -fx-border-color: theme-positive;
+}
+
+.ai-review-badge-match {
+  -fx-text-fill: theme-accent-text;
+  -fx-border-color: theme-accent;
+}
+
+.ai-review-badge-warning {
+  -fx-text-fill: theme-warning;
+  -fx-border-color: theme-warning;
+}
+
+.ai-review-badge-rejected {
+  -fx-text-fill: theme-text-muted;
+  -fx-border-color: theme-border;
+}
+
+.ai-review-badge-error {
+  -fx-text-fill: theme-negative;
+  -fx-border-color: theme-negative;
+}
+
+.ai-review-button-primary {
+  -fx-border-color: theme-positive;
+  -fx-text-fill: theme-positive;
+}
+
+.ai-review-button-danger {
+  -fx-border-color: theme-negative;
+  -fx-text-fill: theme-negative;
+}
+
+.ai-review-button-edit {
+  -fx-border-color: theme-accent;
+  -fx-text-fill: theme-accent-text;
+}
+
+.ai-draft-banner {
+  -fx-background-color: theme-bg-pane;
+  -fx-background-radius: 8px;
+  -fx-border-color: theme-accent;
+  -fx-border-width: 0 0 0 4px;
+  -fx-padding: 10px 14px;
+}
+
+.ai-draft-banner-title {
+  -fx-font-weight: bold;
+  -fx-fill: theme-accent-text;
+}
+
+.ai-draft-banner-text {
+  -fx-fill: theme-text-primary;
+}
+
+.ai-draft-label {
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-secondary;
+}

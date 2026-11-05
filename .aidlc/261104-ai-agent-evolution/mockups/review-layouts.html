@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups: revisão das propostas do agente</title>
+<style>
+:root{--bg:#21222C;--card:#282A36;--pane:#383a52;--hover:#44475A;--border:#44475A;--text:#F8F8F2;--muted:#BFBFC3;--accent:#BD93F9;--green:#40A66A;--side:#0a614e;--cyan:#8BE9FD;--orange:#FFB86C;--red:#FF5555;--yellow:#F1FA8C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,sans-serif;padding:16px}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:16px;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 16px}
+input[name=tab]{display:none}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs label{padding:8px 16px;border:2px solid var(--border);border-radius:20px;cursor:pointer;color:var(--muted)}
+#t1:checked~.tabs label[for=t1],#t2:checked~.tabs label[for=t2],#t3:checked~.tabs label[for=t3]{border-color:var(--accent);color:var(--text);background:var(--pane)}
+.view{display:none}
+#t1:checked~#v1,#t2:checked~#v2,#t3:checked~#v3{display:block}
+.note{background:var(--pane);border-left:4px solid var(--accent);padding:10px 14px;border-radius:8px;margin:12px 0;color:var(--muted)}
+.note b{color:var(--text)}
+.app{display:flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;min-height:520px;background:var(--card)}
+.side{width:56px;background:var(--side)}
+.chat{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.msg{max-width:78%;padding:10px 14px;border-radius:14px}
+.user{align-self:flex-end;background:var(--pane)}
+.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--border)}
+.panel{width:430px;background:var(--bg);border-left:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:10px}
+.cardp{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.title{font-weight:600}.amount{font-weight:700}.exp{color:var(--red)}.inc{color:var(--green)}
+.meta{color:var(--muted);font-size:12px}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+.new{color:var(--green);border-color:var(--green)}.match{color:var(--cyan);border-color:var(--cyan)}
+.dup{color:var(--orange);border-color:var(--orange)}.low{color:var(--yellow);border-color:var(--yellow)}.done{color:var(--muted);border-color:var(--border)}
+.why{font-size:12px;color:var(--muted);background:var(--bg);border-radius:8px;padding:6px 8px}
+.btn{border:2px solid var(--border);background:transparent;color:var(--text);border-radius:20px;padding:4px 14px;font-size:12px;cursor:pointer}
+.btn.pri{border-color:var(--green);color:var(--green)}.btn.warn{border-color:var(--red);color:var(--red)}.btn.ed{border-color:var(--accent);color:var(--accent)}
+.bar{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--pane);border-radius:12px;padding:8px 12px;position:sticky;bottom:0}
+.modalbg{position:relative}
+.dialog{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;width:420px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.field{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}.field span{font-size:12px;color:var(--muted)}
+.field div{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.two{grid-template-columns:1fr}.panel{width:100%}.app{flex-direction:column}.side{width:100%;height:20px}}
+.pros{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.pros div{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+</style>
+</head>
+<body>
+<h1>Revisão das propostas do agente: 3 layouts</h1>
+<p class="lead">Dados fictícios. Paleta Dracula do app (modo escuro). Compare e diga qual direção seguir; o cartão e o fluxo "Editar abre a tela do app" valem para os três.</p>
+
+<input type="radio" name="tab" id="t1" checked>
+<input type="radio" name="tab" id="t2">
+<input type="radio" name="tab" id="t3">
+<div class="tabs">
+  <label for="t1">1 · Cartões no chat (inline)</label>
+  <label for="t2">2 · Painel lateral</label>
+  <label for="t3">3 · Janela de revisão em cartões</label>
+</div>
+
+<!-- ===================== LAYOUT 1 ===================== -->
+<section class="view" id="v1">
+  <h2>1 · Cartões dentro da conversa</h2>
+  <div class="app">
+    <div class="side"></div>
+    <div class="chat">
+      <div class="msg user">Lançar o extrato do Banco Azul de outubro</div>
+      <div class="msg bot">Li 5 linhas. 2 já estão registradas, 1 casa com um pendente e 2 são novas. Revise abaixo.</div>
+
+      <div class="cardp" style="max-width:640px">
+        <div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div>
+        <div class="row"><span class="meta">12/10 · Banco Azul · Alimentação</span><span class="badge new">Nova</span></div>
+        <div class="row"><span></span><span><button class="btn ed">Editar</button> <button class="btn warn">Rejeitar</button> <button class="btn pri">Aprovar</button></span></div>
+      </div>
+
+      <div class="cardp" style="max-width:640px">
+        <div class="row"><span class="title">PIX ACADEMIA FIT</span><span class="amount exp">− R$ 99,90</span></div>
+        <div class="row"><span class="meta">10/10 · Banco Azul</span><span class="badge match">Casa com #214 (pendente)</span></div>
+        <div class="why">Mesmo valor e data (±1 dia) e carteira. Nome diferente: "Academia" → mantém o nome já cadastrado. Confirma o pendente.</div>
+        <div class="row"><span></span><span><button class="btn">Ver existente</button> <button class="btn warn">Criar mesmo assim</button> <button class="btn pri">Confirmar pendente</button></span></div>
+      </div>
+
+      <div class="cardp" style="max-width:640px;opacity:.85">
+        <div class="row"><span class="title">UBER *TRIP</span><span class="amount exp">− R$ 23,50</span></div>
+        <div class="row"><span class="meta">09/10 · Banco Azul</span><span class="badge done">Já registrada #198</span></div>
+        <div class="why">Lançamento confirmado "Transporte app" com mesmo valor e data. Nenhuma ação necessária.</div>
+        <div class="row"><span></span><span><button class="btn">Ver existente</button> <button class="btn warn">Criar mesmo assim</button></span></div>
+      </div>
+
+      <div class="bar" style="max-width:640px"><span class="meta">2 novas/casadas prontas · 1 ignorada</span><span><button class="btn">Rejeitar todas</button> <button class="btn pri">Aprovar 2 selecionadas</button></span></div>
+    </div>
+  </div>
+  <div class="pros">
+    <div><b>Prós</b><br>Contexto da conversa sempre visível; um único lugar; nada de janela extra.</div>
+    <div><b>Contras</b><br>Listas longas (dezenas de linhas) alongam o chat; rolagem mistura texto e cartões.</div>
+  </div>
+</section>
+
+<!-- ===================== LAYOUT 2 ===================== -->
+<section class="view" id="v2">
+  <h2>2 · Painel lateral de revisão</h2>
+  <div class="app">
+    <div class="side"></div>
+    <div class="chat">
+      <div class="msg user">Lançar o extrato do Banco Azul de outubro</div>
+      <div class="msg bot">Preparei 5 propostas no painel à direita: 2 novas, 1 casa com pendente, 2 já registradas. Aprove, edite ou rejeite por lá.</div>
+      <div class="msg user">A academia deve ser a mesma do mês passado, confira</div>
+      <div class="msg bot">Confirmado: casa com a #214 (R$ 99,90, dia 10).</div>
+    </div>
+    <div class="panel">
+      <div class="row"><b>Revisão · 5 propostas</b><span class="meta">filtro: Todas ▾</span></div>
+      <div class="cardp">
+        <div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div>
+        <div class="row"><span class="meta">12/10 · Banco Azul · Alimentação</span><span class="badge new">Nova</span></div>
+        <div class="row"><span></span><span><button class="btn ed">Editar</button> <button class="btn warn">✕</button> <button class="btn pri">✓</button></span></div>
+      </div>
+      <div class="cardp">
+        <div class="row"><span class="title">PIX ACADEMIA FIT</span><span class="amount exp">− R$ 99,90</span></div>
+        <div class="row"><span class="meta">10/10</span><span class="badge match">Casa com #214</span></div>
+        <div class="why">Valor, data e carteira iguais; só o nome difere.</div>
+        <div class="row"><span></span><span><button class="btn">Ver</button> <button class="btn pri">Confirmar</button></span></div>
+      </div>
+      <div class="cardp">
+        <div class="row"><span class="title">Padaria Boa Massa</span><span class="amount exp">− R$ 31,00</span></div>
+        <div class="row"><span class="meta">08/10 · confiança baixa</span><span class="badge low">Baixa confiança</span></div>
+        <div class="why">Categoria incerta (Alimentação ou Lazer).</div>
+        <div class="row"><span></span><span><button class="btn ed">Editar</button> <button class="btn pri">✓</button></span></div>
+      </div>
+      <div class="bar"><span class="meta">3 de 5 selecionadas</span><button class="btn pri">Aprovar selecionadas</button></div>
+    </div>
+  </div>
+  <div class="pros">
+    <div><b>Prós</b><br>Chat e revisão lado a lado; escala bem para listas longas; filtros por selo.</div>
+    <div><b>Contras</b><br>Ocupa largura (precisa colapsar em janela estreita); novo componente no layout do chat.</div>
+  </div>
+</section>
+
+<!-- ===================== LAYOUT 3 ===================== -->
+<section class="view" id="v3">
+  <h2>3 · Janela de revisão em cartões (evolução do diálogo atual)</h2>
+  <div class="two">
+    <div class="dialog" style="width:100%">
+      <div class="row"><b>Revisar propostas (5)</b><span class="meta">Carteira 3 · Cartão 2</span></div>
+      <div class="row" style="margin:8px 0"><span><span class="badge new">Novas 2</span> <span class="badge match">Casadas 1</span> <span class="badge dup">Duplicata 0</span> <span class="badge done">Já registradas 2</span></span></div>
+      <div class="cardp" style="margin-bottom:8px">
+        <div class="row"><span class="title">Mercado Central</span><span class="amount exp">− R$ 187,40</span></div>
+        <div class="row"><span class="meta">12/10 · Banco Azul · Alimentação</span><span class="badge new">Nova</span></div>
+        <div class="row"><span></span><span><button class="btn ed">Editar</button> <button class="btn pri">Aprovar</button></span></div>
+      </div>
+      <div class="cardp">
+        <div class="row"><span class="title">PIX ACADEMIA FIT</span><span class="amount exp">− R$ 99,90</span></div>
+        <div class="row"><span class="meta">10/10</span><span class="badge match">Casa com #214</span></div>
+        <div class="row"><span></span><span><button class="btn">Ver</button> <button class="btn pri">Confirmar</button></span></div>
+      </div>
+      <div class="bar" style="margin-top:10px"><span class="meta">Chat bloqueado enquanto revisa</span><button class="btn pri">Aprovar todas</button></div>
+    </div>
+    <div class="modalbg">
+      <div class="dialog" style="width:100%">
+        <div class="row"><b>Adicionar despesa</b><span class="badge ed" style="color:var(--accent);border-color:var(--accent)">Vindo do agente</span></div>
+        <div class="field"><span>Carteira</span><div>Banco Azul</div></div>
+        <div class="field"><span>Descrição</span><div>Mercado Central</div></div>
+        <div class="field"><span>Valor</span><div>187,40</div></div>
+        <div class="field"><span>Categoria</span><div>Alimentação</div></div>
+        <div class="field"><span>Data</span><div>12/10/2026</div></div>
+        <div class="field"><span>Status</span><div>Confirmada</div></div>
+        <div class="field"><span>Incluir na análise</span><div>Sim</div></div>
+        <div class="row"><button class="btn">Cancelar</button><button class="btn pri">Salvar e marcar como salva</button></div>
+      </div>
+      <p class="meta">A tela real do app (todas as opções), pré-preenchida pela proposta.</p>
+    </div>
+  </div>
+  <div class="pros">
+    <div><b>Prós</b><br>Menor mudança; mantém o modelo mental atual (janela modal).</div>
+    <div><b>Contras</b><br>Bloqueia o chat, dificulta conferir o que o agente disse; modal sobre modal ao editar.</div>
+  </div>
+</section>
+
+<div class="note"><b>Fluxo "Editar" (comum aos 3):</b> ao clicar em Editar abre a tela real do app (à direita no layout 3) pré-preenchida pela proposta. Ao salvar ali, o cartão vira "Salvo" (grava pelo próprio diálogo); Cancelar volta ao cartão sem alterar nada. Aprovar em um cartão grava via o mesmo service que o diálogo usaria.</div>
+<div class="note"><b>Selos:</b> Nova · Casa com #id (pendente ou confirmado) · Possível duplicata · Baixa confiança · Já registrada (ignorada, com motivo). Todo selo diferente de "Nova" mostra o motivo e a ação "Criar mesmo assim".</div>
+</body>
+</html>

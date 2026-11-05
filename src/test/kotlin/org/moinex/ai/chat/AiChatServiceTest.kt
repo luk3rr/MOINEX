@@ -9,15 +9,21 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import org.moinex.ai.operation.ChangeBadge
+import org.moinex.ai.operation.ChangeSet
+import org.moinex.ai.operation.ProposedChange
+import org.moinex.ai.prompt.PromptComposer
 import org.moinex.ai.provider.LlmProvider
 import org.moinex.ai.provider.LlmProviderFactory
+import org.moinex.ai.tools.FindMatchingTransactionsTool
 import org.moinex.ai.tools.LlmTool
-import org.moinex.ai.tools.ProposeInvestmentOperationTool
-import org.moinex.ai.tools.ProposeTransactionTool
+import org.moinex.ai.tools.ProposeChangesTool
 import org.moinex.ai.tools.QueryFinanceTool
 import org.moinex.common.ClockProvider
 import org.moinex.config.AiPromptProperties
+import org.moinex.model.dto.ai.IgnoredLine
 import org.moinex.service.PreferencesService
+import org.moinex.service.matching.MatchTargetType
 import java.time.LocalDate
 import java.util.Locale
 
@@ -25,14 +31,13 @@ class AiChatServiceTest :
     BehaviorSpec({
         val llmProviderFactory = mockk<LlmProviderFactory>()
         val queryFinanceTool = mockk<QueryFinanceTool>()
-        val proposeTransactionTool = mockk<ProposeTransactionTool>()
-        val proposeInvestmentOperationTool = mockk<ProposeInvestmentOperationTool>()
+        val findMatchingTransactionsTool = mockk<FindMatchingTransactionsTool>()
+        val proposeChangesTool = mockk<ProposeChangesTool>()
         val clockProvider = mockk<ClockProvider>()
         val provider = mockk<LlmProvider>()
         val preferencesService = mockk<PreferencesService>(relaxed = true)
         val aiPromptProperties =
             AiPromptProperties(
-                systemPrompt = mapOf("en" to "You are a test assistant."),
                 attachmentInstructionTemplate = "File \"{0}\" | content: {1}",
             )
 
@@ -45,41 +50,24 @@ class AiChatServiceTest :
                 override fun execute(argumentsJson: String): String = """{"netWorth":1000}"""
             }
 
-        every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
+        every { proposeChangesTool.name } returns ProposeChangesTool.NAME
 
         /** Stubs the calls [AiChatService] makes on every turn to build the system message. */
         fun stubTurnContext() {
-            every { proposeTransactionTool.describeAvailableContext() } returns "Existing categories: Groceries"
-            every { proposeInvestmentOperationTool.describeAvailableContext() } returns "Existing tickers: PETR4"
+            every { proposeChangesTool.describeAvailableContext() } returns
+                "Existing categories: Groceries\nExisting tickers: PETR4"
             every { clockProvider.today() } returns LocalDate.of(2026, 9, 21)
+            every { findMatchingTransactionsTool.name } returns FindMatchingTransactionsTool.NAME
         }
-
-        val multiLocalePrompts =
-            AiPromptProperties(
-                systemPrompt =
-                    mapOf(
-                        "en" to "ENGLISH_PROMPT",
-                        "pt-br" to "PORTUGUESE_PROMPT",
-                    ),
-            )
-        val serviceWithMultiLocalePrompts =
-            AiChatService(
-                llmProviderFactory,
-                queryFinanceTool,
-                proposeTransactionTool,
-                proposeInvestmentOperationTool,
-                multiLocalePrompts,
-                preferencesService,
-                clockProvider,
-            )
 
         val service =
             AiChatService(
                 llmProviderFactory,
                 queryFinanceTool,
-                proposeTransactionTool,
-                proposeInvestmentOperationTool,
+                findMatchingTransactionsTool,
+                proposeChangesTool,
                 aiPromptProperties,
+                PromptComposer(),
                 preferencesService,
                 clockProvider,
             )
@@ -94,12 +82,14 @@ class AiChatServiceTest :
             coEvery { provider.chat(any(), any()) } returns LlmResponse(text = "ok")
 
             When("sending a message") {
-                serviceWithMultiLocalePrompts.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Oi")))
+                service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Oi")))
 
                 Then("the Portuguese system prompt is sent to the provider") {
                     coVerify {
                         provider.chat(
-                            match { messages -> messages.first().content.startsWith("PORTUGUESE_PROMPT") },
+                            match { messages ->
+                                messages.first().content.startsWith("Você é o assistente financeiro do MOINEX")
+                            },
                             any(),
                         )
                     }
@@ -115,12 +105,14 @@ class AiChatServiceTest :
             coEvery { provider.chat(any(), any()) } returns LlmResponse(text = "ok")
 
             When("sending a message") {
-                serviceWithMultiLocalePrompts.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Hi")))
+                service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Hi")))
 
                 Then("it falls back to the English prompt") {
                     coVerify {
                         provider.chat(
-                            match { messages -> messages.first().content.startsWith("ENGLISH_PROMPT") },
+                            match { messages ->
+                                messages.first().content.startsWith("You are the MOINEX financial assistant")
+                            },
                             any(),
                         )
                     }
@@ -223,168 +215,155 @@ class AiChatServiceTest :
             }
         }
 
-        Given("a configured provider that calls propose_transactions before answering") {
+        fun change(summary: String) =
+            ProposedChange(
+                id = summary,
+                operationName = "create_wallet_transaction",
+                payload = summary,
+                summary = summary,
+                badge = ChangeBadge.NEW,
+                reasons = emptyList(),
+                confidence = 0.9,
+            )
+
+        fun outcome(
+            changes: List<ProposedChange> = emptyList(),
+            ignored: List<IgnoredLine> = emptyList(),
+        ) = ProposeChangesTool.Outcome(ChangeSet("set", changes, ignored), emptyList())
+
+        Given("a provider that calls propose_changes before answering") {
             every { llmProviderFactory.currentProvider() } returns provider
             every { preferencesService.locale } returns Locale.ENGLISH
             every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
-            every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
             stubTurnContext()
 
-            val toolCall = ToolCall(id = "call_1", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
-            val proposedJson =
-                """
-                [{"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
-                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
-                  "suggestedCategoryName":"Groceries","confidence":0.8}]
-                """.trimIndent()
-            every { proposeTransactionTool.execute(any()) } returns proposedJson
+            val toolCall = ToolCall(id = "call_1", toolName = ProposeChangesTool.NAME, argumentsJson = "{}")
+            val proposed = outcome(listOf(change("Market")))
+            every { proposeChangesTool.propose(any()) } returns proposed
+            every { proposeChangesTool.toModelJson(proposed) } returns """{"accepted":[{"summary":"Market"}]}"""
 
             coEvery { provider.chat(any(), any()) } returnsMany
                 listOf(
                     LlmResponse(text = null, toolCalls = listOf(toolCall)),
-                    LlmResponse(text = "Found 1 transaction, please review."),
+                    LlmResponse(text = "Found 1 change, please review."),
                 )
 
             When("sending a message") {
                 val result =
                     service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
 
-                Then("the result carries the parsed proposed transactions") {
-                    result.shouldBeInstanceOf<ChatTurnResult.Success>()
-                    val success = result as ChatTurnResult.Success
-                    success.proposedTransactions.size shouldBe 1
-                    success.proposedTransactions[0].suggestedCategoryName shouldBe "Groceries"
-                    success.proposedInvestmentOperations.size shouldBe 0
-                    success.reply shouldBe "Found 1 transaction, please review."
+                Then("the result carries the change set and the tool result goes back to the model") {
+                    val success = result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    success.changeSet!!.changes.map { it.summary } shouldBe listOf("Market")
+                    success.reply shouldBe "Found 1 change, please review."
+                    coVerify {
+                        provider.chat(
+                            match { messages -> messages.last().content.contains("\"accepted\"") },
+                            any(),
+                        )
+                    }
                 }
             }
         }
 
-        Given("a configured provider that calls propose_investment_operations before answering") {
+        Given("a propose_changes result that skipped a line already recorded") {
             every { llmProviderFactory.currentProvider() } returns provider
             every { preferencesService.locale } returns Locale.ENGLISH
             every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
-            every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
-            every { proposeInvestmentOperationTool.name } returns ProposeInvestmentOperationTool.NAME
             stubTurnContext()
 
-            val toolCall =
-                ToolCall(id = "call_1", toolName = ProposeInvestmentOperationTool.NAME, argumentsJson = "{}")
-            val proposedJson =
-                """
-                [{"date":"2026-09-05","kind":"dividend","description":"PETR4 dividend","quantity":0,"unitPrice":0,
-                  "fees":0,"taxes":0,"dividendAmount":42.50,"suggestedTickerId":1,"suggestedBondId":null,
-                  "suggestedAssetLabel":"PETR4 - Petrobras","suggestedWalletId":null,"suggestedCategoryId":null,
-                  "suggestedCategoryName":"Investimentos","confidence":0.8}]
-                """.trimIndent()
-            every { proposeInvestmentOperationTool.execute(any()) } returns proposedJson
+            val toolCall = ToolCall(id = "call_1", toolName = ProposeChangesTool.NAME, argumentsJson = "{}")
+            val proposed =
+                outcome(
+                    ignored =
+                        listOf(
+                            IgnoredLine(
+                                "Taxi, 23.50, 2026-10-09 -> already recorded",
+                                MatchTargetType.WALLET_TRANSACTION,
+                                198,
+                                listOf("same amount", "same date"),
+                            ),
+                        ),
+                )
+            every { proposeChangesTool.propose(any()) } returns proposed
+            every { proposeChangesTool.toModelJson(proposed) } returns """{"ignored":[{"targetId":198}]}"""
 
             coEvery { provider.chat(any(), any()) } returnsMany
                 listOf(
                     LlmResponse(text = null, toolCalls = listOf(toolCall)),
-                    LlmResponse(text = "Found 1 investment operation, please review."),
-                )
-
-            When("sending a message") {
-                val result =
-                    service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Recebi dividendo")))
-
-                Then("the result carries the parsed proposed investment operations") {
-                    result.shouldBeInstanceOf<ChatTurnResult.Success>()
-                    val success = result as ChatTurnResult.Success
-                    success.proposedInvestmentOperations.size shouldBe 1
-                    success.proposedInvestmentOperations[0].suggestedAssetLabel shouldBe "PETR4 - Petrobras"
-                    success.proposedTransactions.size shouldBe 0
-                    success.reply shouldBe "Found 1 investment operation, please review."
-                }
-            }
-        }
-
-        Given("a configured provider that calls both propose_transactions and propose_investment_operations") {
-            every { llmProviderFactory.currentProvider() } returns provider
-            every { preferencesService.locale } returns Locale.ENGLISH
-            every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
-            every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
-            every { proposeInvestmentOperationTool.name } returns ProposeInvestmentOperationTool.NAME
-            stubTurnContext()
-
-            val transactionCall = ToolCall(id = "call_1", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
-            val investmentCall =
-                ToolCall(id = "call_2", toolName = ProposeInvestmentOperationTool.NAME, argumentsJson = "{}")
-            val transactionsJson =
-                """
-                [{"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
-                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
-                  "suggestedCategoryName":"Groceries","confidence":0.8}]
-                """.trimIndent()
-            val investmentsJson =
-                """
-                [{"date":"2026-09-05","kind":"dividend","description":"PETR4 dividend","quantity":0,"unitPrice":0,
-                  "fees":0,"taxes":0,"dividendAmount":42.50,"suggestedTickerId":1,"suggestedBondId":null,
-                  "suggestedAssetLabel":"PETR4 - Petrobras","suggestedWalletId":null,"suggestedCategoryId":null,
-                  "suggestedCategoryName":"Investimentos","confidence":0.8}]
-                """.trimIndent()
-            every { proposeTransactionTool.execute(any()) } returns transactionsJson
-            every { proposeInvestmentOperationTool.execute(any()) } returns investmentsJson
-
-            coEvery { provider.chat(any(), any()) } returnsMany
-                listOf(
-                    LlmResponse(text = null, toolCalls = listOf(transactionCall, investmentCall)),
-                    LlmResponse(text = "Found a purchase and a dividend, please review both."),
+                    LlmResponse(text = "Nothing new to review."),
                 )
 
             When("sending a message") {
                 val result =
                     service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
 
-                Then("the result carries both proposed transactions and proposed investment operations") {
-                    result.shouldBeInstanceOf<ChatTurnResult.Success>()
-                    val success = result as ChatTurnResult.Success
-                    success.proposedTransactions.size shouldBe 1
-                    success.proposedInvestmentOperations.size shouldBe 1
+                Then("the change set carries the ignored line with its record id and reasons") {
+                    val success = result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    success.changeSet!!.changes.size shouldBe 0
+                    success.changeSet!!
+                        .ignored
+                        .single()
+                        .targetId shouldBe 198
+                    success.changeSet!!
+                        .ignored
+                        .single()
+                        .reasons shouldBe listOf("same amount", "same date")
                 }
             }
         }
 
-        Given("a configured provider that calls propose_transactions twice before answering") {
+        Given("a provider that calls propose_changes twice before answering") {
             every { llmProviderFactory.currentProvider() } returns provider
             every { preferencesService.locale } returns Locale.ENGLISH
             every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
-            every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
             stubTurnContext()
 
-            val firstCall = ToolCall(id = "call_1", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
-            val secondCall = ToolCall(id = "call_2", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
-            val firstBatchJson =
-                """
-                [{"date":"2026-09-01","description":"Market","amount":50.00,"kind":"wallet",
-                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
-                  "suggestedCategoryName":"Groceries","confidence":0.8}]
-                """.trimIndent()
-            val secondBatchJson =
-                """
-                [{"date":"2026-09-10","description":"Pharmacy","amount":30.00,"kind":"wallet",
-                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
-                  "suggestedCategoryName":"Health","confidence":0.8}]
-                """.trimIndent()
-            every { proposeTransactionTool.execute(any()) } returnsMany listOf(firstBatchJson, secondBatchJson)
+            val first = outcome(listOf(change("Market")))
+            val second = outcome(listOf(change("Pharmacy")))
+            every { proposeChangesTool.propose("1") } returns first
+            every { proposeChangesTool.propose("2") } returns second
+            every { proposeChangesTool.toModelJson(any()) } returns "{}"
 
             coEvery { provider.chat(any(), any()) } returnsMany
                 listOf(
-                    LlmResponse(text = null, toolCalls = listOf(firstCall)),
-                    LlmResponse(text = null, toolCalls = listOf(secondCall)),
-                    LlmResponse(text = "Found 2 transactions across two batches, please review."),
+                    LlmResponse(text = null, toolCalls = listOf(ToolCall("c1", ProposeChangesTool.NAME, "1"))),
+                    LlmResponse(text = null, toolCalls = listOf(ToolCall("c2", ProposeChangesTool.NAME, "2"))),
+                    LlmResponse(text = "Two batches."),
                 )
 
             When("sending a message") {
                 val result =
                     service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
 
-                Then("both batches are accumulated instead of the second call overwriting the first") {
-                    result.shouldBeInstanceOf<ChatTurnResult.Success>()
-                    val success = result as ChatTurnResult.Success
-                    success.proposedTransactions.size shouldBe 2
-                    success.proposedTransactions.map { it.description } shouldBe listOf("Market", "Pharmacy")
+                Then("both batches are accumulated instead of the second overwriting the first") {
+                    val success = result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    success.changeSet!!.changes.map { it.summary } shouldBe listOf("Market", "Pharmacy")
+                }
+            }
+        }
+
+        Given("a propose_changes call that throws") {
+            every { llmProviderFactory.currentProvider() } returns provider
+            every { preferencesService.locale } returns Locale.ENGLISH
+            every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
+            stubTurnContext()
+            every { proposeChangesTool.propose(any()) } throws IllegalStateException("boom")
+
+            coEvery { provider.chat(any(), any()) } returnsMany
+                listOf(
+                    LlmResponse(text = null, toolCalls = listOf(ToolCall("c1", ProposeChangesTool.NAME, "{}"))),
+                    LlmResponse(text = "Sorry."),
+                )
+
+            When("sending a message") {
+                val result =
+                    service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
+
+                Then("the model receives the error and the turn still ends with its answer") {
+                    val success = result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    success.changeSet shouldBe null
+                    success.reply shouldBe "Sorry."
                 }
             }
         }
@@ -452,6 +431,29 @@ class AiChatServiceTest :
 
                 Then("it gives up with an Error instead of looping forever") {
                     result.shouldBeInstanceOf<ChatTurnResult.Error>()
+                }
+            }
+        }
+
+        Given("a provider that keeps calling tools after it already proposed changes") {
+            every { llmProviderFactory.currentProvider() } returns provider
+            every { preferencesService.locale } returns Locale.ENGLISH
+            every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
+            stubTurnContext()
+
+            val proposed = outcome(listOf(change("Market")))
+            every { proposeChangesTool.propose(any()) } returns proposed
+            every { proposeChangesTool.toModelJson(any()) } returns "{}"
+            coEvery { provider.chat(any(), any()) } returns
+                LlmResponse(text = null, toolCalls = listOf(ToolCall("c", ProposeChangesTool.NAME, "{}")))
+
+            When("sending a message") {
+                val result =
+                    service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
+
+                Then("the limit does not throw away what was already proposed") {
+                    val success = result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    success.changeSet!!.changes.map { it.summary } shouldBe listOf("Market")
                 }
             }
         }

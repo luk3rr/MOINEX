@@ -10,6 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "moinex.ai")
 class AiPromptProperties(
-    val systemPrompt: Map<String, String> = emptyMap(),
     val attachmentInstructionTemplate: String = "",
 )

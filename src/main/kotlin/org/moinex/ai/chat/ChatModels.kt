@@ -6,8 +6,7 @@
 
 package org.moinex.ai.chat
 
-import org.moinex.model.dto.ai.ExtractedInvestmentOperationDTO
-import org.moinex.model.dto.ai.ExtractedTransactionDTO
+import org.moinex.ai.operation.ChangeSet
 
 enum class ChatRole {
     SYSTEM,
@@ -56,8 +55,7 @@ data class LlmResponse(
 sealed class ChatTurnResult {
     data class Success(
         val reply: String,
-        val proposedTransactions: List<ExtractedTransactionDTO> = emptyList(),
-        val proposedInvestmentOperations: List<ExtractedInvestmentOperationDTO> = emptyList(),
+        val changeSet: ChangeSet? = null,
     ) : ChatTurnResult()
 
     data object NoProviderConfigured : ChatTurnResult()
