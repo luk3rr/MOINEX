@@ -179,7 +179,10 @@ class UpdateGoalOperation(
     ): GoalPayload {
         val current = arguments.getString("goalName")
         val goal =
-            goalService.getAllGoals().firstOrNull { !it.isArchived && it.name.equals(current.trim(), true) }
+            goalService
+                .getAllGoals()
+                .filter { it.name.equals(current.trim(), true) }
+                .minByOrNull { it.isArchived }
                 ?: error("goal '$current' not found")
         val stored =
             GoalPayload(

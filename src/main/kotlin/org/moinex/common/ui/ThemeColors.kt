@@ -19,6 +19,8 @@ object ThemeColors {
     const val LIGHT_BG_CARD = "#FFFFFF"
     const val DARK_BG_CARD_ALT = "#21222C"
     const val LIGHT_BG_CARD_ALT = "#F5F5F5"
+    const val DARK_BORDER = "#44475A"
+    const val LIGHT_BORDER = "#D1D9E0"
     const val DARK_BG_SIDEBAR = "#0A614E"
     const val LIGHT_BG_SIDEBAR = "#1ABC9C"
     const val DARK_ON_SIDEBAR = "#F8F8F2"

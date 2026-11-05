@@ -13,52 +13,52 @@
 
 
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.AiChatController">
-   <children>
-      <HBox AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <children>
-      <VBox spacing="10.0" HBox.hgrow="ALWAYS" minWidth="0.0">
-         <padding>
-            <Insets top="20.0" right="30.0" bottom="20.0" left="30.0" />
-         </padding>
-         <children>
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-               <children>
-                  <Label text="%aichat.title" styleClass="ai-chat-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-                  <Button fx:id="reopenReviewButton" visible="false" managed="false" styleClass="ai-chat-attach-button" />
-               </children>
-            </HBox>
-            <Label text="%aichat.disclaimer" wrapText="true" prefWidth="0.0" minHeight="-Infinity" maxWidth="Infinity" styleClass="ai-chat-disclaimer">
-   <graphic>
-      <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-16" />
-   </graphic>
-</Label>
-            <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" prefHeight="0.0" minHeight="0.0" VBox.vgrow="ALWAYS" styleClass="ai-chat-scroll">
-               <content>
-                  <VBox fx:id="messagesContainer" spacing="12.0" styleClass="ai-chat-messages">
-                     <padding>
-                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
-                     </padding>
-                  </VBox>
-               </content>
-            </ScrollPane>
-            <Label fx:id="thinkingLabel" text="%aichat.thinking" styleClass="ai-chat-thinking" />
-            <FlowPane fx:id="attachmentsContainer" hgap="6.0" vgap="6.0" visible="false" managed="false" />
-            <HBox spacing="10.0" alignment="TOP_LEFT" minHeight="-Infinity">
-               <children>
-                  <Button fx:id="attachButton" text="%aichat.attach.button" onAction="#handleAttach" styleClass="ai-chat-attach-button" />
-                  <VBox spacing="2.0" minHeight="-Infinity" HBox.hgrow="ALWAYS">
-                     <children>
-                        <TextArea fx:id="inputField" styleClass="ai-chat-input" promptText="%aichat.input.placeholder" wrapText="true" prefRowCount="1" minHeight="34" />
-                        <Label text="%aichat.input.hint" styleClass="ai-chat-input-hint" />
-                     </children>
-                  </VBox>
-                  <Button fx:id="sendButton" text="%aichat.send" onAction="#handleSend" styleClass="ai-chat-send-button" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
-      <VBox fx:id="reviewContainer" visible="false" managed="false" />
-         </children>
-      </HBox>
-   </children>
+    <children>
+        <HBox AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <VBox spacing="10.0" HBox.hgrow="ALWAYS" minWidth="0.0">
+                    <padding>
+                        <Insets top="20.0" right="30.0" bottom="20.0" left="30.0" />
+                    </padding>
+                    <children>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="%aichat.title" styleClass="ai-chat-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                                <Button fx:id="reopenReviewButton" visible="false" managed="false" styleClass="ai-chat-attach-button" />
+                            </children>
+                        </HBox>
+                        <Label text="%aichat.disclaimer" wrapText="true" prefWidth="0.0" minHeight="-Infinity" maxWidth="Infinity" styleClass="ai-chat-disclaimer">
+                            <graphic>
+                                <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-16" />
+                            </graphic>
+                        </Label>
+                        <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" prefHeight="0.0" minHeight="0.0" VBox.vgrow="ALWAYS" styleClass="ai-chat-scroll">
+                            <content>
+                                <VBox fx:id="messagesContainer" spacing="12.0" styleClass="ai-chat-messages">
+                                    <padding>
+                                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                        <Label fx:id="thinkingLabel" text="%aichat.thinking" styleClass="ai-chat-thinking" />
+                        <FlowPane fx:id="attachmentsContainer" hgap="6.0" vgap="6.0" visible="false" managed="false" />
+                        <HBox spacing="10.0" alignment="TOP_LEFT" minHeight="-Infinity">
+                            <children>
+                                <Button fx:id="attachButton" text="%aichat.attach.button" onAction="#handleAttach" styleClass="ai-chat-attach-button" />
+                                <VBox spacing="2.0" minHeight="-Infinity" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <TextArea fx:id="inputField" styleClass="ai-chat-input" promptText="%aichat.input.placeholder" wrapText="true" prefRowCount="1" minHeight="34" />
+                                        <Label text="%aichat.input.hint" styleClass="ai-chat-input-hint" />
+                                    </children>
+                                </VBox>
+                                <Button fx:id="sendButton" text="%aichat.send" onAction="#handleSend" styleClass="ai-chat-send-button" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                <VBox fx:id="reviewContainer" visible="false" managed="false" />
+            </children>
+        </HBox>
+    </children>
 </AnchorPane>

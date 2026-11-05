@@ -574,9 +574,9 @@ class AiChatController(
                 }
             else ->
                 if (isDark) {
-                    ThemeColors.DARK_BG_CARD_ALT to ThemeColors.DARK_TEXT_PRIMARY
+                    ThemeColors.DARK_BORDER to ThemeColors.DARK_TEXT_PRIMARY
                 } else {
-                    ThemeColors.LIGHT_BG_CARD_ALT to ThemeColors.LIGHT_TEXT_PRIMARY
+                    ThemeColors.LIGHT_BORDER to ThemeColors.LIGHT_TEXT_PRIMARY
                 }
         }
     }

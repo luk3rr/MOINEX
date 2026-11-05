@@ -106,6 +106,32 @@ class PlanningOperationsTest :
             }
         }
 
+        Given("a request to rename an archived goal") {
+            val old = GoalFactory.create(id = 7, name = "Old Plan", isArchived = true)
+            every { goalService.getAllGoals() } returns listOf(old, goal)
+            every { goalService.getGoalById(7) } returns old
+            val operation = UpdateGoalOperation(goalService)
+            val payload =
+                operation.fromModelArguments(JSONObject("""{"goalName":"old plan","name":"Old Plan 2"}"""), catalog)
+
+            Then("it is found, renamed and the goal stays archived") {
+                payload.goalId shouldBe 7
+                val saved = slot<Goal>()
+                every { goalService.updateGoal(capture(saved)) } returns Unit
+                operation.apply(payload).shouldBeInstanceOf<ApplyResult.Success>()
+                saved.captured.isArchived shouldBe true
+                saved.captured.name shouldBe "Old Plan 2"
+            }
+
+            Then("with an active and an archived goal of the same name the active one wins") {
+                val twin = GoalFactory.create(id = 8, name = "Trip", isArchived = true)
+                every { goalService.getAllGoals() } returns listOf(twin, goal)
+                operation
+                    .fromModelArguments(JSONObject("""{"goalName":"trip"}"""), catalog)
+                    .goalId shouldBe 6
+            }
+        }
+
         Given("wishlist requests") {
             every { resolver.resolveOrCreate(any()) } answers { CategoryFactory.create(id = 99, name = firstArg()) }
 

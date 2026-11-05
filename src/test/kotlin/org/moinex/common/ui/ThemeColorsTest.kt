@@ -20,6 +20,7 @@ class ThemeColorsTest :
                             Triple("theme-text-primary", ThemeColors.DARK_TEXT_PRIMARY, ThemeColors.LIGHT_TEXT_PRIMARY),
                             Triple("theme-bg-card", ThemeColors.DARK_BG_CARD, ThemeColors.LIGHT_BG_CARD),
                             Triple("theme-bg-card-alt", ThemeColors.DARK_BG_CARD_ALT, ThemeColors.LIGHT_BG_CARD_ALT),
+                            Triple("theme-border", ThemeColors.DARK_BORDER, ThemeColors.LIGHT_BORDER),
                             Triple("theme-bg-sidebar", ThemeColors.DARK_BG_SIDEBAR, ThemeColors.LIGHT_BG_SIDEBAR),
                             Triple("theme-on-sidebar", ThemeColors.DARK_ON_SIDEBAR, ThemeColors.LIGHT_ON_SIDEBAR),
                             Triple("theme-warning", ThemeColors.DARK_WARNING, ThemeColors.LIGHT_WARNING),
