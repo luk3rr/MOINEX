@@ -16,6 +16,7 @@ import org.moinex.common.extension.toRounded
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FileUtils
 import org.moinex.factory.investment.TickerFactory
+import org.moinex.model.dto.TickerMetadata
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Ticker
 import org.moinex.repository.investment.CryptoExchangeRepository
@@ -53,6 +54,7 @@ class TickerServiceUpdatePricesTest :
                 notificationService,
                 preferencesService,
                 clockProvider,
+                TickerMarketDataService(tickerRepository),
             )
 
         beforeSpec {
@@ -72,11 +74,11 @@ class TickerServiceUpdatePricesTest :
             When("updating all non-archived ticker prices") {
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns emptyList()
 
-                service.updateAllNonArchivedTickersPrices()
+                service.updateAllNonArchivedTickersPrices(force = true)
 
                 Then("should skip price update") {
                     verify(exactly = 1) { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() }
-                    verify(exactly = 0) { tickerRepository.saveAll(any<List<Ticker>>()) }
+                    verify(exactly = 0) { tickerRepository.save(any<Ticker>()) }
                 }
             }
         }
@@ -119,10 +121,9 @@ class TickerServiceUpdatePricesTest :
                         apiResponse
                     coEvery { APIUtils.fetchStockLogos(any()) } returns
                         JSONObject()
-                    every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
-                        listOf(ticker1, ticker2)
+                    every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                    service.updateAllNonArchivedTickersPrices()
+                    service.updateAllNonArchivedTickersPrices(force = true)
 
                     Then("should update ticker prices") {
                         ticker1.currentUnitValue shouldBe BigDecimal("150.00")
@@ -135,7 +136,7 @@ class TickerServiceUpdatePricesTest :
                     }
 
                     Then("should save all updated tickers") {
-                        verify { tickerRepository.saveAll(any<List<Ticker>>()) }
+                        verify { tickerRepository.save(any<Ticker>()) }
                     }
                 }
             }
@@ -174,8 +175,7 @@ class TickerServiceUpdatePricesTest :
                         apiResponse
                     coEvery { APIUtils.fetchStockLogos(any()) } returns
                         JSONObject()
-                    every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
-                        listOf(ticker1)
+                    every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
                     val failed =
                         service.updateTickersPriceFromApi(listOf(ticker1, ticker2))
@@ -194,7 +194,7 @@ class TickerServiceUpdatePricesTest :
                     }
 
                     Then("should save only successful tickers") {
-                        verify { tickerRepository.saveAll(match<List<Ticker>> { it.size == 1 }) }
+                        verify(exactly = 1) { tickerRepository.save(any<Ticker>()) }
                     }
                 }
             }
@@ -213,7 +213,7 @@ class TickerServiceUpdatePricesTest :
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
                     coEvery { APIUtils.fetchStockPrices(any()) } returns
                         apiResponse
-                    every { tickerRepository.saveAll(any<List<Ticker>>()) } returns emptyList()
+                    every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
                     val failed =
                         service.updateTickersPriceFromApi(listOf(ticker))
@@ -228,7 +228,7 @@ class TickerServiceUpdatePricesTest :
                     }
 
                     Then("should not save any tickers") {
-                        verify(exactly = 0) { tickerRepository.saveAll(any<List<Ticker>>()) }
+                        verify(exactly = 0) { tickerRepository.save(any<Ticker>()) }
                     }
                 }
             }
@@ -270,10 +270,9 @@ class TickerServiceUpdatePricesTest :
                     apiResponse
                 coEvery { APIUtils.fetchStockLogos(any()) } returns
                     JSONObject()
-                every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
-                    listOf(stock, crypto)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                service.updateAllNonArchivedTickersPrices()
+                service.updateAllNonArchivedTickersPrices(force = true)
 
                 Then("should update stock price") {
                     stock.currentUnitValue shouldBe BigDecimal("150.00")
@@ -288,7 +287,7 @@ class TickerServiceUpdatePricesTest :
                 }
 
                 Then("should save all tickers") {
-                    verify { tickerRepository.saveAll(match<List<Ticker>> { it.size == 2 }) }
+                    verify(exactly = 2) { tickerRepository.save(any<Ticker>()) }
                 }
             }
         }
@@ -316,10 +315,9 @@ class TickerServiceUpdatePricesTest :
                 coEvery { APIUtils.fetchStockPrices(any()) } returns apiResponse
                 coEvery { APIUtils.fetchStockLogos(any()) } returns
                     JSONObject()
-                every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
-                    listOf(ticker)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                service.updateAllNonArchivedTickersPrices()
+                service.updateAllNonArchivedTickersPrices(force = true)
 
                 Then("should update domain to new value") {
                     ticker.domain shouldBe "apple.com"
@@ -351,10 +349,9 @@ class TickerServiceUpdatePricesTest :
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
                 coEvery { APIUtils.fetchStockPrices(any()) } returns apiResponse
-                every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
-                    listOf(ticker)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                service.updateAllNonArchivedTickersPrices()
+                service.updateAllNonArchivedTickersPrices(force = true)
 
                 Then("should keep domain as null") {
                     ticker.domain shouldBe null
@@ -402,10 +399,9 @@ class TickerServiceUpdatePricesTest :
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
                 coEvery { APIUtils.fetchStockPrices(any()) } returns apiResponse
-                every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
-                    listOf(ticker)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                service.updateAllNonArchivedTickersPrices()
+                service.updateAllNonArchivedTickersPrices(force = true)
 
                 Then("should update last update timestamp") {
                     ticker.lastUpdate.isAfter(oldTimestamp) shouldBe true
@@ -448,7 +444,7 @@ class TickerServiceUpdatePricesTest :
                     listOf(ticker1, ticker2)
                 coEvery { APIUtils.fetchStockPrices(any()) } returns
                     apiResponse
-                every { tickerRepository.saveAll(any<List<Ticker>>()) } returns emptyList()
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
                 val failed =
                     service.updateTickersPriceFromApi(listOf(ticker1, ticker2))
@@ -463,7 +459,7 @@ class TickerServiceUpdatePricesTest :
                 }
 
                 Then("should not save any tickers") {
-                    verify(exactly = 0) { tickerRepository.saveAll(any<List<Ticker>>()) }
+                    verify(exactly = 0) { tickerRepository.save(any<Ticker>()) }
                 }
             }
         }
@@ -499,12 +495,12 @@ class TickerServiceUpdatePricesTest :
                     listOf(ticker1, ticker2)
                 coEvery { APIUtils.fetchStockPrices(any()) } returns
                     apiResponse
-                every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker1)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                service.updateAllNonArchivedTickersPrices()
+                service.updateAllNonArchivedTickersPrices(force = true)
 
                 Then("should log warning about failed tickers") {
-                    verify { tickerRepository.saveAll(match<List<Ticker>> { it.size == 1 }) }
+                    verify(exactly = 1) { tickerRepository.save(any<Ticker>()) }
                 }
 
                 Then("should update successful ticker") {
@@ -552,9 +548,9 @@ class TickerServiceUpdatePricesTest :
                         priceResponse
                     coEvery { APIUtils.fetchStockLogos(any()) } returns
                         logoResponse
-                    every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker)
+                    every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                    service.updateAllNonArchivedTickersPrices()
+                    service.updateAllNonArchivedTickersPrices(force = true)
 
                     Then("should update ticker price") {
                         ticker.currentUnitValue shouldBe BigDecimal("150.00")
@@ -600,9 +596,9 @@ class TickerServiceUpdatePricesTest :
                         priceResponse
                     coEvery { APIUtils.fetchStockLogos(any()) } returns
                         logoResponse
-                    every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker)
+                    every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                    service.updateAllNonArchivedTickersPrices()
+                    service.updateAllNonArchivedTickersPrices(force = true)
 
                     Then("should update ticker price despite logo exception") {
                         ticker.currentUnitValue shouldBe BigDecimal("150.00")
@@ -647,17 +643,158 @@ class TickerServiceUpdatePricesTest :
                         priceResponse
                     coEvery { APIUtils.fetchStockLogos(any()) } returns
                         logoResponse
-                    every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker)
+                    every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
 
-                    service.updateAllNonArchivedTickersPrices()
+                    service.updateAllNonArchivedTickersPrices(force = true)
 
                     Then("should update ticker price despite logo processing issue") {
                         ticker.currentUnitValue shouldBe BigDecimal("150.00")
                     }
 
                     Then("should handle gracefully") {
-                        verify { tickerRepository.saveAll(any<List<Ticker>>()) }
+                        verify { tickerRepository.save(any<Ticker>()) }
                     }
+                }
+            }
+        }
+
+        Given("tickers updated recently and tickers updated long ago") {
+            val now = LocalDateTime.now()
+            val fresh =
+                TickerFactory.create(id = 1, symbol = "FRESH", lastUpdate = now.minusMinutes(10))
+            val stale =
+                TickerFactory.create(id = 2, symbol = "STALE", lastUpdate = now.minusHours(3))
+
+            When("the automatic update runs") {
+                every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(fresh, stale)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    JSONObject().put("STALE", JSONObject().put("price", 12.0).put("currency", "BRL"))
+                coEvery { APIUtils.fetchStockLogos(any()) } returns JSONObject()
+
+                service.updateAllNonArchivedTickersPrices()
+
+                Then("only the stale ticker is requested") {
+                    coVerify(exactly = 1) { APIUtils.fetchStockPrices(listOf("STALE")) }
+                }
+            }
+
+            When("the update is forced") {
+                every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(fresh, stale)
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    JSONObject()
+                        .put("FRESH", JSONObject().put("price", 11.0))
+                        .put("STALE", JSONObject().put("price", 12.0))
+                coEvery { APIUtils.fetchStockLogos(any()) } returns JSONObject()
+
+                service.updateAllNonArchivedTickersPrices(force = true)
+
+                Then("both are requested") {
+                    coVerify(exactly = 1) {
+                        APIUtils.fetchStockPrices(
+                            match { args ->
+                                args.map { it.substringBefore(":") } ==
+                                    listOf("FRESH", "STALE")
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+        Given("every ticker is fresh") {
+            val fresh = TickerFactory.create(id = 1, symbol = "FRESH", lastUpdate = LocalDateTime.now().minusMinutes(5))
+
+            When("the automatic update runs") {
+                every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(fresh)
+
+                service.updateAllNonArchivedTickersPrices()
+
+                Then("Yahoo is not asked at all") {
+                    coVerify(exactly = 0) { APIUtils.fetchStockPrices(any()) }
+                    verify(exactly = 0) { tickerRepository.save(any<Ticker>()) }
+                }
+            }
+        }
+
+        Given("a ticker whose currency is known and one whose currency is not") {
+            val known = TickerFactory.create(id = 1, symbol = "KNOWN", currentUnitValue = BigDecimal("10.00"))
+            known.metadata = TickerMetadata(currency = "USD").toJson()
+            val unknown = TickerFactory.create(id = 2, symbol = "NEW", currentUnitValue = BigDecimal("20.00"))
+
+            When("prices are fetched") {
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    JSONObject()
+                        .put("KNOWN", JSONObject().put("price", 55.0).put("currency", "USD"))
+                        .put(
+                            "NEW",
+                            JSONObject()
+                                .put(
+                                    "price",
+                                    21.0,
+                                ).put("currency", "BRL")
+                                .put("website", "https://new.example"),
+                        )
+                coEvery { APIUtils.fetchStockLogos(any()) } returns JSONObject()
+
+                val failed = service.updateTickersPriceFromApi(listOf(known, unknown))
+
+                Then("the known currency goes to the script and the unknown one does not") {
+                    coVerify { APIUtils.fetchStockPrices(listOf("KNOWN:USD", "NEW")) }
+                    failed.size shouldBe 0
+                }
+
+                Then("the currency and the site the script reported are stored with the price and the moment") {
+                    TickerMetadata.fromJson(unknown.metadata).currency shouldBe "BRL"
+                    unknown.domain shouldBe "https://new.example"
+                    unknown.currentUnitValue shouldBe BigDecimal("21.00")
+                    unknown.lastUpdate.isAfter(LocalDateTime.now().minusMinutes(1)) shouldBe true
+                }
+            }
+        }
+
+        Given("a script answer that carries an error and no price") {
+            val unknownCurrency =
+                TickerFactory.create(
+                    id = 1,
+                    symbol = "NOCUR",
+                    currentUnitValue = BigDecimal("30.00"),
+                    lastUpdate = LocalDateTime.now().minusDays(1),
+                )
+            val limited =
+                TickerFactory.create(
+                    id = 2,
+                    symbol = "LIMIT",
+                    currentUnitValue = BigDecimal("40.00"),
+                    lastUpdate = LocalDateTime.now().minusDays(1),
+                )
+            val before = unknownCurrency.lastUpdate
+
+            When("prices are fetched") {
+                every { tickerRepository.save(any<Ticker>()) } answers { firstArg() }
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    JSONObject()
+                        .put(
+                            "NOCUR",
+                            JSONObject()
+                                .put(
+                                    "error",
+                                    "Currency of NOCUR is unknown",
+                                ).put("error_kind", "currency_unknown"),
+                        ).put("LIMIT", JSONObject().put("error", "429").put("error_kind", "rate_limit"))
+                coEvery { APIUtils.fetchStockLogos(any()) } returns JSONObject()
+
+                val failed = service.updateTickersPriceFromApi(listOf(unknownCurrency, limited))
+
+                Then("both are reported as failed and keep their old price, moment and record") {
+                    failed.map { it.symbol } shouldBe listOf("NOCUR", "LIMIT")
+                    unknownCurrency.currentUnitValue shouldBe BigDecimal("30.00")
+                    limited.currentUnitValue shouldBe BigDecimal("40.00")
+                    unknownCurrency.lastUpdate shouldBe before
+                    unknownCurrency.metadata shouldBe null
+                    verify(exactly = 0) { tickerRepository.save(any<Ticker>()) }
                 }
             }
         }

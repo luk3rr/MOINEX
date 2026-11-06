@@ -41,6 +41,7 @@ class TickerPriceHistoryServiceTest :
                 tickerPurchaseRepository,
                 tickerSaleRepository,
                 clockProvider,
+                TickerMarketDataService(tickerRepository),
             )
 
         beforeSpec {

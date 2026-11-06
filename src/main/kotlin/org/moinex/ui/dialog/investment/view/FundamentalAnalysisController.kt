@@ -46,6 +46,7 @@ import org.moinex.service.PreferencesService
 import org.moinex.service.ThemeService
 import org.moinex.service.investment.FundamentalAnalysisService
 import org.moinex.service.investment.FundamentalParser
+import org.moinex.service.investment.FundamentalPriceOverlay
 import org.moinex.service.investment.FundamentalScoringService
 import org.moinex.ui.common.DividendHistoryChart
 import org.moinex.ui.common.FundamentalInsightsView
@@ -559,9 +560,12 @@ class FundamentalAnalysisController(
         }
     }
 
+    private fun effectiveDataJson(analysis: FundamentalAnalysis): String =
+        FundamentalPriceOverlay.apply(analysis.dataJson, ticker.currentUnitValue, ticker.lastUpdate)
+
     private fun buildInsights(analysis: FundamentalAnalysis): AnalysisInsights? =
         runCatching {
-            val snapshot = FundamentalParser.parse(analysis.dataJson)
+            val snapshot = FundamentalParser.parse(effectiveDataJson(analysis))
             AnalysisInsights(
                 snapshot,
                 fundamentalScoringService.valuation(snapshot),
@@ -609,7 +613,7 @@ class FundamentalAnalysisController(
         }
 
         runCatching {
-            val data = JSONObject(currentAnalysis!!.dataJson)
+            val data = JSONObject(effectiveDataJson(currentAnalysis!!))
             showInsights()
             populateMetricsTabs(data)
 

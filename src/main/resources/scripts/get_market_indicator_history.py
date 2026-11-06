@@ -4,9 +4,9 @@
 # Created on: February 20, 2026
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
+import os
 import sys
 import json
-import time
 import requests
 from datetime import datetime
 
@@ -28,33 +28,16 @@ INDICATOR_MAPPING = {
 
 TIMEOUT_SECONDS = 20
 
-RETRY_MAX_ATTEMPTS = 3
-RETRY_INITIAL_DELAY = 1.0
-RETRY_MULTIPLIER = 1.5
-RETRY_KEYWORDS = ("429", "rate limit", "too many requests", "503", "service unavailable")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import yf_resilience as res
 
 
 def retry_call(fn, label):
-    """
-    Calls fn(), retrying on transient errors with exponential backoff.
-    Writes retry status to stderr. Returns the result or raises on exhaustion.
-    """
-    delay = RETRY_INITIAL_DELAY
-    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
-        try:
-            return fn()
-        except Exception as e:
-            error_str = str(e).lower()
-            is_transient = any(k in error_str for k in RETRY_KEYWORDS)
-            if not is_transient or attempt == RETRY_MAX_ATTEMPTS:
-                raise
-            print(
-                f"[RETRY] {label} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
-                f"after {delay:.0f}s delay: {e}",
-                file=sys.stderr,
-            )
-            time.sleep(delay)
-            delay *= RETRY_MULTIPLIER
+    """Retries transient BACEN errors (429, 503) with the shared backoff."""
+    return res.retry_call(
+        fn, label, max_attempts=3, initial_delay=1.0, multiplier=1.5, keywords=res.TRANSIENT_KEYWORDS
+    )
 
 
 def download_data(url: str) -> list:

@@ -1,0 +1,1 @@
+ALTER TABLE ticker ADD COLUMN metadata TEXT;

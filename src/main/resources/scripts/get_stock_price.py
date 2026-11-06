@@ -4,54 +4,33 @@
 # Created on: January 12, 2025
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
-import sys
+"""
+Usage: get_stock_price.py SYMBOL[:CURRENCY] ...
+
+Prints one JSON object keyed by symbol. A symbol that worked is {"price": <in BRL>, "currency": <of the
+quote>, "website": <only when it had to be looked up>}. A symbol that failed is {"error": ..., "error_kind": ...}.
+
+When the currency is given (SYMBOL:USD) the script never calls yfinance info for that symbol: the app stores
+the currency once and passes it on the next runs. Without a currency the script reads it, and the website,
+from info. If that fails the symbol gets an error and no price: a currency is never assumed and a
+conversion rate is never guessed, since either would store a wrong price.
+"""
+
 import json
-import yfinance as yf
-import requests
+import os
+import sys
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from urllib.parse import urlparse
+from concurrent.futures import ThreadPoolExecutor
 
-WINDOWS_DNS_SERVERS = "1.1.1.1,8.8.8.8"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import yfinance as yf
 
-def use_explicit_dns_on_windows():
-    """
-    On Windows the resolver bundled with curl_cffi (c-ares) can take ~20s per
-    lookup while the system resolver answers in milliseconds. Giving libcurl
-    explicit DNS servers avoids the stall. No-op on other platforms.
-    """
-    if sys.platform != "win32":
-        return
-    try:
-        from curl_cffi import CurlOpt
-        from curl_cffi.requests import Session
-    except ImportError:
-        return
+import yf_resilience as res
 
-    original_init = Session.__init__
+res.use_explicit_dns_on_windows()
 
-    def init_with_dns(self, *args, **kwargs):
-        options = dict(kwargs.get("curl_options") or {})
-        options.setdefault(CurlOpt.DNS_SERVERS, WINDOWS_DNS_SERVERS)
-        kwargs["curl_options"] = options
-        original_init(self, *args, **kwargs)
-
-    Session.__init__ = init_with_dns
-
-
-use_explicit_dns_on_windows()
-
-DEFAULT_CURRENCY = "BRL"
-
-EXCHANGE_API_URL_BASE = "https://api.exchangerate-api.com/v4/latest"
-
-TIMEOUT_SECONDS = 20
-
-RETRY_MAX_ATTEMPTS = 3
-RETRY_INITIAL_DELAY = 1.0
-RETRY_MULTIPLIER = 1.5
-RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
+DEFAULT_CURRENCY = res.DEFAULT_CURRENCY
 
 IS_WINDOWS = sys.platform == "win32"
 MAX_INFO_WORKERS = 1 if IS_WINDOWS else 5
@@ -59,187 +38,161 @@ BATCH_SIZE = 8
 INTER_BATCH_DELAY = 2.0
 
 
-def retry_call(fn, symbol):
+def parse_arguments(arguments):
     """
-    Calls fn(), retrying on rate-limit errors with exponential backoff.
-    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    Splits SYMBOL[:CURRENCY] arguments into the ordered list of symbols and a {symbol: currency} map.
     """
-    delay = RETRY_INITIAL_DELAY
-    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
-        try:
-            return fn()
-        except Exception as e:
-            # Check both exception type and message for rate limiting
-            error_str = str(e).lower()
-            error_type = type(e).__name__
-            is_rate_limit = (
-                any(k in error_str for k in RETRY_KEYWORDS)
-                or "ratelimit" in error_type.lower()
-            )
-            if not is_rate_limit or attempt == RETRY_MAX_ATTEMPTS:
-                raise
-            print(
-                f"[RETRY] {symbol} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
-                f"after {delay:.0f}s delay: {e}",
-                file=sys.stderr,
-            )
-            time.sleep(delay)
-            delay *= RETRY_MULTIPLIER
+    symbols = []
+    currencies = {}
+    for argument in arguments:
+        symbol, _, currency = argument.partition(":")
+        if symbol and symbol not in symbols:
+            symbols.append(symbol)
+        if symbol and currency:
+            currencies[symbol] = currency.upper()
+    return symbols, currencies
 
 
-def get_conversion_rate(
-    from_currency: str, to_currency: str = DEFAULT_CURRENCY
-) -> float:
+def close_series(data, symbol):
+    """The closing prices of a symbol from a yf.download result, whatever shape the columns have."""
+    if data is None or data.empty or "Close" not in data.columns:
+        return None
+    close = data["Close"]
+    if hasattr(close, "columns"):
+        if symbol in close.columns:
+            return close[symbol].dropna()
+        if len(close.columns) == 1:
+            return close.iloc[:, 0].dropna()
+        return None
+    return close.dropna()
+
+
+def download_chunk(chunk):
     """
-    Convert the amount from one currency to another using the exchange rate API
-
-    @param from_currency: The currency to convert from
-    @param to_currency: The currency to convert to
-    @return: The conversion rate from the source currency to the target currency
+    Downloads the last days of a chunk of symbols and returns (data, error messages yfinance logged).
+    yf.download() does not raise on a failure, so the logged messages are checked: a rate limit among
+    them raises, for the caller to retry. An empty answer without a rate limit is not an error: those
+    symbols just have no data.
     """
-    # Case the source or target currency is 'USX', convert to dollar (USD) first
-    # USX is a virtual currency that represents cents of dollar
-    if from_currency == "USX":
-        base_rate = get_conversion_rate("USD", to_currency)
-        return base_rate / 100
-    elif to_currency == "USX":
-        base_rate = get_conversion_rate(from_currency, "USD")
-        return base_rate * 100
+    with res.capture_yfinance_errors() as messages:
+        data = yf.download(chunk, period="5d", progress=False, auto_adjust=True, threads=not IS_WINDOWS)
 
-    # Get the exchange rates from the API
-    url = f"{EXCHANGE_API_URL_BASE}/{from_currency}"
-    response = requests.get(url, timeout=TIMEOUT_SECONDS)
-
-    if response.status_code == 200:
-        data = response.json()
-
-        if to_currency in data["rates"]:
-            return data["rates"][to_currency]
-        else:
-            raise ValueError(
-                f"Currency {to_currency} or {from_currency} not found in the response"
-            )
-    else:
-        raise Exception("Failed to get the conversion rate")
+    for message in messages:
+        if res.is_rate_limit(message):
+            raise Exception(f"rate limit: {message}")
+    return data, list(messages)
 
 
 def fetch_prices_batch(symbols):
     """
-    Fetch close prices using chunked yf.download() calls to avoid rate limiting.
-    Splits symbols into chunks of BATCH_SIZE with INTER_BATCH_DELAY between each chunk.
-    Each chunk is retried with exponential backoff on rate limit errors.
+    Fetches the last close of each symbol with chunked yf.download() calls, INTER_BATCH_DELAY apart. After a
+    rate limit no further chunk is requested, so a blocked run costs a handful of requests instead of dozens.
 
-    @param symbols: List of stock symbols
-    @return: Dict of {symbol: price}
+    @return: ({symbol: price in the quote currency}, {symbol: error payload})
     """
-    if not symbols:
-        return {}
-
     prices = {}
+    errors = {}
     chunks = [symbols[i:i + BATCH_SIZE] for i in range(0, len(symbols), BATCH_SIZE)]
+    rate_limited = None
 
-    for idx, chunk in enumerate(chunks):
-        if idx > 0:
-            time.sleep(INTER_BATCH_DELAY)
-
-        def _download_chunk():
-            data = yf.download(chunk, period="5d", progress=False, auto_adjust=True, threads=not IS_WINDOWS)
-            # yf.download doesn't raise on rate limit, just returns empty DataFrame
-            # We need to raise manually to trigger retry
-            if data.empty:
-                raise Exception("rate limit... yfinance returned empty DataFrame")
-            return data
-
-        try:
-            data = retry_call(_download_chunk, f"chunk {idx + 1}/{len(chunks)}")
-        except Exception as e:
-            print(
-                f"[WARN] Chunk {idx + 1}/{len(chunks)} download failed after retries: {e}",
-                file=sys.stderr,
-            )
+    for index, chunk in enumerate(chunks):
+        if rate_limited is not None:
+            for symbol in chunk:
+                errors[symbol] = res.error_payload(rate_limited, kind=res.KIND_RATE_LIMIT)
             continue
 
-        if len(chunk) == 1:
-            symbol = chunk[0]
-            if "Close" in data.columns:
-                series = data["Close"].dropna()
-                if not series.empty:
-                    prices[symbol] = float(series.iloc[-1])
-        else:
-            if "Close" in data.columns:
-                close = data["Close"]
-                for symbol in chunk:
-                    try:
-                        series = close[symbol].dropna()
-                        if not series.empty:
-                            prices[symbol] = float(series.iloc[-1])
-                    except (KeyError, IndexError):
-                        pass
+        if index > 0:
+            time.sleep(INTER_BATCH_DELAY)
 
-    return prices
+        try:
+            data, messages = res.retry_call(lambda: download_chunk(chunk), f"chunk {index + 1}/{len(chunks)}")
+        except Exception as e:
+            print(f"[WARN] Chunk {index + 1}/{len(chunks)} download failed: {e}", file=sys.stderr)
+            if res.is_rate_limit(e):
+                rate_limited = e
+            for symbol in chunk:
+                errors[symbol] = res.error_payload(e)
+            continue
+
+        for symbol in chunk:
+            series = close_series(data, symbol)
+            if series is not None and not series.empty:
+                prices[symbol] = float(series.iloc[-1])
+            elif res.messages_about(symbol, messages):
+                errors[symbol] = res.error_payload("; ".join(res.messages_about(symbol, messages)))
+            else:
+                errors[symbol] = res.error_payload(
+                    f"No price data available for {symbol}", kind=res.KIND_INVALID_SYMBOL
+                )
+
+    return prices, errors
 
 
-def fetch_symbol_info(symbol):
+def lookup_symbol(symbol):
     """
-    Fetch currency and website for a single symbol.
-    Returns safe defaults on any failure — info is optional.
-
-    @param symbol: Stock symbol
-    @return: Tuple of (currency, website)
+    Reads currency and website of a symbol with a single info call (also retried on a rate limit).
+    Returns (symbol, (currency, website)) or (symbol, error payload).
     """
     try:
-        ticker = yf.Ticker(symbol)
-        info = ticker.info
-        return info.get("currency", "USD"), info.get("website")
-    except Exception:
-        return "USD", None
+        return symbol, res.retry_call(lambda: res.lookup_currency_and_website(symbol, yf), symbol)
+    except Exception as e:
+        kind = res.KIND_RATE_LIMIT if res.is_rate_limit(e) else res.KIND_CURRENCY_UNKNOWN
+        return symbol, res.error_payload(e, kind=kind)
+
+
+def build_result(symbols, prices, errors, currencies, lookups):
+    """
+    Turns the prices into the output. Only a symbol with a price, a known currency and a conversion
+    rate gets a price; every other symbol gets its error.
+    """
+    result = {}
+    for symbol in symbols:
+        if symbol in errors:
+            result[symbol] = errors[symbol]
+            continue
+
+        currency = currencies.get(symbol)
+        website = None
+        if currency is None:
+            looked_up = lookups.get(symbol)
+            if isinstance(looked_up, dict):
+                result[symbol] = looked_up
+                continue
+            currency, website = looked_up
+
+        try:
+            rate = res.get_conversion_rate(currency)
+        except Exception as e:
+            result[symbol] = res.error_payload(f"Conversion rate from {currency} unavailable: {e}")
+            continue
+
+        result[symbol] = {"price": prices[symbol] * rate, "currency": currency}
+        if website:
+            result[symbol]["website"] = website
+
+    return result
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python get_price.py <symbol1> <symbol2> ... <symbolN>")
+        print("Usage: python get_stock_price.py <symbol[:currency]> ... <symbol[:currency]>")
         sys.exit(1)
 
-    symbols = sys.argv[1:]
-    conversion_rates = {DEFAULT_CURRENCY: 1.0}
-    result = {}
+    symbols, currencies = parse_arguments(sys.argv[1:])
 
-    # Fetch prices using chunked batch downloads
     try:
-        prices = fetch_prices_batch(symbols)
+        prices, errors = fetch_prices_batch(symbols)
     except Exception as e:
         print(f"[WARN] Price fetch failed: {e}", file=sys.stderr)
-        prices = {}
+        prices, errors = {}, {symbol: res.error_payload(e) for symbol in symbols}
 
-    # Fetch info (currency + website) only for symbols that have prices
-    symbols_with_prices = [s for s in symbols if s in prices]
-    infos = {}
-    if symbols_with_prices:
+    needs_lookup = [s for s in symbols if s in prices and s not in currencies]
+    lookups = {}
+    if needs_lookup:
         with ThreadPoolExecutor(max_workers=MAX_INFO_WORKERS) as executor:
-            info_futures = {executor.submit(fetch_symbol_info, s): s for s in symbols_with_prices}
-            infos = {info_futures[f]: f.result() for f in as_completed(info_futures)}
+            lookups = dict(executor.map(lookup_symbol, needs_lookup))
 
-    # Build result
-    for symbol in symbols:
-        price = prices.get(symbol)
-        if price is None:
-            result[symbol] = {"error": f"No price data available for {symbol}"}
-            continue
-
-        currency, website = infos.get(symbol, ("USD", None))
-
-        if currency != DEFAULT_CURRENCY and currency not in conversion_rates:
-            try:
-                conversion_rates[currency] = get_conversion_rate(currency)
-            except Exception:
-                conversion_rates[currency] = 1.0
-
-        result[symbol] = {"price": price * conversion_rates.get(currency, 1.0)}
-
-        if website:
-            result[symbol]["website"] = website
-
-    print(json.dumps(result))
+    print(json.dumps(build_result(symbols, prices, errors, currencies, lookups)))
 
 
 if __name__ == "__main__":

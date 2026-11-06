@@ -74,13 +74,16 @@ Every app source file (`.kt` in `src/main`, `.py` scripts) starts with the heade
 
 ## Python Script Integration
 
-Six Python scripts in `src/main/resources/scripts/` fetch external financial data (yfinance, HTTP). They are executed by `APIUtils` as subprocesses:
+Six Python scripts in `src/main/resources/scripts/` fetch external financial data (yfinance, HTTP), plus `yf_resilience.py`, the module they share. `APIUtils` copies the script and `yf_resilience.py` into a private temporary directory and runs it as a subprocess from there; each script puts its own directory on `sys.path` before `import yf_resilience`.
 
 - **stdout** — final JSON result (always a single JSON line)
 - **stderr** — retry/debug logs, always captured and logged by Kotlin at DEBUG level
 - **Timeout** — 300s default (`DEFAULT_SCRIPT_TIMEOUT_SECONDS`)
+- **Failures** — a failed symbol is `{"error", "error_kind"}` with `error_kind` one of `rate_limit`, `invalid_symbol`, `currency_unknown`, `error`. Scripts never assume a currency or a conversion rate: they return an error and no price.
 
-Scripts own their own retry logic (`retry_call()` with exponential backoff: 3 attempts, 2s initial delay, 2× multiplier). Retryable conditions: HTTP 429, "rate limit", "too many requests".
+`yf_resilience.py` owns the retry (`retry_call()`: 2 attempts, 2s initial delay, 2× multiplier, jitter, only on a rate limit: HTTP 429, "rate limit", "too many requests", `YFRateLimitError`), the error classification and the currency conversion. `yf.download()` does not raise on failure in yfinance 1.7.0, it only logs on the `yfinance` logger, so the scripts read those messages with `capture_yfinance_errors()` to tell a rate limit from a symbol without data.
+
+All calls to Yahoo go through `YahooGateway` (`common/util`): at most 2 at a time, and after a `rate_limit` result no call is made until a cooldown ends (5 min, doubling to 60 min, reset by the first call that ends without a rate limit). A refused call throws `MoinexException.YahooCooldownException`.
 
 Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On Linux, `Constants.PYTHON_INTERPRETER` hardcodes `/usr/bin/python3` (not whatever `python3` resolves to on PATH), so dependencies must be installed for that interpreter specifically — e.g. `python3 -m pip install --user --break-system-packages -r requirements.txt` on distros where the system Python is externally-managed (PEP 668).
 
@@ -89,7 +92,7 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On 
 ## Database
 
 - **Location:** `~/.moinex/data/moinex.db`
-- **Migrations:** Flyway, `src/main/resources/db/migration/` (36 migrations, prefix `V0xx__`; `V035` adds `benchmark_price_history`, the Ibovespa series; `V036` adds `notification.action_url`)
+- **Migrations:** Flyway, `src/main/resources/db/migration/` (37 migrations, prefix `V0xx__`; `V035` adds `benchmark_price_history`, the Ibovespa series; `V036` adds `notification.action_url`; `V037` adds `ticker.metadata`, a JSON column for what has no column of its own (currency, history sync moment, anything new); the price, its moment and the site stay in `current_unit_value`, `last_update` and `domain`, and all of it is written only by `TickerMarketDataService`)
 - **Hibernate:** `ddl-auto: validate` — schema must exist before startup; never let Hibernate manage schema
 - **Startup order:** `FlywayConfig` is a manual bean that migrates and then runs `data.sql`, and the `entityManagerFactory` bean definition is made to depend on `flyway` so Hibernate validates an existing schema. `spring.sql.init.mode` is `never` on purpose; do not turn it back on, since Spring would run `data.sql` before the tables exist.
 - **Connection pool:** HikariCP, max 1 connection (SQLite constraint)

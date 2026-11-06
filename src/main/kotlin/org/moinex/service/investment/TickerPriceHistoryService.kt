@@ -11,12 +11,14 @@ package org.moinex.service.investment
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.ClockProvider
 import org.moinex.common.extension.throwIfError
 import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.common.util.APIUtils
 import org.moinex.model.dto.DailyPricePointDTO
+import org.moinex.model.dto.StockHistoryRequest
 import org.moinex.model.dto.TickerPriceInitializationStatsDTO
 import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPriceHistory
@@ -39,6 +41,7 @@ class TickerPriceHistoryService(
     private val tickerPurchaseRepository: TickerPurchaseRepository,
     private val tickerSaleRepository: TickerSaleRepository,
     private val clockProvider: ClockProvider,
+    private val tickerMarketDataService: TickerMarketDataService,
 ) {
     companion object {
         const val DAILY_WINDOW_MONTHS = 12
@@ -84,14 +87,69 @@ class TickerPriceHistoryService(
 
     /**
      * Keeps one closing price per trading day for the last [DAILY_WINDOW_MONTHS] months, for every active ticker (or
-     * just [tickers]). A failure on one ticker is logged and never removes data already stored.
+     * just [tickers]), with a single script run for all of them. Unless [force] is set, tickers synced less than
+     * [MarketDataFreshness.TTL] ago are left alone. A failure on one ticker is logged and never removes data already
+     * stored; when Yahoo is cooling down after a rate limit nothing is requested.
      */
-    suspend fun syncDailyPriceHistory(tickers: List<Ticker>? = null) {
-        val targets = tickers ?: tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
+    suspend fun syncDailyPriceHistory(
+        tickers: List<Ticker>? = null,
+        force: Boolean = false,
+    ) {
+        val candidates = tickers ?: tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
+        val now = clockProvider.now()
+        val targets =
+            if (force) {
+                candidates
+            } else {
+                candidates.filterNot {
+                    MarketDataFreshness.isFresh(tickerMarketDataService.read(it).historyUpdatedAt, now)
+                }
+            }
 
-        targets.forEach { ticker ->
-            runCatching { syncDaily(ticker) }
-                .onFailure { logger.error("Failed to sync the daily price history of {}: {}", ticker, it.message) }
+        if (targets.isEmpty()) {
+            logger.info("Daily price history is fresh for all {} tickers, nothing to sync", candidates.size)
+            return
+        }
+
+        val today = clockProvider.today()
+        val windowStart = today.minusMonths(DAILY_WINDOW_MONTHS.toLong())
+
+        val requests =
+            targets.map { ticker ->
+                StockHistoryRequest(
+                    symbol = ticker.symbol,
+                    start = dailyFetchStart(ticker.id!!, windowStart),
+                    end = today.plusDays(1),
+                    currency = tickerMarketDataService.read(ticker).currency,
+                )
+            }
+
+        val results =
+            runCatching { APIUtils.fetchStockPriceHistoryBatch(requests) }
+                .getOrElse {
+                    logger.error("Failed to sync the daily price history of {} tickers: {}", targets.size, it.message)
+                    return
+                }
+
+        targets.zip(requests).forEach { (ticker, request) ->
+            runCatching {
+                val result =
+                    results.optJSONObject(ticker.symbol)
+                        ?: error("API response does not contain data for ${ticker.symbol}")
+
+                check(!result.has("error")) { "${result.getString("error")} [${result.optString("error_kind")}]" }
+
+                val written = storeDailyPrices(ticker, request.start, result.getJSONArray("prices"))
+                tickerMarketDataService.recordHistorySync(
+                    ticker,
+                    clockProvider.now(),
+                    result.optString("currency").takeIf { it.isNotBlank() },
+                )
+
+                logger.info("Synced {} daily prices for {} starting {}", written, ticker, request.start)
+            }.onFailure {
+                logger.error("Failed to sync the daily price history of {}: {}", ticker, it.message)
+            }
         }
     }
 
@@ -146,9 +204,30 @@ class TickerPriceHistoryService(
                 .fetchStockPriceHistory(ticker.symbol, fetchStart.toNoTimeFormat(), today.plusDays(1).toNoTimeFormat())
                 .throwIfError("Fetch daily price history for $ticker")
 
-        val prices = jsonObject.getJSONArray("prices")
+        val written = storeDailyPrices(ticker, fetchStart, jsonObject.getJSONArray("prices"))
+        tickerMarketDataService.recordHistorySync(
+            ticker,
+            clockProvider.now(),
+            jsonObject.optString("currency").takeIf { it.isNotBlank() },
+        )
+
+        logger.info("Synced {} daily prices for {} starting {}", written, ticker, fetchStart)
+
+        return written
+    }
+
+    /**
+     * Upserts the [prices] the script returned for [ticker], read from [fetchStart] on.
+     * @return how many rows were written
+     */
+    private fun storeDailyPrices(
+        ticker: Ticker,
+        fetchStart: LocalDate,
+        prices: JSONArray,
+    ): Int {
         if (prices.length() == 0) return 0
 
+        val today = clockProvider.today()
         val existingByDate =
             priceHistoryRepository
                 .findByTickerIdAndDateRange(ticker.id!!, fetchStart, today.plusDays(1))
@@ -163,7 +242,6 @@ class TickerPriceHistoryService(
                 .toList()
 
         priceHistoryRepository.saveAll(rows)
-        logger.info("Synced {} daily prices for {} starting {}", rows.size, ticker, fetchStart)
 
         return rows.size
     }

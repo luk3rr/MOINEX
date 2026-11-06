@@ -44,6 +44,11 @@
                   <SegmentedControl fx:id="periodSegment" styleClass="filter-segment" />
                </children>
             </HBox>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <TitledValue fx:id="lastUpdateLabel" />
+               </children>
+            </HBox>
             <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="12.0" />

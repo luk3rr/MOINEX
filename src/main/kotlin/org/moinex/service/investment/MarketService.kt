@@ -39,19 +39,25 @@ class MarketService(
     private val marketQuotesAndCommoditiesMutex = Mutex()
 
     companion object {
-        private val MARKET_SYMBOLS =
-            listOf(
-                Constants.IBOVESPA_TICKER,
-                Constants.DOLLAR_TICKER,
-                Constants.EURO_TICKER,
-                Constants.GOLD_TICKER,
-                Constants.SOYBEAN_TICKER,
-                Constants.COFFEE_ARABICA_TICKER,
-                Constants.WHEAT_TICKER,
-                Constants.OIL_BRENT_TICKER,
-                Constants.BITCOIN_TICKER,
-                Constants.ETHEREUM_TICKER,
+        /**
+         * The quote currency of each market symbol, as Yahoo reports it. Passing it to the script saves one `info`
+         * call per symbol on every refresh. Soybean, coffee and wheat are quoted in cents of dollar (USX).
+         */
+        private val MARKET_SYMBOL_CURRENCIES =
+            linkedMapOf(
+                Constants.IBOVESPA_TICKER to "BRL",
+                Constants.DOLLAR_TICKER to "BRL",
+                Constants.EURO_TICKER to "BRL",
+                Constants.GOLD_TICKER to "USD",
+                Constants.SOYBEAN_TICKER to "USX",
+                Constants.COFFEE_ARABICA_TICKER to "USX",
+                Constants.WHEAT_TICKER to "USX",
+                Constants.OIL_BRENT_TICKER to "USD",
+                Constants.BITCOIN_TICKER to "USD",
+                Constants.ETHEREUM_TICKER to "USD",
             )
+
+        private val MARKET_SYMBOLS = MARKET_SYMBOL_CURRENCIES.map { (symbol, currency) -> "$symbol:$currency" }
 
         private const val VALUE_FIELD = "valor"
         private const val PRICE_FIELD = "price"
@@ -71,6 +77,40 @@ class MarketService(
     suspend fun updateMarketQuotesAndCommoditiesFromApi(): MarketQuotesAndCommodities =
         marketQuotesAndCommoditiesMutex.withLock {
             updateMarketQuotesAndCommodities()
+        }
+
+    /**
+     * Like [updateBrazilianMarketIndicatorsFromApi], but leaves the stored indicators alone when they were updated
+     * less than [MarketDataFreshness.TTL] ago.
+     */
+    @Transactional
+    suspend fun updateBrazilianMarketIndicatorsIfStale(): BrazilianMarketIndicators? =
+        brazilianMarketIndicatorsMutex.withLock {
+            val stored = runCatching { getBrazilianMarketIndicatorsAndCleanup() }.getOrNull()
+
+            if (stored != null && MarketDataFreshness.isFresh(stored.lastUpdate, clockProvider.now())) {
+                logger.info("Brazilian market indicators are fresh, skipping the update")
+                null
+            } else {
+                updateBrazilianMarketIndicators()
+            }
+        }
+
+    /**
+     * Like [updateMarketQuotesAndCommoditiesFromApi], but leaves the stored quotes alone when they were updated less
+     * than [MarketDataFreshness.TTL] ago.
+     */
+    @Transactional
+    suspend fun updateMarketQuotesAndCommoditiesIfStale(): MarketQuotesAndCommodities? =
+        marketQuotesAndCommoditiesMutex.withLock {
+            val stored = runCatching { getMarketQuotesAndCommoditiesAndCleanup() }.getOrNull()
+
+            if (stored != null && MarketDataFreshness.isFresh(stored.lastUpdate, clockProvider.now())) {
+                logger.info("Market quotes and commodities are fresh, skipping the update")
+                null
+            } else {
+                updateMarketQuotesAndCommodities()
+            }
         }
 
     @Transactional

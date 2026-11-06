@@ -4,275 +4,279 @@
 # Created on: February 17, 2026
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
-import sys
+"""
+Usage:
+  get_stock_price_history.py <symbol> <start_date> [end_date] [specific_dates_json]
+  get_stock_price_history.py --batch <json>
+
+The single form prints {"symbol", "currency", "conversion_rate", "prices": [...]} for one symbol and, on a
+failure, {"error", "error_kind"} with exit code 1.
+
+The batch form reads a JSON array of {"symbol", "start", "end", "currency"?, "dates"?} and prints
+{"results": {symbol: <the object above> | {"error", "error_kind"}}}. One download serves the whole chunk, so
+30 tickers cost a handful of requests instead of 30 processes. A symbol that failed does not hide the others.
+
+A symbol whose currency is not given has it read from yfinance info; if that fails the symbol gets an error:
+a currency is never assumed and a conversion rate is never guessed, since either would store wrong prices.
+Dates are YYYY-MM-DD; the end date is inclusive. The range asked for is the only range requested, with one
+extra 15 day request when it ends within 5 days of today and came back empty (long weekends and holidays).
+"""
+
 import json
-import yfinance as yf
-import requests
+import os
+import sys
 import time
-from datetime import datetime, timedelta
-from urllib.parse import urlparse
+from datetime import datetime
 
-WINDOWS_DNS_SERVERS = "1.1.1.1,8.8.8.8"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import yfinance as yf
+
+import yf_resilience as res
+
+res.use_explicit_dns_on_windows()
+
+DEFAULT_CURRENCY = res.DEFAULT_CURRENCY
+
+IS_WINDOWS = sys.platform == "win32"
+BATCH_SIZE = 8
+INTER_BATCH_DELAY = 2.0
+RECENT_END_DAYS = 5
+FALLBACK_PERIOD = "15d"
 
 
-def use_explicit_dns_on_windows():
+def parse_date(text):
+    return datetime.strptime(text, "%Y-%m-%d").date()
+
+
+def download_history(symbols, **kwargs):
     """
-    On Windows the resolver bundled with curl_cffi (c-ares) can take ~20s per
-    lookup while the system resolver answers in milliseconds. Giving libcurl
-    explicit DNS servers avoids the stall. No-op on other platforms.
+    One yf.download() call for the symbols, retried on a rate limit. yf.download() does not raise when a
+    symbol fails, so the messages it logs are checked: a rate limit among them raises.
+    Returns (data, messages).
     """
-    if sys.platform != "win32":
-        return
-    try:
-        from curl_cffi import CurlOpt
-        from curl_cffi.requests import Session
-    except ImportError:
-        return
+    def attempt():
+        with res.capture_yfinance_errors() as messages:
+            data = yf.download(symbols, progress=False, auto_adjust=True, threads=not IS_WINDOWS, **kwargs)
+        for message in messages:
+            if res.is_rate_limit(message):
+                raise Exception(f"rate limit: {message}")
+        return data, list(messages)
 
-    original_init = Session.__init__
-
-    def init_with_dns(self, *args, **kwargs):
-        options = dict(kwargs.get("curl_options") or {})
-        options.setdefault(CurlOpt.DNS_SERVERS, WINDOWS_DNS_SERVERS)
-        kwargs["curl_options"] = options
-        original_init(self, *args, **kwargs)
-
-    Session.__init__ = init_with_dns
+    return res.retry_call(attempt, ",".join(symbols))
 
 
-use_explicit_dns_on_windows()
+def close_series(data, symbol):
+    """The closing prices of a symbol from a yf.download result, whatever shape the columns have."""
+    if data is None or data.empty or "Close" not in data.columns:
+        return None
+    close = data["Close"]
+    if hasattr(close, "columns"):
+        if symbol in close.columns:
+            return close[symbol].dropna()
+        if len(close.columns) == 1:
+            return close.iloc[:, 0].dropna()
+        return None
+    return close.dropna()
 
-DEFAULT_CURRENCY = "BRL"
-EXCHANGE_API_URL_BASE = "https://api.exchangerate-api.com/v4/latest"
-TIMEOUT_SECONDS = 20
 
-RETRY_MAX_ATTEMPTS = 3
-RETRY_INITIAL_DELAY = 1.0
-RETRY_MULTIPLIER = 1.5
-RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
+def slice_range(series, start, end):
+    """The closes between start and end (both inclusive); None when nothing is left."""
+    if series is None or series.empty:
+        return None
+    kept = series[(series.index.date >= start) & (series.index.date <= end)]
+    return kept if not kept.empty else None
 
 
-def retry_call(fn, symbol):
+def fetch_closes(items):
     """
-    Calls fn(), retrying on rate-limit errors with exponential backoff.
-    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    Downloads the closes of every item with one request per chunk of BATCH_SIZE symbols. After a rate limit no
+    further chunk is requested.
+
+    @return: ({symbol: closes within its own range}, {symbol: error payload})
     """
-    delay = RETRY_INITIAL_DELAY
-    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+    closes = {}
+    errors = {}
+    chunks = [items[i:i + BATCH_SIZE] for i in range(0, len(items), BATCH_SIZE)]
+    rate_limited = None
+
+    for index, chunk in enumerate(chunks):
+        symbols = [item["symbol"] for item in chunk]
+
+        if rate_limited is not None:
+            for symbol in symbols:
+                errors[symbol] = res.error_payload(rate_limited, kind=res.KIND_RATE_LIMIT)
+            continue
+
+        if index > 0:
+            time.sleep(INTER_BATCH_DELAY)
+
+        start = min(item["start"] for item in chunk)
+        end = max(item["end"] for item in chunk)
+
         try:
-            return fn()
+            data, messages = download_history(symbols, start=start.isoformat(), end=end.isoformat())
         except Exception as e:
-            error_str = str(e).lower()
-            is_rate_limit = any(k in error_str for k in RETRY_KEYWORDS)
-            if not is_rate_limit or attempt == RETRY_MAX_ATTEMPTS:
-                raise
-            print(
-                f"[RETRY] {symbol} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
-                f"after {delay:.0f}s delay: {e}",
-                file=sys.stderr,
+            print(f"[WARN] Chunk {index + 1}/{len(chunks)} download failed: {e}", file=sys.stderr)
+            if res.is_rate_limit(e):
+                rate_limited = e
+            for symbol in symbols:
+                errors[symbol] = res.error_payload(e)
+            continue
+
+        for item in chunk:
+            symbol = item["symbol"]
+            series = slice_range(close_series(data, symbol), item["start"], item["end"])
+            if series is not None:
+                closes[symbol] = series
+            else:
+                about = res.messages_about(symbol, messages)
+                if about:
+                    errors[symbol] = res.error_payload("; ".join(about))
+
+    missing = [item for item in items if item["symbol"] not in closes and item["symbol"] not in errors]
+    recent = [item for item in missing if 0 <= (datetime.now().date() - item["end"]).days <= RECENT_END_DAYS]
+
+    if recent and rate_limited is None:
+        symbols = [item["symbol"] for item in recent]
+        try:
+            data, _ = download_history(symbols, period=FALLBACK_PERIOD)
+            for item in recent:
+                series = slice_range(close_series(data, item["symbol"]), item["start"], item["end"])
+                if series is not None:
+                    closes[item["symbol"]] = series
+        except Exception as e:
+            print(f"[WARN] Fallback download failed: {e}", file=sys.stderr)
+            for item in recent:
+                errors[item["symbol"]] = res.error_payload(e)
+
+    for item in items:
+        symbol = item["symbol"]
+        if symbol not in closes and symbol not in errors:
+            errors[symbol] = res.error_payload(
+                f"No data found for {symbol} in the date range {item['start']} to {item['end']}",
+                kind=res.KIND_INVALID_SYMBOL,
             )
-            time.sleep(delay)
-            delay *= RETRY_MULTIPLIER
+
+    return closes, errors
 
 
-def history_with_retry(ticker, symbol, **kwargs):
-    """Call ticker.history() with retry on rate limiting."""
-    return retry_call(lambda: ticker.history(**kwargs), symbol)
+def resolve_currency(item):
+    """The currency the app passed, or the one read from yfinance info (an error payload when unknown)."""
+    if item.get("currency"):
+        return item["currency"].upper(), None
+    try:
+        currency, _ = res.retry_call(lambda: res.lookup_currency_and_website(item["symbol"], yf), item["symbol"])
+        return currency, None
+    except Exception as e:
+        kind = res.KIND_RATE_LIMIT if res.is_rate_limit(e) else res.KIND_CURRENCY_UNKNOWN
+        return None, res.error_payload(e, kind=kind)
 
 
-def get_conversion_rate(from_currency: str, to_currency: str = DEFAULT_CURRENCY) -> float:
-    """
-    Convert the amount from one currency to another using the exchange rate API
+def build_prices(closes, specific_dates, rate):
+    """Month-end closes plus the specific dates asked for (all of them when none were asked), converted."""
+    month_ends = set()
+    for _, group in closes.groupby(closes.index.to_period("M")):
+        month_ends.add(group.index[-1].date())
 
-    @param from_currency: The currency to convert from
-    @param to_currency: The currency to convert to
-    @return: The conversion rate from the source currency to the target currency
-    """
-    if from_currency == "USX":
-        base_rate = get_conversion_rate("USD", to_currency)
-        return base_rate / 100
-    elif to_currency == "USX":
-        base_rate = get_conversion_rate(from_currency, "USD")
-        return base_rate * 100
+    wanted = set()
+    for text in specific_dates or []:
+        try:
+            wanted.add(parse_date(text))
+        except (TypeError, ValueError):
+            pass
 
-    url = f"{EXCHANGE_API_URL_BASE}/{from_currency}"
-    response = requests.get(url, timeout=TIMEOUT_SECONDS)
-
-    if response.status_code == 200:
-        data = response.json()
-        if to_currency in data["rates"]:
-            return data["rates"][to_currency]
-        else:
-            raise ValueError(
-                f"Currency {to_currency} or {from_currency} not found in the response"
-            )
-    else:
-        raise Exception("Failed to get the conversion rate")
+    prices = []
+    for index, close in closes.items():
+        day = index.date()
+        is_month_end = day in month_ends
+        if is_month_end or day in wanted or not specific_dates:
+            prices.append({"date": day.strftime("%Y-%m-%d"), "price": float(close) * rate, "is_month_end": is_month_end})
+    return prices
 
 
-def get_month_end_date(year: int, month: int) -> datetime:
-    """
-    Get the last day of a given month
+def build_results(items):
+    """The result object of every item, keyed by symbol."""
+    closes, errors = fetch_closes(items)
+    results = {}
 
-    @param year: Year
-    @param month: Month (1-12)
-    @return: Last day of the month
-    """
-    if month == 12:
-        return datetime(year, month, 31)
-    else:
-        next_month = datetime(year, month + 1, 1)
-        return next_month - timedelta(days=1)
+    for item in items:
+        symbol = item["symbol"]
+        if symbol in errors:
+            results[symbol] = errors[symbol]
+            continue
+
+        currency, failure = resolve_currency(item)
+        if failure is not None:
+            results[symbol] = failure
+            continue
+
+        try:
+            rate = res.get_conversion_rate(currency)
+        except Exception as e:
+            results[symbol] = res.error_payload(f"Conversion rate from {currency} unavailable: {e}")
+            continue
+
+        results[symbol] = {
+            "symbol": symbol,
+            "currency": currency,
+            "conversion_rate": rate,
+            "prices": build_prices(closes[symbol], item.get("dates"), rate),
+        }
+
+    return results
+
+
+def parse_batch(text):
+    items = []
+    for raw in json.loads(text):
+        items.append({
+            "symbol": raw["symbol"],
+            "start": parse_date(raw["start"]),
+            "end": parse_date(raw["end"]) if raw.get("end") else datetime.now().date(),
+            "currency": raw.get("currency"),
+            "dates": raw.get("dates"),
+        })
+    return items
 
 
 def main():
     if len(sys.argv) < 3:
         print("Usage: python get_stock_price_history.py <symbol> <start_date> [end_date] [specific_dates_json]")
-        print("Dates format: YYYY-MM-DD")
-        print("specific_dates_json: Optional JSON array of specific dates to fetch")
+        print("       python get_stock_price_history.py --batch <json>")
         sys.exit(1)
 
-    symbol = sys.argv[1]
-    start_date = sys.argv[2]
-    end_date = sys.argv[3] if len(sys.argv) > 3 else datetime.now().strftime("%Y-%m-%d")
+    if sys.argv[1] == "--batch":
+        try:
+            items = parse_batch(sys.argv[2])
+        except Exception as e:
+            print(json.dumps(res.error_payload(f"Invalid batch: {e}", kind=res.KIND_ERROR)))
+            sys.exit(1)
+        print(json.dumps({"results": build_results(items)}))
+        return
 
-    # Parse specific dates if provided
     specific_dates = []
     if len(sys.argv) > 4:
         try:
             specific_dates = json.loads(sys.argv[4])
-        except:
+        except Exception:
             specific_dates = []
 
     try:
-        # Create ticker
-        ticker = yf.Ticker(symbol)
-
-        # Parse end_date to check if it's today or recent
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-        today = datetime.now()
-        days_diff = (today.date() - end_date_obj.date()).days
-
-        # Get historical data with fallback strategy
-        hist = None
-
-        # First try: exact dates
-        try:
-            hist = history_with_retry(ticker, symbol, start=start_date, end=end_date)
-            if hist is None or hist.empty:
-                hist = None
-        except Exception as e:
-            hist = None
-
-        # Fallback: if end_date is today or up to 5 days in the past, fetch last 15 days
-        if hist is None or hist.empty:
-            if days_diff >= 0 and days_diff <= 5:
-                try:
-                    hist = history_with_retry(ticker, symbol, period="15d")
-                    if hist is not None and not hist.empty:
-                        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-                        hist = hist[hist.index.date >= start_date_obj.date()]
-                        if hist is None or hist.empty:
-                            hist = None
-                    else:
-                        hist = None
-                except Exception as e:
-                    hist = None
-
-        # Second fallback: try with 365 days
-        if hist is None or hist.empty:
-            try:
-                hist = history_with_retry(ticker, symbol, period="365d")
-                if hist is None or hist.empty:
-                    hist = None
-            except Exception as e:
-                hist = None
-
-        # Third fallback: try with max period
-        if hist is None or hist.empty:
-            try:
-                hist = history_with_retry(ticker, symbol, period="max")
-                if hist is None or hist.empty:
-                    hist = None
-            except Exception as e:
-                hist = None
-
-        # If still no data, return error
-        if hist is None or hist.empty:
-            error_msg = f"No data found for {symbol} in the date range {start_date} to {end_date}"
-            print(json.dumps({"error": error_msg}))
-            sys.exit(1)
-
-        # Get currency with error handling
-        try:
-            currency = retry_call(lambda: ticker.info.get("currency", DEFAULT_CURRENCY), symbol)
-        except:
-            currency = DEFAULT_CURRENCY
-
-        # Get conversion rate if needed
-        conversion_rate = 1.0
-        if currency != DEFAULT_CURRENCY:
-            conversion_rate = get_conversion_rate(currency)
-
-        # Parse start and end dates
-        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-
-        # Filter history to requested date range
-        hist = hist[(hist.index.date >= start_date_obj.date()) & (hist.index.date <= end_date_obj.date())]
-
-        if hist.empty:
-            error_msg = f"No data found for {symbol} in the date range {start_date} to {end_date}"
-            print(json.dumps({"error": error_msg}))
-            sys.exit(1)
-
-        result = {
-            "symbol": symbol,
-            "currency": currency,
-            "conversion_rate": conversion_rate,
-            "prices": []
+        item = {
+            "symbol": sys.argv[1],
+            "start": parse_date(sys.argv[2]),
+            "end": parse_date(sys.argv[3]) if len(sys.argv) > 3 else datetime.now().date(),
+            "currency": None,
+            "dates": specific_dates,
         }
-
-        # Group by month to identify month-end dates
-        hist['YearMonth'] = hist.index.to_period('M')
-        month_end_dates = set()
-
-        for period, group in hist.groupby('YearMonth'):
-            last_date = group.iloc[-1].name.date()
-            month_end_dates.add(last_date)
-
-        # Convert specific dates to date objects
-        specific_dates_set = set()
-        for date_str in specific_dates:
-            try:
-                specific_dates_set.add(datetime.strptime(date_str, "%Y-%m-%d").date())
-            except:
-                pass
-
-        # Store only specific dates + month-end dates
-        for index, row in hist.iterrows():
-            actual_date = index.date()
-            is_month_end = actual_date in month_end_dates
-            is_specific_date = actual_date in specific_dates_set
-
-            # Only store if it's a month-end OR a specific requested date
-            if is_month_end or is_specific_date or not specific_dates:
-                price_date = actual_date.strftime("%Y-%m-%d")
-                closing_price = float(row['Close']) * conversion_rate
-
-                result["prices"].append({
-                    "date": price_date,
-                    "price": closing_price,
-                    "is_month_end": is_month_end
-                })
-
-        print(json.dumps(result))
-
+        result = build_results([item])[item["symbol"]]
     except Exception as e:
-        import traceback
-        error_msg = str(e)
-        tb_str = traceback.format_exc()
-        print(json.dumps({"error": error_msg, "traceback": tb_str}))
+        result = res.error_payload(e)
+
+    print(json.dumps(result))
+    if "error" in result:
+        print(f"[ERROR] error_kind={result['error_kind']}: {result['error']}", file=sys.stderr)
         sys.exit(1)
 
 

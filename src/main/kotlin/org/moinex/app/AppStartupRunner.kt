@@ -87,14 +87,14 @@ class AppStartupRunner(
             val brazilianMarketIndicatorsStep =
                 async {
                     runStep("Updating Brazilian market indicators") {
-                        marketService.updateBrazilianMarketIndicatorsFromApi()
+                        marketService.updateBrazilianMarketIndicatorsIfStale()
                     }
                 }
 
             val quotesAndCommoditiesStep =
                 async {
                     runStep("Updating market quotes and commodities") {
-                        marketService.updateMarketQuotesAndCommoditiesFromApi()
+                        marketService.updateMarketQuotesAndCommoditiesIfStale()
                     }
                 }
 
@@ -109,6 +109,15 @@ class AppStartupRunner(
                     }
                 }
 
+            val nonArchivedTickerPricesStep =
+                async {
+                    runStep("Updating ticker prices") {
+                        tickerService.updateAllNonArchivedTickersPrices()
+                    }
+                }
+
+            nonArchivedTickerPricesStep.await()
+
             val tickerPriceHistoryStep =
                 async {
                     runStep("Initializing price history") {
@@ -118,16 +127,8 @@ class AppStartupRunner(
                     }
                 }
 
-            val nonArchivedTickerPricesStep =
-                async {
-                    runStep("Updating ticker prices") {
-                        tickerService.updateAllNonArchivedTickersPrices()
-                    }
-                }
-
             bondInterestCalculationStep.await()
             tickerPriceHistoryStep.await()
-            nonArchivedTickerPricesStep.await()
 
             runStep("Recalculating investment performance snapshots") {
                 investmentPerformanceService.recalculateAllSnapshots()

@@ -51,6 +51,7 @@ class TickerServiceCRUDTickerPurchaseTest :
                 notificationService,
                 preferencesService,
                 clockProvider,
+                TickerMarketDataService(tickerRepository),
             )
 
         afterContainer { clearAllMocks(answers = true) }

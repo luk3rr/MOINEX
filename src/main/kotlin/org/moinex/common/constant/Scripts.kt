@@ -18,4 +18,6 @@ object Scripts {
     const val GET_MARKET_INDICATOR_HISTORY_SCRIPT: String = "get_market_indicator_history.py"
 
     const val GET_STOCK_PRICE_HISTORY_SCRIPT: String = "get_stock_price_history.py"
+
+    const val RESILIENCE_MODULE: String = "yf_resilience.py"
 }

@@ -8,11 +8,19 @@
 
 package org.moinex.exception
 
+import java.time.LocalDateTime
+
 sealed class MoinexException(
     message: String,
 ) : RuntimeException(message) {
     /** Exception thrown when there is an exception fetching data from an API */
     class APIFetchException(
+        message: String,
+    ) : MoinexException(message)
+
+    /** Exception thrown when a Yahoo call is refused because a rate limit opened a cooldown that has not ended */
+    class YahooCooldownException(
+        val until: LocalDateTime,
         message: String,
     ) : MoinexException(message)
 

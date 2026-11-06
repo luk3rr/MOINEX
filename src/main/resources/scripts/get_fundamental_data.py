@@ -4,6 +4,7 @@
 # Created on: January 08, 2026
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
+import os
 import sys
 import json
 import argparse
@@ -14,42 +15,13 @@ import yfinance as yf
 from datetime import datetime
 from pathlib import Path
 
-WINDOWS_DNS_SERVERS = "1.1.1.1,8.8.8.8"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import yf_resilience as res
 
-def use_explicit_dns_on_windows():
-    """
-    On Windows the resolver bundled with curl_cffi (c-ares) can take ~20s per
-    lookup while the system resolver answers in milliseconds. Giving libcurl
-    explicit DNS servers avoids the stall. No-op on other platforms.
-    """
-    if sys.platform != "win32":
-        return
-    try:
-        from curl_cffi import CurlOpt
-        from curl_cffi.requests import Session
-    except ImportError:
-        return
-
-    original_init = Session.__init__
-
-    def init_with_dns(self, *args, **kwargs):
-        options = dict(kwargs.get("curl_options") or {})
-        options.setdefault(CurlOpt.DNS_SERVERS, WINDOWS_DNS_SERVERS)
-        kwargs["curl_options"] = options
-        original_init(self, *args, **kwargs)
-
-    Session.__init__ = init_with_dns
-
-
-use_explicit_dns_on_windows()
+res.use_explicit_dns_on_windows()
 
 DEFAULT_CURRENCY = "BRL"
-
-RETRY_MAX_ATTEMPTS = 5
-RETRY_INITIAL_DELAY = 1.0
-RETRY_MULTIPLIER = 1.5
-RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
 
 EPS_DIVERGENCE_THRESHOLD = 0.25
 NON_MONETARY_ROW_MARKERS = ("shares", "rate", "ratio", "percent")
@@ -109,27 +81,7 @@ FUND_METRIC_SPECS = {
 }
 
 
-def retry_call(fn, symbol):
-    """
-    Calls fn(), retrying on rate-limit errors with exponential backoff.
-    Writes retry status to stderr. Returns the result or raises on exhaustion.
-    """
-    delay = RETRY_INITIAL_DELAY
-    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
-        try:
-            return fn()
-        except Exception as e:
-            error_str = str(e).lower()
-            is_rate_limit = any(k in error_str for k in RETRY_KEYWORDS)
-            if not is_rate_limit or attempt == RETRY_MAX_ATTEMPTS:
-                raise
-            print(
-                f"[RETRY] {symbol} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
-                f"after {delay:.0f}s delay: {e}",
-                file=sys.stderr,
-            )
-            time.sleep(delay)
-            delay *= RETRY_MULTIPLIER
+retry_call = res.retry_call
 
 
 def create_percent_object(value, data_temporality="calculated", reference_date=None):
@@ -1296,12 +1248,11 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
         return result
 
     except Exception as e:
-        error_str = str(e).lower()
-        if any(k in error_str for k in RETRY_KEYWORDS):
+        if res.is_rate_limit(e):
             raise
         return {
             "symbol": symbol,
-            "error": str(e)
+            **res.error_payload(e)
         }
 
 
@@ -1507,7 +1458,7 @@ Examples:
             try:
                 results[symbol] = retry_call(lambda: get_fundamental_data(symbol, args.period), symbol)
             except Exception as e:
-                results[symbol] = {"symbol": symbol, "error": str(e)}
+                results[symbol] = {"symbol": symbol, **res.error_payload(e)}
         print(json.dumps(results, indent=2, ensure_ascii=False))
 
     elif args.format == "csv":
@@ -1518,7 +1469,7 @@ Examples:
             try:
                 data = retry_call(lambda: get_fundamental_data(symbol, args.period), symbol)
             except Exception as e:
-                data = {"symbol": symbol, "error": str(e)}
+                data = {"symbol": symbol, **res.error_payload(e)}
             export_to_csv(symbol, data, args.output, args.period)
 
         print(f"\n{'='*60}")

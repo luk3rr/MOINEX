@@ -43,6 +43,7 @@ import org.moinex.common.ui.SparklineGeometry
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.exception.MoinexException
 import org.moinex.model.dto.PortfolioSnapshotDTO
 import org.moinex.model.dto.TickerRowDTO
 import org.moinex.model.dto.TickerSort
@@ -70,6 +71,7 @@ import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.MessageFormat
+import java.time.format.DateTimeFormatter
 
 @Controller
 class SavingsStocksFundsController(
@@ -346,7 +348,7 @@ class SavingsStocksFundsController(
                 runCatching {
                     val tickers = stocksFundsTabTickerTable.items.toList()
                     tickerService.updateTickersPriceFromApi(tickers).also {
-                        tickerPriceHistoryService.syncDailyPriceHistory(tickers)
+                        tickerPriceHistoryService.syncDailyPriceHistory(tickers, force = true)
                     }
                 }
             },
@@ -399,7 +401,7 @@ class SavingsStocksFundsController(
                         notificationService.send(
                             type = NotificationType.ERROR,
                             title = preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
-                            message = e.message ?: "",
+                            message = failureMessage(e),
                         )
                     }
 
@@ -408,6 +410,15 @@ class SavingsStocksFundsController(
             },
         )
     }
+
+    private fun failureMessage(error: Throwable): String =
+        if (error is MoinexException.YahooCooldownException) {
+            preferencesService
+                .translate(TranslationKeys.YAHOO_COOLDOWN_MESSAGE)
+                .format(error.until.format(DateTimeFormatter.ofPattern("HH:mm")))
+        } else {
+            error.message ?: ""
+        }
 
     fun handleRefreshTickerData() {
         val selectedTicker = stocksFundsTabTickerTable.selectionModel.selectedItem ?: return
@@ -781,6 +792,12 @@ class SavingsStocksFundsController(
             createPercentColumn(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_DY_ON_COST, signed = false) {
                 it.dyOnCostPct
             },
+            createStringColumn(
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_LAST_UPDATE,
+            ) { UIUtils.formatDateTimeForDisplay(it.lastUpdate) }.apply {
+                minWidth = LAST_UPDATE_COLUMN_WIDTH
+                prefWidth = LAST_UPDATE_COLUMN_WIDTH
+            },
         )
 
         stocksFundsTabTickerTable.style = "${stocksFundsTabTickerTable.style}-fx-fixed-cell-size: 45px;"
@@ -926,6 +943,7 @@ class SavingsStocksFundsController(
     companion object {
         private val logger = LoggerFactory.getLogger(SavingsStocksFundsController::class.java)
         private const val SPARKLINE_COLUMN_WIDTH = 100.0
+        private const val LAST_UPDATE_COLUMN_WIDTH = 150.0
         private const val SPARKLINE_SORT_SCALE = 6
     }
 }

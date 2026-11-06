@@ -54,3 +54,9 @@ Dados financeiros pessoais, locais. Credenciais de IA ficam em `AiCredentialStor
 - `TickerPriceHistory` agora também guarda série diária de 12 meses (`TickerPriceHistoryService.syncDaily`), além do fim de mês. [src: service/investment/TickerPriceHistoryService.kt]
 - `FundamentalAnalysis.data_json` passa ao schema v2 com `reason` por métrica (por que é N/A); lido por `FundamentalParser` em `FundamentalSnapshot`. [src: service/investment/FundamentalParser.kt] [src: model/dto/FundamentalSnapshot.kt]
 - DTOs novos: `BenchmarkSeriesDTO`/`DividendPanelDTO`/`ContributionDTO`, `TickerRowDTO`/`TickerDetailDTO` (com `TickerPositionDTO` e `TickerIncomeDTO`), `RebalanceDTO`, `FundamentalScoring` (veredito e nota de qualidade). [src: model/dto/]
+
+## Atualização 2026-11-06 (intent yfinance-resilience, UNIT-3)
+- (SUBSTITUÍDO pela atualização seguinte: a coluna é `ticker.metadata` e não repete preço, site nem data) `ticker.market_data` (TEXT, JSON, V037): registro agregado de dados de mercado do ticker (`schema_version`, `price`, `currency`, `website`, `updated_at`; chaves desconhecidas são preservadas). `current_unit_value`, `last_update` e `domain` continuam como colunas espelhadas; o único escritor é `TickerMarketDataService.record`. [src: V037__add_ticker_market_data.sql] [src: TickerMarketDataService.kt]
+
+## Atualização 2026-11-06 (revisão do `ticker.metadata`)
+- A V037 cria `ticker.metadata` (JSON, nulo até o primeiro uso) e guarda só o que não tem coluna: `schema_version`, `currency`, `history_updated_at` e chaves futuras (preservadas em `TickerMetadata.other`). Preço, momento e site seguem em `current_unit_value`, `last_update` e `domain`; o JSON não repete esses dados. [src: V037__add_ticker_metadata.sql] [src: TickerMetadata.kt]

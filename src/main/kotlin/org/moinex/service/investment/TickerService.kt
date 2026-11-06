@@ -53,10 +53,13 @@ class TickerService(
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
     private val clockProvider: ClockProvider,
+    private val tickerMarketDataService: TickerMarketDataService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {
+        private const val API_RESPONSE_CURRENCY_FIELD = "currency"
+        private const val API_RESPONSE_ERROR_KIND_FIELD = "error_kind"
         private const val API_RESPONSE_LOGO_PATH_FIELD = "logo_path"
         private const val API_RESPONSE_ERROR_FIELD = "error"
         private const val API_RESPONSE_PRICE_FIELD = "price"
@@ -501,18 +504,38 @@ class TickerService(
         )
     }
 
+    /**
+     * Updates the price of every active ticker. Unless [force] is set, tickers updated less than
+     * [MarketDataFreshness.TTL] ago are left alone, so opening the app again soon does not ask Yahoo for the same
+     * prices.
+     */
     @Transactional
-    suspend fun updateAllNonArchivedTickersPrices() {
+    suspend fun updateAllNonArchivedTickersPrices(force: Boolean = false) {
         logger.info("Starting update of all non-archived ticker prices")
 
-        val activeTickers = tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
+        val allActiveTickers = tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
 
-        if (activeTickers.isEmpty()) {
+        if (allActiveTickers.isEmpty()) {
             logger.info("No active tickers found, skipping price update")
             return
         }
 
-        logger.info("Updating prices for {} active tickers", activeTickers.size)
+        val now = clockProvider.now()
+        val activeTickers =
+            if (force) {
+                allActiveTickers
+            } else {
+                allActiveTickers.filterNot {
+                    MarketDataFreshness.isFresh(it.lastUpdate, now)
+                }
+            }
+
+        if (activeTickers.isEmpty()) {
+            logger.info("All {} active tickers are fresh, skipping price update", allActiveTickers.size)
+            return
+        }
+
+        logger.info("Updating prices for {} of {} active tickers", activeTickers.size, allActiveTickers.size)
 
         val failed =
             try {
@@ -538,11 +561,14 @@ class TickerService(
     suspend fun updateTickersPriceFromApi(tickers: List<Ticker>): List<Ticker> {
         if (tickers.isEmpty()) return emptyList()
 
-        val symbols = tickers.map { it.symbol }
+        val arguments =
+            tickers.map { ticker ->
+                tickerMarketDataService.read(ticker).currency?.let { "${ticker.symbol}:$it" } ?: ticker.symbol
+            }
 
-        logger.info("Fetching prices for {} tickers", symbols.size)
+        logger.info("Fetching prices for {} tickers", arguments.size)
 
-        val jsonObject = APIUtils.fetchStockPrices(symbols)
+        val jsonObject = APIUtils.fetchStockPrices(arguments)
 
         val updatedTickers = mutableListOf<Ticker>()
         val failedTickers = mutableListOf<Ticker>()
@@ -554,17 +580,19 @@ class TickerService(
                         ?: error("API response does not contain data for ${ticker.symbol}")
 
                 if (tickerData.has(API_RESPONSE_ERROR_FIELD)) {
-                    error(tickerData.getString(API_RESPONSE_ERROR_FIELD))
+                    error(
+                        "${tickerData.getString(API_RESPONSE_ERROR_FIELD)} " +
+                            "[${tickerData.optString(API_RESPONSE_ERROR_KIND_FIELD)}]",
+                    )
                 }
 
-                ticker.currentUnitValue =
-                    tickerData.getBigDecimal(API_RESPONSE_PRICE_FIELD)
-
-                ticker.lastUpdate = clockProvider.now()
-
-                if (tickerData.has(API_RESPONSE_WEBSITE_FIELD)) {
-                    ticker.domain = tickerData.getString(API_RESPONSE_WEBSITE_FIELD)
-                }
+                tickerMarketDataService.record(
+                    ticker = ticker,
+                    price = tickerData.getBigDecimal(API_RESPONSE_PRICE_FIELD),
+                    at = clockProvider.now(),
+                    currency = tickerData.optString(API_RESPONSE_CURRENCY_FIELD).takeIf { it.isNotBlank() },
+                    website = tickerData.optString(API_RESPONSE_WEBSITE_FIELD).takeIf { it.isNotBlank() },
+                )
 
                 updatedTickers.add(ticker)
             }.onFailure { e ->
@@ -575,10 +603,6 @@ class TickerService(
                 )
                 failedTickers.add(ticker)
             }
-        }
-
-        if (updatedTickers.isNotEmpty()) {
-            tickerRepository.saveAll(updatedTickers)
         }
 
         downloadMissingLogosFromApi(updatedTickers)

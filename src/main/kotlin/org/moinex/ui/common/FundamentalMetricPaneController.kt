@@ -28,6 +28,7 @@ import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.text.MessageFormat
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Controller
 @Scope("prototype")
@@ -209,7 +210,11 @@ class FundamentalMetricPaneController(
     private fun formatDate(dateStr: String): String =
         runCatching {
             val date = LocalDateTime.parse(dateStr)
-            UIUtils.formatDateForDisplay(date)
+            if (date.toLocalTime() == LocalTime.MIDNIGHT) {
+                UIUtils.formatDateForDisplay(date)
+            } else {
+                UIUtils.formatDateTimeForDisplay(date)
+            }
         }.getOrDefault(dateStr)
 
     private fun updateFontSize(value: BigDecimal) {

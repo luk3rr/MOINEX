@@ -16,4 +16,5 @@
 | conventions.md | human-reviewed (2026-11-01) | medium-high | |
 | operations.md | human-reviewed (2026-11-02) | high | |
 | quality-and-risks.md | human-reviewed (2026-11-02) | medium-high | baseline: 1553 testes, 0 falhas (2026-11-01) |
+| areas/market-data.md | human-reviewed (2026-11-06) | alta no código, média nas estimativas | adicionado no intent 261106-yfinance-resilience; commit cb27418a |
 | areas/ai-agent.md | human-reviewed (2026-11-04) | alta no código, média no comportamento do LLM | adicionado no intent 261104-ai-agent-evolution; commit edee9038 |

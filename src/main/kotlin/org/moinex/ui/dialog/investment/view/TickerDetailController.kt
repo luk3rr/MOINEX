@@ -67,6 +67,9 @@ class TickerDetailController(
     private lateinit var returnLabel: TitledValue
 
     @FXML
+    private lateinit var lastUpdateLabel: TitledValue
+
+    @FXML
     private lateinit var periodSegment: SegmentedControl
 
     @FXML
@@ -173,6 +176,8 @@ class TickerDetailController(
             suffix = " (${UIUtils.formatCurrency(detail.profitLoss)})",
         )
         returnLabel.title = preferencesService.translate(TranslationKeys.TICKER_DETAIL_RETURN)
+        lastUpdateLabel.title = preferencesService.translate(TranslationKeys.TICKER_DETAIL_LAST_UPDATE)
+        lastUpdateLabel.value = UIUtils.formatDateTimeForDisplay(detail.ticker.lastUpdate)
 
         chartHolder.children.clear()
         if (detail.prices.size < 2) {

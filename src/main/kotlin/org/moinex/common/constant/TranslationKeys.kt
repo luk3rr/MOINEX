@@ -2375,4 +2375,8 @@ object TranslationKeys {
     const val AIOPERATION_APPLY_TO_BOND: String = "aioperation.apply_to_bond"
     const val AIOPERATION_REDEEM_BOND: String = "aioperation.redeem_bond"
     const val AIPANEL_DRAFT_BANNER_TITLE: String = "aipanel.draft.bannerTitle"
+    const val SAVINGS_STOCKS_FUNDS_TABLE_HEADER_LAST_UPDATE: String = "savings.stocksFunds.table.header.lastUpdate"
+    const val TICKER_DETAIL_LAST_UPDATE: String = "tickerDetail.lastUpdate"
+    const val YAHOO_COOLDOWN_TITLE: String = "yahoo.cooldown.title"
+    const val YAHOO_COOLDOWN_MESSAGE: String = "yahoo.cooldown.message"
 }

@@ -477,4 +477,95 @@ class MarketServiceTest :
                 }
             }
         }
+
+        Given("market quotes updated ten minutes ago") {
+            When("the startup update runs") {
+                every { marketQuotesAndCommoditiesRepository.findAll() } returns
+                    listOf(
+                        MarketQuotesAndCommoditiesFactory.create(
+                            id = 1,
+                            lastUpdate = LocalDateTime.now().minusMinutes(10),
+                        ),
+                    )
+
+                val result = service.updateMarketQuotesAndCommoditiesIfStale()
+
+                Then("nothing is fetched and nothing is saved") {
+                    result shouldBe null
+                    coVerify(exactly = 0) { APIUtils.fetchStockPrices(any()) }
+                    verify(exactly = 0) { marketQuotesAndCommoditiesRepository.save(any()) }
+                }
+            }
+        }
+
+        Given("market quotes updated two hours ago") {
+            When("the startup update runs") {
+                every { marketQuotesAndCommoditiesRepository.findAll() } returns
+                    listOf(
+                        MarketQuotesAndCommoditiesFactory.create(
+                            id = 1,
+                            lastUpdate = LocalDateTime.now().minusHours(2),
+                        ),
+                    )
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    JSONObject(mapOf("USDBRL=X" to mapOf("price" to "5.50")))
+                every { marketQuotesAndCommoditiesRepository.save(any()) } answers { firstArg() }
+
+                val result = service.updateMarketQuotesAndCommoditiesIfStale()
+
+                Then("they are fetched with the quote currency of every symbol, so no info lookup is needed") {
+                    result shouldNotBe null
+                    coVerify {
+                        APIUtils.fetchStockPrices(
+                            match { symbols ->
+                                symbols.size == 10 &&
+                                    symbols.all { ":" in it } &&
+                                    "ZS=F:USX" in symbols &&
+                                    "USDBRL=X:BRL" in symbols &&
+                                    "BTC-USD:USD" in symbols
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+        Given("Brazilian indicators updated ten minutes ago") {
+            When("the startup update runs") {
+                every { brazilianMarketIndicatorsRepository.findAll() } returns
+                    listOf(
+                        BrazilianMarketIndicatorsFactory.create(
+                            id = 1,
+                            lastUpdate = LocalDateTime.now().minusMinutes(10),
+                        ),
+                    )
+
+                val result = service.updateBrazilianMarketIndicatorsIfStale()
+
+                Then("nothing is fetched") {
+                    result shouldBe null
+                    coVerify(exactly = 0) { APIUtils.fetchBrazilianMarketIndicators() }
+                }
+            }
+        }
+
+        Given("no Brazilian indicators stored yet") {
+            When("the startup update runs") {
+                every { brazilianMarketIndicatorsRepository.findAll() } returns emptyList()
+                coEvery { APIUtils.fetchBrazilianMarketIndicators() } returns
+                    JSONObject(
+                        mapOf(
+                            "selic_target" to mapOf("valor" to "10.5"),
+                            "ipca_12_months" to mapOf("valor" to "4.2"),
+                            "ipca_last_month" to mapOf("valor" to "0.3", "data" to "01/10/2026"),
+                        ),
+                    )
+                every { brazilianMarketIndicatorsRepository.save(any()) } answers { firstArg() }
+
+                Then("they are fetched") {
+                    runCatching { service.updateBrazilianMarketIndicatorsIfStale() }
+                    coVerify(exactly = 1) { APIUtils.fetchBrazilianMarketIndicators() }
+                }
+            }
+        }
     })

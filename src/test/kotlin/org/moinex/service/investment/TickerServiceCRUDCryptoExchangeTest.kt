@@ -46,6 +46,7 @@ class TickerServiceCRUDCryptoExchangeTest :
                 notificationService,
                 preferencesService,
                 clockProvider,
+                TickerMarketDataService(tickerRepository),
             )
 
         afterContainer { clearAllMocks(answers = true) }

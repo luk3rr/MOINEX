@@ -18,6 +18,7 @@ import org.moinex.common.ClockProvider
 import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.factory.investment.TickerPriceHistoryFactory
+import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPriceHistory
 import org.moinex.repository.investment.TickerPriceHistoryRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
@@ -38,6 +39,11 @@ class TickerPriceHistoryServiceRebuildTest :
                 purchaseRepository,
                 saleRepository,
                 clockProvider,
+                TickerMarketDataService(
+                    mockk<TickerRepository> {
+                        every { save(any<Ticker>()) } answers { firstArg() }
+                    },
+                ),
             )
 
         val today = clockProvider.today()

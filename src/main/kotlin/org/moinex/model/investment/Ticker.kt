@@ -37,6 +37,8 @@ class Ticker(
     var isArchived: Boolean = false,
     @Column(name = "domain")
     var domain: String? = null,
+    @Column(name = "metadata")
+    var metadata: String? = null,
     name: String,
     symbol: String,
     type: AssetType,

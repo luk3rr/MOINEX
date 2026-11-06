@@ -15,12 +15,14 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.json.JSONArray
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Scripts
 import org.moinex.common.extension.toBACENFormat
 import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.config.AppDispatchers
 import org.moinex.exception.MoinexException
+import org.moinex.model.dto.StockHistoryRequest
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.PeriodType
 import org.slf4j.LoggerFactory
@@ -33,7 +35,7 @@ import java.time.LocalDate
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
-import kotlin.io.path.createTempFile
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 import org.moinex.common.constant.Files as FilesConstants
 
@@ -41,6 +43,9 @@ object APIUtils {
     private val scope = CoroutineScope(SupervisorJob() + AppDispatchers.IO)
     private val runningProcesses = mutableListOf<Process>()
     private val processMutex = Mutex()
+
+    @Volatile
+    internal var yahooGateway = YahooGateway(ClockProvider())
     private val logger = LoggerFactory.getLogger(APIUtils::class.java)
 
     @Volatile
@@ -105,7 +110,9 @@ object APIUtils {
         }
 
     suspend fun fetchStockPrices(symbols: List<String>): JSONObject =
-        runPythonScript(Scripts.GET_STOCK_PRICE_SCRIPT, symbols)
+        yahooGateway.call(Scripts.GET_STOCK_PRICE_SCRIPT, symbols.size) {
+            runPythonScript(Scripts.GET_STOCK_PRICE_SCRIPT, symbols)
+        }
 
     suspend fun fetchBrazilianMarketIndicators(): JSONObject =
         runPythonScript(Scripts.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT)
@@ -114,10 +121,12 @@ object APIUtils {
         symbol: String,
         period: PeriodType,
     ): JSONObject =
-        runPythonScript(
-            Scripts.GET_FUNDAMENTAL_DATA_SCRIPT,
-            listOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
-        )
+        yahooGateway.call(Scripts.GET_FUNDAMENTAL_DATA_SCRIPT, 1) {
+            runPythonScript(
+                Scripts.GET_FUNDAMENTAL_DATA_SCRIPT,
+                listOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
+            )
+        }
 
     suspend fun fetchMarketIndicatorHistory(
         indicatorType: InterestIndex,
@@ -148,7 +157,36 @@ object APIUtils {
             } else {
                 listOf(symbol, startDate, endDate, JSONArray(specificDates.map { it.toNoTimeFormat() }).toString())
             }
-        return runPythonScript(Scripts.GET_STOCK_PRICE_HISTORY_SCRIPT, args)
+        return yahooGateway.call(Scripts.GET_STOCK_PRICE_HISTORY_SCRIPT, 1) {
+            runPythonScript(Scripts.GET_STOCK_PRICE_HISTORY_SCRIPT, args)
+        }
+    }
+
+    /**
+     * Fetches the daily history of several symbols with one script run. The result maps each symbol to its
+     * history, or to an object with `error` and `error_kind` when that symbol failed.
+     */
+    suspend fun fetchStockPriceHistoryBatch(requests: List<StockHistoryRequest>): JSONObject {
+        val payload =
+            JSONArray(
+                requests.map { request ->
+                    JSONObject()
+                        .put("symbol", request.symbol)
+                        .put("start", request.start.toNoTimeFormat())
+                        .put("end", request.end.toNoTimeFormat())
+                        .apply {
+                            request.currency?.let { put("currency", it) }
+                            request.dates?.takeIf { it.isNotEmpty() }?.let { dates ->
+                                put("dates", JSONArray(dates.map { it.toNoTimeFormat() }))
+                            }
+                        }
+                },
+            )
+
+        return yahooGateway
+            .call(Scripts.GET_STOCK_PRICE_HISTORY_SCRIPT, requests.size) {
+                runPythonScript(Scripts.GET_STOCK_PRICE_HISTORY_SCRIPT, listOf("--batch", payload.toString()))
+            }.getJSONObject("results")
     }
 
     suspend fun runPythonScript(
@@ -158,28 +196,46 @@ object APIUtils {
     ): JSONObject {
         check(!shuttingDown) { "Application is shutting down" }
 
-        val scriptInputStream =
-            APIUtils::class.java.getResourceAsStream("${FilesConstants.SCRIPT_PATH}$script")
-                ?: throw MoinexException.ScriptNotFoundException("Python script '$script' not found")
+        val workDir = prepareScriptDirectory(script)
 
-        return scriptInputStream.use { stream ->
-            val tempFile =
-                createTempFile(script.substringBeforeLast('.'), ".py")
-                    .also { setSecurePermissions(it) }
-
-            Files.copy(stream, tempFile, StandardCopyOption.REPLACE_EXISTING)
-
+        return try {
             val command =
                 buildList {
                     add(Constants.PYTHON_INTERPRETER)
-                    add(tempFile.pathString)
+                    add(workDir.resolve(script).pathString)
                     addAll(args)
                 }
 
             logger.debug("Executing: ${command.joinToString(" ")}")
 
             executePythonProcess(script, command, timeoutSeconds)
+        } finally {
+            runCatching { workDir.toFile().deleteRecursively() }
+                .onFailure { logger.warn("Failed to remove {}: {}", workDir, it.message) }
         }
+    }
+
+    /**
+     * Copies [script] and the module the scripts share into a new private temporary directory, which is where the
+     * script runs from: a script finds its shared module next to itself. The caller removes the directory.
+     */
+    internal fun prepareScriptDirectory(script: String): Path {
+        val workDir = createTempDirectory("moinex-script-")
+
+        return runCatching {
+            listOf(script, Scripts.RESILIENCE_MODULE).forEach { name ->
+                val stream =
+                    APIUtils::class.java.getResourceAsStream("${FilesConstants.SCRIPT_PATH}$name")
+                        ?: throw MoinexException.ScriptNotFoundException("Python script '$name' not found")
+
+                val target = workDir.resolve(name)
+                stream.use { Files.copy(it, target, StandardCopyOption.REPLACE_EXISTING) }
+                setSecurePermissions(target)
+            }
+            workDir
+        }.onFailure {
+            runCatching { workDir.toFile().deleteRecursively() }
+        }.getOrThrow()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
