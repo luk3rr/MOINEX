@@ -13,6 +13,13 @@ import io.mockk.mockk
 import org.json.JSONObject
 import org.moinex.ai.chat.ToolLabels
 import org.moinex.factory.CategoryFactory
+import org.moinex.factory.creditcard.CreditCardDebtFactory
+import org.moinex.factory.creditcard.CreditCardFactory
+import org.moinex.factory.creditcard.RecurringCreditCardDebtFactory
+import org.moinex.factory.goal.GoalFactory
+import org.moinex.factory.investment.BondFactory
+import org.moinex.factory.investment.TickerFactory
+import org.moinex.factory.wallet.RecurringTransactionFactory
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.enums.WalletTransactionStatus
@@ -103,6 +110,64 @@ class ReadToolsTest :
             Then("it lists the kind asked and refuses an unknown kind") {
                 JSONObject(list.execute("""{"kind":"wallets"}""")).getInt("total") shouldBe 1
                 runCatching { list.execute("""{"kind":"nope"}""") }.isFailure shouldBe true
+            }
+        }
+
+        Given("every kind of listing") {
+            val card = CreditCardFactory.create(id = 20, name = "Card")
+            every { walletService.getAllWalletsOrderedByName() } returns listOf(bank)
+            every { categoryService.getCategories() } returns
+                listOf(food, CategoryFactory.create(id = 3, name = "Old", isArchived = true))
+            every { creditCardService.getAllNonArchivedCreditCardsOrderedByName() } returns listOf(card)
+            every { creditCardService.getAllArchivedCreditCards() } returns
+                listOf(CreditCardFactory.create(id = 21, name = "Gone", isArchived = true))
+            every { tickerService.getAllNonArchivedTickers() } returns listOf(TickerFactory.create(id = 30))
+            every { recurringService.getAllRecurringTransactions() } returns
+                listOf(RecurringTransactionFactory.create(id = 4, wallet = bank, category = food))
+            every { goalService.getAllGoals() } returns
+                listOf(GoalFactory.create(id = 6), GoalFactory.create(id = 7, name = "Done", isArchived = true))
+            every { bondService.getAllNonArchivedBonds() } returns listOf(BondFactory.create(id = 40))
+            every { recurringCardService.getAllRecurringDebts() } returns
+                listOf(RecurringCreditCardDebtFactory.create(id = 3, creditCard = card, category = food))
+
+            fun total(args: String) = JSONObject(list.execute(args)).getInt("total")
+
+            Then("each kind lists its records and archived ones only when asked") {
+                total("""{"kind":"wallets","includeArchived":true}""") shouldBe 1
+                total("""{"kind":"categories"}""") shouldBe 1
+                total("""{"kind":"categories","includeArchived":true}""") shouldBe 2
+                total("""{"kind":"credit_cards"}""") shouldBe 1
+                total("""{"kind":"credit_cards","includeArchived":true}""") shouldBe 2
+                total("""{"kind":"tickers"}""") shouldBe 1
+                total("""{"kind":"recurring"}""") shouldBe 1
+                total("""{"kind":"goals"}""") shouldBe 1
+                total("""{"kind":"goals","includeArchived":true}""") shouldBe 2
+                total("""{"kind":"bonds"}""") shouldBe 1
+                total("""{"kind":"card_recurring"}""") shouldBe 1
+            }
+        }
+
+        Given("a search over wallet transactions and card purchases") {
+            every { creditCardService.getDebtsBetweenForAnalysis(any(), any()) } returns
+                listOf(
+                    CreditCardDebtFactory.create(
+                        id = 5,
+                        category = food,
+                        creditCard = CreditCardFactory.create(id = 20, name = "Card"),
+                        description = "Shoes",
+                        amount = BigDecimal("300"),
+                        date = LocalDateTime.of(2026, 10, 30, 10, 0),
+                    ),
+                )
+
+            Then("card purchases are found with their kind and the filters narrow them") {
+                val shoes = JSONObject(search.execute("""{"text":"shoes","walletOrCard":"card","category":"food"}"""))
+                shoes.getInt("total") shouldBe 1
+                shoes.getJSONArray("items").getJSONObject(0).getString("kind") shouldBe "credit_card_debt"
+                JSONObject(
+                    search.execute("""{"startDate":"2026-10-01","endDate":"2026-12-31","walletOrCard":"nobody"}"""),
+                ).getInt("total") shouldBe
+                    0
             }
         }
 
