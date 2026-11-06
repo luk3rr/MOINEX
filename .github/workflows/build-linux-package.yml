@@ -71,10 +71,19 @@ jobs:
             installer-output/*.tar.gz
           retention-days: 90
 
+      - name: Add a fixed-name copy of the .deb
+        if: github.event_name == 'release'
+        run: |
+          set -eu
+          set -- installer-output/moinex_*_amd64.deb
+          [ "$#" -eq 1 ] && [ -f "$1" ] || { echo "expected exactly one versioned .deb, found: $*" >&2; exit 1; }
+          cp "$1" installer-output/moinex_amd64.deb
+
       - name: Upload packages to release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            installer-output/*.deb
+            installer-output/moinex_*_amd64.deb
+            installer-output/moinex_amd64.deb
             installer-output/*.tar.gz

@@ -70,14 +70,15 @@ O Moinex está disponível para **Linux** e **Windows**.
 
 Já traz o Java e o Python com as dependências.
 
-1. Baixe `moinex_X.X.X_amd64.deb` na [página de releases](https://github.com/luk3rr/MOINEX/releases/latest)
-2. Instale:
-```bash
-sudo apt install ./moinex_X.X.X_amd64.deb
-```
-3. Abra o **Moinex** pelo menu de aplicativos.
+Instale ou atualize com um comando, direto da última release:
 
-Para atualizar, instale o `.deb` da versão nova do mesmo jeito. Seus dados em `$HOME/.moinex/` não são alterados.
+```bash
+curl -fL -o /tmp/moinex.deb https://github.com/luk3rr/MOINEX/releases/latest/download/moinex_amd64.deb && sudo apt install -y /tmp/moinex.deb
+```
+
+O mesmo comando serve para instalar e para atualizar. Seus dados em `$HOME/.moinex/` não são alterados.
+
+Depois, abra o **Moinex** pelo menu de aplicativos.
 
 #### Pacote `.tar.gz` (qualquer distribuição)
 
