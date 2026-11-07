@@ -43,5 +43,12 @@ O diagrama mostra que o loop de tools fica no serviço, e que a gravação acont
 - Provedor/modelo no dia a dia: **OpenRouter, variando o modelo** [user] → testes e prompts devem ser agnósticos ao modelo; formatos de tool-calling via OpenRouter seguem o estilo OpenAI.
 - Caso de duplicata mais frequente: **extrato vs lançamento manual já confirmado**, só com nome diferente [user] → hoje não coberto pelo casamento (só pendentes).
 
+## Atualização 2026-11-07
+- O histórico agora guarda as mensagens de ferramenta e as propostas (ver `areas/ai-chat-history.md`); `AiChatService.sendMessage` devolve `turnMessages` em `ChatTurnResult.Success`. [src: ai/chat/AiChatService.kt]
+- `propose_changes`: o schema do item é plano (só `operation` obrigatório, sem `anyOf`); cada operação tem um exemplo completo na descrição e o erro de item sem campos devolve o exemplo (`ProposeChangesTool.exampleOf`). [src: ai/tools/ProposeChangesTool.kt]
+- O `core.md` do prompt (pt-br e en) tem uma regra para pedidos de exemplo ou mock: inventar valores plausíveis, preencher todos os campos e marcar a descrição com "(mock)". Sem ela, o `deepseek-v4.1-flash` mandava os itens só com o nome da operação. [src: resources/ai/prompts/*/core.md] [user]
+- Observação de diagnóstico: o mesmo modelo no OpenRouter funcionou ou falhou conforme a hospedagem (DeepInfra e DigitalOcean entregaram propostas completas; Wafer e OpenInference, na maioria, só `operation`). Amostra pequena; ainda hipótese. [inferred] [src: moinex.log]
+- A proposta de despesa e de receita na carteira mostra o tipo no resumo ("Despesa: …", "Receita: …"). [src: ai/operation/transactions/CreateWalletTransactionOperation.kt]
+
 ### Open questions
 - Qual o limite de contexto/modelos usados via OpenRouter? (afeta C5 e o tamanho do catálogo de tools)

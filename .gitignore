@@ -63,3 +63,6 @@ installer-output/
 
 __pycache__/
 *.pyc
+
+# Generated from the migrations by scripts/dev/generate_erd.py (make erd)
+!docs/database-erd.md

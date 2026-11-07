@@ -23,7 +23,7 @@ TESTS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-debug demo jar build test test-python coverage lint format clean pre-commit install-hooks install uninstall log
+.PHONY: help run run-debug demo jar build test test-python erd coverage lint format clean pre-commit install-hooks install uninstall log
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -50,6 +50,9 @@ test: ## Run the Kotlin and the Python tests (use TESTS='--tests "*Foo"' for a K
 
 test-python: ## Run the Python script tests (src/test/python)
 	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest discover -s src/test/python
+
+erd: ## Regenerate docs/database-erd.md (Mermaid ER diagram) from the Flyway migrations
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) scripts/dev/generate_erd.py
 
 coverage: ## Generate the JaCoCo coverage report
 	$(GRADLE) jacocoTestReport $(GRADLE_FLAGS)

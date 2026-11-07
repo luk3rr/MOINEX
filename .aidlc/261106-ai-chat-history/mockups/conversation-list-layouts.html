@@ -1,0 +1,45 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lista de conversas - opções</title>
+<style>
+:root{--bg:#21222C;--card:#282A36;--pane:#383a52;--hover:#44475A;--border:#44475A;--text:#F8F8F2;--muted:#BFBFC3;--accent:#BD93F9;--green:#40A66A;--side:#0a614e}
+*{box-sizing:border-box}body{margin:0;padding:24px 16px;background:#14151b;color:var(--text);font:14px system-ui,sans-serif}
+h1{font-size:20px}h2{font-size:16px;margin:28px 0 4px}p.cap{color:var(--muted);margin:0 0 10px;max-width:70ch}
+.win{display:flex;height:360px;max-width:900px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--card)}
+.list{width:230px;background:var(--bg);border-right:1px solid var(--border);padding:10px;display:flex;flex-direction:column;gap:6px}
+.btn{background:var(--green);color:#1F2328;border-radius:20px;padding:6px 12px;text-align:center;font-weight:600;border:2px solid var(--green)}
+.search{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 12px;color:var(--muted)}
+.item{padding:8px 10px;border-radius:8px}.item small{display:block;color:var(--muted)}.item.sel{background:var(--hover)}
+.chat{flex:1;display:flex;flex-direction:column;padding:12px;gap:8px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.b{max-width:75%;padding:8px 12px;border-radius:12px;background:var(--pane)}.b.u{align-self:flex-end;background:var(--hover)}
+.rev{margin-top:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--bg)}
+.tag{font-size:12px;border-radius:10px;padding:1px 8px;border:1px solid var(--border);margin-left:6px}
+.pend{color:var(--accent)}.ok{color:var(--green)}.rej{color:var(--muted)}
+.pop{position:absolute;margin-top:34px;width:260px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.sel2{border:1px solid var(--border);border-radius:20px;padding:4px 12px;background:var(--card)}
+</style></head><body>
+<h1>Chat com IA: onde mostrar as conversas guardadas</h1>
+<h2>Opção A: coluna lateral fixa (recomendada)</h2>
+<p class="cap">Lista à esquerda do chat, com busca e "Nova conversa". Lote de propostas por resposta no painel de revisão, com estado.</p>
+<div class="win">
+ <div class="list"><div class="btn">+ Nova conversa</div><div class="search">Buscar nas conversas…</div>
+  <div class="item sel">Extrato Nubank outubro<small>hoje 14:02</small></div>
+  <div class="item">Gastos por categoria<small>ontem</small></div>
+  <div class="item">Compra de ações<small>03/11</small></div></div>
+ <div class="chat"><div class="top"><b>Extrato Nubank outubro</b><span class="sel2">Renomear · Apagar</span></div>
+  <div class="b u">Lança esse extrato</div><div class="b">Encontrei 12 lançamentos, 2 já existiam.</div>
+  <div class="rev"><b>Resposta 1</b> <span class="tag pend">3 pendentes</span><span class="tag ok">7 aprovadas</span><span class="tag rej">2 rejeitadas</span>
+  <div style="color:var(--muted);margin-top:4px">Pendentes: aceitar, rejeitar, editar · Aprovadas e rejeitadas: só consulta</div></div></div>
+</div>
+<h2>Opção B: seletor no topo do chat</h2>
+<p class="cap">Mais espaço para o chat; a lista abre num popup ao clicar no título. Busca fica dentro do popup.</p>
+<div class="win"><div class="chat"><div class="top"><span class="sel2">Extrato Nubank outubro ▾</span><span class="btn">+ Nova</span></div>
+ <div class="pop"><div class="search">Buscar…</div><div class="item sel">Extrato Nubank outubro<small>hoje 14:02</small></div><div class="item">Gastos por categoria<small>ontem</small></div><div class="item">Compra de ações<small>03/11</small></div></div>
+ <div class="b u" style="margin-top:150px">Lança esse extrato</div><div class="b">Encontrei 12 lançamentos.</div>
+ <div class="rev"><b>Resposta 1</b> <span class="tag pend">3 pendentes</span><span class="tag ok">7 aprovadas</span></div></div></div>
+<h2>Opção C: tela própria "Histórico"</h2>
+<p class="cap">Tabela de conversas (título, data, nº de mensagens, propostas pendentes) em outra aba; duplo clique abre no chat. Melhor para busca e limpeza em lote, pior para trocar rápido de conversa.</p>
+<div class="win"><div class="chat"><div class="top"><b>Histórico de conversas</b><span class="search" style="width:240px">Buscar…</span></div>
+<div class="item sel">Extrato Nubank outubro<small>14 msgs · 3 propostas pendentes · hoje 14:02</small></div>
+<div class="item">Gastos por categoria<small>6 msgs · ontem</small></div><div class="item">Compra de ações<small>9 msgs · 03/11</small></div>
+<div style="margin-top:auto;display:flex;gap:8px"><span class="btn">Abrir</span><span class="sel2">Apagar selecionadas</span></div></div></div>
+</body></html>
