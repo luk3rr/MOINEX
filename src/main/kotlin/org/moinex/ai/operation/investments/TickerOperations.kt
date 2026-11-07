@@ -19,6 +19,7 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.common.util.APIUtils
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Ticker
 import org.moinex.service.investment.TickerPriceHistoryService
@@ -254,15 +255,17 @@ class RefreshTickerDataOperation(
     override fun execute(payload: RefreshTickerPayload): ApplyResult.Success {
         val ticker = tickerService.getAllNonArchivedTickers().first { it.id == payload.tickerId }
         runBlocking {
-            check(tickerService.updateTickersPriceFromApi(listOf(ticker)).isEmpty()) {
-                "could not fetch the price of ${ticker.symbol}"
-            }
-            if (payload.rebuild) {
-                priceHistoryService.rebuildPriceHistory(
-                    ticker,
-                )
-            } else {
-                priceHistoryService.syncDaily(ticker)
+            APIUtils.withoutYahooCooldown {
+                check(tickerService.updateTickersPriceFromApi(listOf(ticker)).isEmpty()) {
+                    "could not fetch the price of ${ticker.symbol}"
+                }
+                if (payload.rebuild) {
+                    priceHistoryService.rebuildPriceHistory(
+                        ticker,
+                    )
+                } else {
+                    priceHistoryService.syncDaily(ticker)
+                }
             }
         }
         return ApplyResult.Success(listOf(payload.tickerId!!), summary(payload))

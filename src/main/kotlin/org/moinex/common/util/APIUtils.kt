@@ -109,6 +109,11 @@ object APIUtils {
             runningProcesses.remove(process)
         }
 
+    /**
+     * Runs [block] with the Yahoo cooldown switched off, for an update the user asked for by hand.
+     */
+    suspend fun <T> withoutYahooCooldown(block: suspend () -> T): T = yahooGateway.ignoringCooldown(block)
+
     suspend fun fetchStockPrices(symbols: List<String>): JSONObject =
         yahooGateway.call(Scripts.GET_STOCK_PRICE_SCRIPT, symbols.size) {
             runPythonScript(Scripts.GET_STOCK_PRICE_SCRIPT, symbols)

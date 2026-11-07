@@ -14,6 +14,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
@@ -239,6 +240,71 @@ class YahooGatewayTest :
                 Then("the cooldown opens once, is announced once and is not doubled") {
                     started shouldBe listOf(LocalDateTime.of(2026, 11, 6, 12, 5))
                     gateway.cooldownUntil() shouldBe LocalDateTime.of(2026, 11, 6, 12, 5)
+                }
+            }
+        }
+
+        Given("a gateway cooling down after a rate limit") {
+            val clock = MutableClock(Instant.parse("2026-11-06T12:00:00Z"))
+            val gateway = newGateway(clock)
+            runBlocking { gateway.call("get_stock_price.py", 1) { rateLimited } }
+            val executed = AtomicInteger(0)
+
+            When("a call made inside ignoringCooldown arrives") {
+                val result =
+                    runBlocking {
+                        gateway.ignoringCooldown {
+                            gateway.call("get_fundamental_data.py", 1) {
+                                executed.incrementAndGet()
+                                ok
+                            }
+                        }
+                    }
+
+                Then("it runs, and its success ends the cooldown") {
+                    result.toString() shouldBe ok.toString()
+                    executed.get() shouldBe 1
+                    gateway.cooldownUntil() shouldBe null
+                }
+            }
+        }
+
+        Given("a cooldown that is still running") {
+            val clock = MutableClock(Instant.parse("2026-11-06T12:00:00Z"))
+            val gateway = newGateway(clock)
+            runBlocking { gateway.call("get_stock_price.py", 1) { rateLimited } }
+            val started = mutableListOf<LocalDateTime>()
+            gateway.onCooldownStarted = { started.add(it) }
+
+            When("a call inside ignoringCooldown is rate limited too") {
+                runBlocking { gateway.ignoringCooldown { gateway.call("get_fundamental_data.py", 1) { rateLimited } } }
+
+                Then("the cooldown is neither extended nor announced again") {
+                    gateway.cooldownUntil() shouldBe LocalDateTime.of(2026, 11, 6, 12, 5)
+                    started shouldBe emptyList()
+                }
+            }
+
+            When("a call made after the block, outside it, arrives") {
+                runBlocking { gateway.ignoringCooldown { } }
+
+                Then("it is refused as before") {
+                    shouldThrow<MoinexException.YahooCooldownException> {
+                        runBlocking { gateway.call("get_stock_price.py", 1) { ok } }
+                    }
+                }
+            }
+
+            When("a coroutine launched inside the block makes a call") {
+                val result =
+                    runBlocking {
+                        gateway.ignoringCooldown {
+                            coroutineScope { async { gateway.call("get_stock_price.py", 1) { ok } }.await() }
+                        }
+                    }
+
+                Then("it inherits the exemption") {
+                    result.toString() shouldBe ok.toString()
                 }
             }
         }

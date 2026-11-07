@@ -6,14 +6,18 @@
 
 package org.moinex.common.util
 
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.moinex.common.ClockProvider
 import org.moinex.exception.MoinexException
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.time.LocalDateTime
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 
 /**
  * The single entry point for calls that reach Yahoo Finance. It lets at most [maxConcurrentCalls] run at once and,
@@ -60,18 +64,35 @@ class YahooGateway(
         }
 
     /**
+     * Marks the calls made inside [ignoringCooldown] as asked for by the user, so the cooldown does not refuse them.
+     */
+    private object IgnoreCooldown : AbstractCoroutineContextElement(Key) {
+        object Key : CoroutineContext.Key<IgnoreCooldown>
+    }
+
+    /**
+     * Runs [block] with the cooldown switched off for every call it makes, as the user asked for that update
+     * explicitly. The concurrency limit still applies. A call that succeeds ends the cooldown; one that is rate
+     * limited while a cooldown is running changes nothing.
+     */
+    suspend fun <T> ignoringCooldown(block: suspend () -> T): T = withContext(IgnoreCooldown) { block() }
+
+    /**
      * Runs [block], the real call to [script] for [symbolCount] symbols, under the concurrency limit.
-     * @throws MoinexException.YahooCooldownException while a cooldown is running; [block] is not run then
+     * @throws MoinexException.YahooCooldownException while a cooldown is running; [block] is not run then, unless
+     * the call is made inside [ignoringCooldown]
      */
     suspend fun call(
         script: String,
         symbolCount: Int,
         block: suspend () -> JSONObject,
     ): JSONObject {
-        failIfCooling(script)
+        val ignoreCooldown = currentCoroutineContext()[IgnoreCooldown.Key] != null
+
+        if (!ignoreCooldown) failIfCooling(script)
 
         return semaphore.withPermit {
-            failIfCooling(script)
+            if (!ignoreCooldown) failIfCooling(script)
 
             val startedAt = System.nanoTime()
             val outcome = runCatching { block() }

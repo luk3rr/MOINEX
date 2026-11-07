@@ -82,4 +82,28 @@ class APIUtilsYahooGatewayTest :
                 }
             }
         }
+
+        Given("Yahoo cooling down after a rate limit") {
+            APIUtils.yahooGateway = YahooGateway(ClockProvider())
+            coEvery { APIUtils.runPythonScript(any(), any(), any()) } returns
+                JSONObject("""{"AAA":{"error":"x","error_kind":"rate_limit"}}""")
+            runBlocking { APIUtils.fetchStockPrices(listOf("AAA")) }
+
+            When("a fundamental analysis is fetched by hand, inside withoutYahooCooldown") {
+                coEvery { APIUtils.runPythonScript(Scripts.GET_FUNDAMENTAL_DATA_SCRIPT, any(), any()) } returns
+                    JSONObject("""{"AAA":{"symbol":"AAA"}}""")
+
+                val result =
+                    runBlocking {
+                        APIUtils.withoutYahooCooldown { APIUtils.fetchFundamentalAnalysis("AAA", PeriodType.ANNUAL) }
+                    }
+
+                Then("the script runs") {
+                    result.has("AAA") shouldBe true
+                    coVerify(exactly = 1) {
+                        APIUtils.runPythonScript(Scripts.GET_FUNDAMENTAL_DATA_SCRIPT, any(), any())
+                    }
+                }
+            }
+        }
     })

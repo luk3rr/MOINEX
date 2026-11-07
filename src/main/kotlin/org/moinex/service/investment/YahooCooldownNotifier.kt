@@ -14,7 +14,6 @@ import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Tells the user, once per cooldown, that Yahoo limited the requests and when the app will try again.
@@ -24,8 +23,6 @@ class YahooCooldownNotifier(
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
 ) {
-    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
     @PostConstruct
     fun register() {
         APIUtils.yahooGateway.onCooldownStarted = ::notifyCooldown
@@ -36,9 +33,7 @@ class YahooCooldownNotifier(
             type = NotificationType.WARNING,
             title = preferencesService.translate(TranslationKeys.YAHOO_COOLDOWN_TITLE),
             message =
-                preferencesService
-                    .translate(TranslationKeys.YAHOO_COOLDOWN_MESSAGE)
-                    .format(until.format(timeFormatter)),
+                YahooCooldownMessage.text(preferencesService.translate(TranslationKeys.YAHOO_COOLDOWN_MESSAGE), until),
         )
     }
 }

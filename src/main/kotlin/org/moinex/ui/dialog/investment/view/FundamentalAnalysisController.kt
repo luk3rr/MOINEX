@@ -28,10 +28,12 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isUpdateRecommended
+import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.config.RetryConfig
+import org.moinex.exception.MoinexException
 import org.moinex.model.dto.AssetKind
 import org.moinex.model.dto.FundamentalSnapshot
 import org.moinex.model.dto.QualityScore
@@ -48,6 +50,7 @@ import org.moinex.service.investment.FundamentalAnalysisService
 import org.moinex.service.investment.FundamentalParser
 import org.moinex.service.investment.FundamentalPriceOverlay
 import org.moinex.service.investment.FundamentalScoringService
+import org.moinex.service.investment.YahooCooldownMessage
 import org.moinex.ui.common.DividendHistoryChart
 import org.moinex.ui.common.FundamentalInsightsView
 import org.moinex.ui.common.FundamentalMetricPaneController
@@ -538,7 +541,14 @@ class FundamentalAnalysisController(
             val result =
                 runCatching {
                     FxUtils.withBackground {
-                        val analysis = fundamentalAnalysisService.getAnalysis(ticker.id!!, period, forceRefresh)
+                        val analysis =
+                            if (forceRefresh) {
+                                APIUtils.withoutYahooCooldown {
+                                    fundamentalAnalysisService.getAnalysis(ticker.id!!, period, forceRefresh)
+                                }
+                            } else {
+                                fundamentalAnalysisService.getAnalysis(ticker.id!!, period, forceRefresh)
+                            }
                         analysis to buildInsights(analysis)
                     }
                 }
@@ -550,8 +560,13 @@ class FundamentalAnalysisController(
                     displayAnalysis()
                     updateCacheStatusIndicators()
                 }.onFailure { exception ->
-                    logger.error("Error loading fundamental analysis", exception)
-                    handleAnalysisError(exception)
+                    if (exception is MoinexException.YahooCooldownException) {
+                        logger.warn("Fundamental analysis of {} not loaded: {}", ticker.symbol, exception.message)
+                        handleCooldown(exception)
+                    } else {
+                        logger.error("Error loading fundamental analysis", exception)
+                        handleAnalysisError(exception)
+                    }
                 }
 
             showLoading(false)
@@ -854,6 +869,18 @@ class FundamentalAnalysisController(
         loadingContainer.isVisible = show
         loadingContainer.isManaged = show
         metricsTabPane.isVisible = !show
+    }
+
+    private fun handleCooldown(exception: MoinexException.YahooCooldownException) {
+        notificationService.send(
+            type = NotificationType.WARNING,
+            title = preferencesService.translate(TranslationKeys.YAHOO_COOLDOWN_TITLE),
+            message =
+                YahooCooldownMessage.text(
+                    preferencesService.translate(TranslationKeys.YAHOO_COOLDOWN_MESSAGE),
+                    exception.until,
+                ),
+        )
     }
 
     private fun handleAnalysisError(exception: Throwable) {

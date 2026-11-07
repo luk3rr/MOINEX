@@ -40,6 +40,7 @@ import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.ui.SegmentedFilter
 import org.moinex.common.ui.SparklineCell
 import org.moinex.common.ui.SparklineGeometry
+import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -55,6 +56,7 @@ import org.moinex.service.PreferencesService
 import org.moinex.service.investment.PortfolioAnalyticsService
 import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.investment.TickerService
+import org.moinex.service.investment.YahooCooldownMessage
 import org.moinex.ui.dialog.investment.create.AddCryptoExchangeController
 import org.moinex.ui.dialog.investment.create.AddDividendController
 import org.moinex.ui.dialog.investment.create.AddTickerController
@@ -71,7 +73,6 @@ import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.MessageFormat
-import java.time.format.DateTimeFormatter
 
 @Controller
 class SavingsStocksFundsController(
@@ -413,9 +414,10 @@ class SavingsStocksFundsController(
 
     private fun failureMessage(error: Throwable): String =
         if (error is MoinexException.YahooCooldownException) {
-            preferencesService
-                .translate(TranslationKeys.YAHOO_COOLDOWN_MESSAGE)
-                .format(error.until.format(DateTimeFormatter.ofPattern("HH:mm")))
+            YahooCooldownMessage.text(
+                preferencesService.translate(TranslationKeys.YAHOO_COOLDOWN_MESSAGE),
+                error.until,
+            )
         } else {
             error.message ?: ""
         }
@@ -453,16 +455,18 @@ class SavingsStocksFundsController(
         FxUtils.launchBackgroundThenUI(
             background = {
                 runCatching {
-                    check(tickerService.updateTickersPriceFromApi(listOf(ticker)).isEmpty()) {
-                        preferencesService.translate(
-                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_REFRESH_TICKER_ERROR_MESSAGE,
-                        )
-                    }
+                    APIUtils.withoutYahooCooldown {
+                        check(tickerService.updateTickersPriceFromApi(listOf(ticker)).isEmpty()) {
+                            preferencesService.translate(
+                                TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_REFRESH_TICKER_ERROR_MESSAGE,
+                            )
+                        }
 
-                    if (rebuildHistory) {
-                        tickerPriceHistoryService.rebuildPriceHistory(ticker)
-                    } else {
-                        tickerPriceHistoryService.syncDaily(ticker)
+                        if (rebuildHistory) {
+                            tickerPriceHistoryService.rebuildPriceHistory(ticker)
+                        } else {
+                            tickerPriceHistoryService.syncDaily(ticker)
+                        }
                     }
                 }
             },
@@ -492,7 +496,7 @@ class SavingsStocksFundsController(
                                 preferencesService.translate(
                                     TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
                                 ),
-                            message = "${e.message.orEmpty()}\n${ticker.symbol}",
+                            message = "${failureMessage(e)}\n${ticker.symbol}",
                         )
                     }
 
