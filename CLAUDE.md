@@ -21,7 +21,7 @@ A `Makefile` wraps the Gradle tasks above plus install/uninstall (see `make help
 
 Tests use **Kotest BehaviorSpec** (Given/When/Then DSL), **MockK** for mocking, and **AssertJ**-style matchers. Test fixtures live in `src/test/kotlin/org/moinex/factory/`. The H2 in-memory database is used for tests.
 
-The Python scripts have their own `unittest` suite in `src/test/python/`, run with `/usr/bin/python3 -m unittest discover -s src/test/python`. It is not part of `./gradlew test` or of the CI pipeline yet.
+The Python scripts have their own `unittest` suite in `src/test/python/`, run with `make test-python` (`/usr/bin/python3 -m unittest discover -s src/test/python`). It is not part of `./gradlew test`, but `make test` and the pre-commit hook (`make pre-commit`) run it after the Kotlin tests, and the `python-tests` job of `pipeline.yml` runs it in CI (Python 3.12, `requirements.txt`).
 
 ## Code Style
 

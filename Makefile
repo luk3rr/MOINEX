@@ -9,6 +9,10 @@ JAVA_HOME ?= /usr/lib/jvm/java-25-openjdk-amd64
 XDG_DATA_HOME ?= $(HOME)/.local/share
 GRADLE        := JAVA_HOME=$(JAVA_HOME) XDG_DATA_HOME=$(XDG_DATA_HOME) ./gradlew
 
+# The app runs its scripts with this interpreter (Constants.PYTHON_INTERPRETER), so the
+# script tests use it too. Its dependencies come from requirements.txt.
+PYTHON ?= /usr/bin/python3
+
 # Extra flags appended to every Gradle invocation (escape hatch), e.g.
 # `make GRADLE_FLAGS=-Djdk.lang.Process.launchMechanism=VFORK <target>`.
 GRADLE_FLAGS ?=
@@ -19,7 +23,7 @@ TESTS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run run-debug demo jar build test coverage lint format clean pre-commit install-hooks install uninstall log
+.PHONY: help run run-debug demo jar build test test-python coverage lint format clean pre-commit install-hooks install uninstall log
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -40,8 +44,12 @@ jar: ## Package to build/libs/moinex.jar
 build: ## Full build with coverage report
 	$(GRADLE) clean build jacocoTestReport $(GRADLE_FLAGS)
 
-test: ## Run tests (use TESTS='--tests "*Foo"' for a subset)
+test: ## Run the Kotlin and the Python tests (use TESTS='--tests "*Foo"' for a Kotlin subset)
 	$(GRADLE) test $(TESTS) $(GRADLE_FLAGS)
+	$(MAKE) test-python
+
+test-python: ## Run the Python script tests (src/test/python)
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest discover -s src/test/python
 
 coverage: ## Generate the JaCoCo coverage report
 	$(GRADLE) jacocoTestReport $(GRADLE_FLAGS)
@@ -55,8 +63,9 @@ format: ## Auto-fix Kotlin style and apply all formatters
 clean: ## Remove build artifacts
 	$(GRADLE) clean $(GRADLE_FLAGS)
 
-pre-commit: ## Run lint + tests (invoked by the git pre-commit hook)
+pre-commit: ## Run lint + Kotlin and Python tests (invoked by the git pre-commit hook)
 	$(GRADLE) ktlintCheck test $(GRADLE_FLAGS)
+	$(MAKE) test-python
 
 install: ## Install/update Moinex system-wide (bash scripts/linux/install.sh)
 	JAVA_HOME=$(JAVA_HOME) bash scripts/linux/install.sh
