@@ -147,6 +147,31 @@ class ProposeChangesToolTest :
             }
         }
 
+        Given("a model that needs a concrete example of each operation") {
+            val wallet = registry.find("create_wallet_transaction")!!
+
+            Then("the example holds the operation and a placeholder for each required field") {
+                val example = tool.exampleOf(wallet)
+                example shouldContain "\"operation\":\"create_wallet_transaction\""
+                example shouldContain "\"date\":\"YYYY-MM-DD\""
+                example shouldContain "\"amount\":<number>"
+                example shouldContain "\"walletName\":\"<existing wallet>\""
+                example shouldContain "\"categoryName\":\"<existing category>\""
+                example shouldContain "\"movementType\":\"income|expense\""
+            }
+
+            Then("every operation has an example in the description, before the model makes its first call") {
+                registry.all().forEach { operation ->
+                    tool.description shouldContain "Example: " + tool.exampleOf(operation)
+                }
+            }
+
+            Then("an item that arrives with only its operation gets the example back in the error") {
+                val outcome = tool.propose("""{"changes":[{"operation":"create_wallet_transaction"}]}""")
+                outcome.errors.single().message shouldContain tool.exampleOf(wallet)
+            }
+        }
+
         Given("an unknown operation name") {
             val outcome = tool.propose("""{"changes":[{"operation":"delete_wallet","date":"2026-09-05"}]}""")
 
@@ -488,24 +513,13 @@ class ProposeChangesToolTest :
             val schema = JSONObject(tool.jsonSchema)
             val item = schema.getJSONObject("properties").getJSONObject("changes").getJSONObject("items")
             val known = item.getJSONObject("properties").keySet()
-            val variants = item.getJSONArray("anyOf")
 
-            Then("the item schema has one alternative per operation, naming it and what it needs") {
-                variants.length() shouldBe registry.all().size
-                val wallet =
-                    (0 until variants.length())
-                        .map { variants.getJSONObject(it) }
-                        .first {
-                            it
-                                .getJSONObject(
-                                    "properties",
-                                ).getJSONObject("operation")
-                                .getJSONArray("enum")
-                                .getString(0) ==
-                                "create_wallet_transaction"
-                        }
-                wallet.getJSONArray("required").toList() shouldContain "categoryName"
-                wallet.getJSONArray("required").toList() shouldContain "operation"
+            Then("the item schema is flat, with only the operation required, so no provider drops the other fields") {
+                item.has("anyOf") shouldBe false
+                item.has("oneOf") shouldBe false
+                item.getJSONArray("required").toList() shouldBe listOf("operation")
+                known shouldContain "categoryName"
+                known shouldContain "amount"
             }
 
             Then("every required field is a field the tool declares, so none is a typo") {

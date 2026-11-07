@@ -64,12 +64,31 @@ class ProposeChangesTool(
     override val description: String
         get() =
             preferencesService.translate(TranslationKeys.AI_TOOL_PROPOSE_CHANGES_DESCRIPTION) +
-                "\n" + registry.all().joinToString("\n") { "- " + it.modelDescription() + requiredNote(it) }
+                "\n" +
+                registry.all().joinToString("\n") {
+                    "- " + it.modelDescription() + requiredNote(it) +
+                        exampleNote(it)
+                }
 
     override val jsonSchema: String
         get() = buildJsonSchema().toString()
 
     private fun buildJsonSchema(): JSONObject {
+        val properties = itemProperties()
+
+        val item =
+            JSONObject()
+                .put("type", "object")
+                .put("properties", properties)
+                .put("required", JSONArray(listOf("operation")))
+
+        return JSONObject()
+            .put("type", "object")
+            .put("properties", JSONObject().put("changes", JSONObject().put("type", "array").put("items", item)))
+            .put("required", JSONArray(listOf("changes")))
+    }
+
+    private fun itemProperties(): JSONObject {
         val properties =
             JSONObject()
                 .put(
@@ -135,19 +154,52 @@ class ProposeChangesTool(
                 )
 
         registry.all().flatMap { it.modelProperties().entries }.forEach { (key, value) -> properties.put(key, value) }
-
-        val item =
-            JSONObject()
-                .put("type", "object")
-                .put("properties", properties)
-                .put("required", JSONArray(listOf("operation")))
-                .put("anyOf", JSONArray(registry.all().sortedBy { it.name }.map { variantOf(it) }))
-
-        return JSONObject()
-            .put("type", "object")
-            .put("properties", JSONObject().put("changes", JSONObject().put("type", "array").put("items", item)))
-            .put("required", JSONArray(listOf("changes")))
+        return properties
     }
+
+    /**
+     * A complete item of [operation] with a placeholder for each required field. Models that leave out the fields they
+     * are only told about in prose copy a concrete example, so it goes in the description and in the error that a
+     * field-less item gets.
+     */
+    fun exampleOf(operation: AppOperation<*>): String {
+        val properties = itemProperties()
+        val fields =
+            listOf("operation") + operation.modelRequired().filter { it != "operation" }
+        return fields.joinToString(prefix = "{", postfix = "}", separator = ",") { key ->
+            val value =
+                if (key == "operation") {
+                    "\"${operation.name}\""
+                } else {
+                    placeholderOf(key, properties.optJSONObject(key))
+                }
+            "\"$key\":$value"
+        }
+    }
+
+    private fun placeholderOf(
+        key: String,
+        schema: JSONObject?,
+    ): String {
+        val enumValues =
+            schema
+                ?.optJSONArray("enum")
+                ?.toList()
+                ?.map { it.toString() }
+                .orEmpty()
+        return when {
+            enumValues.isNotEmpty() -> "\"${enumValues.joinToString("|")}\""
+            schema?.optString("format") == "date" -> "\"YYYY-MM-DD\""
+            schema?.optString("type") == "number" || schema?.optString("type") == "integer" -> "<number>"
+            schema?.optString("type") == "boolean" -> "true|false"
+            key.endsWith("WalletName") || key == "walletName" -> "\"<existing wallet>\""
+            key == "categoryName" -> "\"<existing category>\""
+            key == "creditCardName" -> "\"<existing card>\""
+            else -> "\"<text>\""
+        }
+    }
+
+    private fun exampleNote(operation: AppOperation<*>): String = " Example: " + exampleOf(operation)
 
     private fun requiredNote(operation: AppOperation<*>): String =
         operation
@@ -155,14 +207,6 @@ class ProposeChangesTool(
             .takeIf { it.isNotEmpty() }
             ?.let { " Required fields: " + it.joinToString() + "." }
             .orEmpty()
-
-    /** One alternative of the item schema: this operation by name with the fields it needs. */
-    private fun variantOf(operation: AppOperation<*>): JSONObject =
-        JSONObject()
-            .put(
-                "properties",
-                JSONObject().put("operation", JSONObject().put("enum", JSONArray(listOf(operation.name)))),
-            ).put("required", JSONArray(listOf("operation") + operation.modelRequired()))
 
     fun describeAvailableContext(): String {
         val catalog = catalogProvider.snapshot()
@@ -292,8 +336,8 @@ class ProposeChangesTool(
                 )
                 error(
                     "$operationName could not be read (${e.message}). The item arrived with only these fields: " +
-                        "$received. Put every field of the operation flat inside the item, next to \"operation\", " +
-                        "and resend it.",
+                        "$received. Send the fields of the operation in the same item, next to \"operation\", " +
+                        "like this: ${exampleOf(operation)} - and resend it.",
                 )
             }
         val missing = operation.missingFromModel(payload)

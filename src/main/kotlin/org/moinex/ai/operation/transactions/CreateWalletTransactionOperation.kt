@@ -116,7 +116,18 @@ class CreateWalletTransactionOperation(
     override fun categoryNeeded(payload: WalletTransactionPayload) = payload.categoryName.takeIf { it.isNotBlank() }
 
     override fun summary(payload: WalletTransactionPayload) =
-        "${payload.description}, ${payload.amount.toPlainString()}, ${payload.date}"
+        "${movementLabel(
+            payload.movementType,
+        )}: ${payload.description}, ${payload.amount.toPlainString()}, ${payload.date}"
+
+    private fun movementLabel(type: WalletTransactionType) =
+        preferencesService.translate(
+            if (type == WalletTransactionType.INCOME) {
+                TranslationKeys.TRANSACTION_TYPE_INCOME
+            } else {
+                TranslationKeys.TRANSACTION_TYPE_EXPENSE
+            },
+        )
 
     override fun matchQuery(payload: WalletTransactionPayload) =
         MatchQuery(

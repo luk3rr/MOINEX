@@ -89,6 +89,15 @@ class WalletAndCreditCardOperationsTest :
             }
         }
 
+        Given("a wallet proposal that the user reviews") {
+            Then("the summary says whether it will be created as an expense or as an income") {
+                walletOperation.summary(payload) shouldBe
+                    "${TranslationKeys.TRANSACTION_TYPE_EXPENSE}: Market, 150.30, 2026-10-10"
+                walletOperation.summary(payload.copy(movementType = WalletTransactionType.INCOME)) shouldBe
+                    "${TranslationKeys.TRANSACTION_TYPE_INCOME}: Market, 150.30, 2026-10-10"
+            }
+        }
+
         Given("a payload that confirms an existing pending transaction") {
             val updated = slot<WalletTransaction>()
             every { walletService.updateWalletTransaction(capture(updated)) } returns Unit

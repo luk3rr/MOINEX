@@ -55,4 +55,18 @@ class PromptComposerTest :
                 prompt shouldNotContain "credit card purchase split into installments"
             }
         }
+
+        Given("a request for examples or mocks, with no values from the user") {
+            Then("the core of every language lets the model invent values and requires all the fields") {
+                composer.compose("en", listOf("transactions")) shouldContain "make up plausible fictional values"
+                composer.compose("en", listOf("transactions")) shouldContain "(mock)"
+                composer.compose("pt-BR", listOf("transactions")) shouldContain "invente valores plausíveis"
+                composer.compose("pt-BR", listOf("transactions")) shouldContain "(mock)"
+            }
+
+            Then("the rule stays limited to examples, so real entries still take their values from the user") {
+                composer.compose("en") shouldContain "applies only when the user asks for examples or tests"
+                composer.compose("pt-BR") shouldContain "vale só quando o usuário pedir exemplos ou testes"
+            }
+        }
     })

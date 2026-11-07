@@ -104,6 +104,7 @@ abstract class BaseWalletTransactionManagement(
         wallet = wt
         walletComboBox.value = wallet
         UIUtils.updateWalletBalanceLabelStyle(wallet, walletCurrentBalanceValueLabel)
+        walletAfterBalance()
     }
 
     @FXML
