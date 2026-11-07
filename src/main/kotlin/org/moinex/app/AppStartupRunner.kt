@@ -13,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
+import org.moinex.service.ai.AiChatHistoryService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.InvestmentPerformanceService
@@ -40,6 +41,7 @@ class AppStartupRunner(
     private val marketIndicatorService: MarketIndicatorService,
     private val bondInterestCalculationService: BondInterestCalculationService,
     private val releaseUpdateScheduler: ReleaseUpdateScheduler,
+    private val aiChatHistoryService: AiChatHistoryService,
 ) : ApplicationRunner {
     private val logger = LoggerFactory.getLogger(AppStartupRunner::class.java)
 
@@ -63,6 +65,18 @@ class AppStartupRunner(
         releaseUpdateScheduler.start()
 
         FxUtils.launchOnBackground {
+            runCatching { aiChatHistoryService.applyConfiguredRetention() }
+                .onSuccess {
+                    if (it >
+                        0
+                    ) {
+                        logger.info("Assistant conversations removed by the retention limits: {}", it)
+                    }
+                }.onFailure {
+                    logger
+                        .warn("Assistant conversation retention failed: {}", it.javaClass.simpleName)
+                }
+
             logger.info("Processing recurring wallet transactions")
             recurringTransactionService.processRecurringTransactions()
 

@@ -46,6 +46,9 @@ io-github-mkpaz-atlantafx-base = { module = "io.github.mkpaz:atlantafx-base", ve
 org-kordamp-ikonli-ikonli-javafx = { module = "org.kordamp.ikonli:ikonli-javafx", version.ref = "org-kordamp-ikonli" }
 org-kordamp-ikonli-ikonli-material2-pack = { module = "org.kordamp.ikonli:ikonli-material2-pack", version.ref = "org-kordamp-ikonli" }
 com-opencsv-opencsv = { module = "com.opencsv:opencsv", version.ref = "com-opencsv-opencsv" }
+com-fasterxml-jackson-core-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+com-fasterxml-jackson-module-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 net-minidev-json-smart = { module = "net.minidev:json-smart", version.ref = "net-minidev-json-smart" }
 net-objecthunter-exp4j = { module = "net.objecthunter:exp4j", version.ref = "net-objecthunter-exp4j" }
 org-flywaydb-flyway-maven-plugin = { module = "org.flywaydb:flyway-maven-plugin", version.ref = "org-flywaydb-flyway-maven-plugin" }

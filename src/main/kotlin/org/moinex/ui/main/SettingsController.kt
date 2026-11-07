@@ -84,6 +84,12 @@ class SettingsController(
     private lateinit var aiKeyStatusLabel: Label
 
     @FXML
+    private lateinit var aiHistoryMaxChatsField: TextField
+
+    @FXML
+    private lateinit var aiHistoryMaxDaysField: TextField
+
+    @FXML
     private lateinit var aiTestConnectionButton: Button
 
     @FXML
@@ -191,6 +197,7 @@ class SettingsController(
         }
 
         configureAiSettings()
+        configureAiHistoryLimits()
     }
 
     private fun configureAiSettings() {
@@ -320,6 +327,26 @@ class SettingsController(
         aiCredentialStore.clearApiKey(provider)
         aiApiKeyField.clear()
         updateAiKeyStatusLabel(provider)
+    }
+
+    private fun configureAiHistoryLimits() {
+        aiHistoryMaxChatsField.text = preferencesService.aiHistoryMaxChats?.toString().orEmpty()
+        aiHistoryMaxDaysField.text = preferencesService.aiHistoryMaxDays?.toString().orEmpty()
+        listOf(aiHistoryMaxChatsField, aiHistoryMaxDaysField).forEach { field ->
+            field.setOnAction { commitAiHistoryLimits() }
+            field.focusedProperty().addListener { _, _, focused -> if (!focused) commitAiHistoryLimits() }
+        }
+    }
+
+    private fun commitAiHistoryLimits() {
+        val maxChats =
+            PreferencesService.interpretLimit(aiHistoryMaxChatsField.text, preferencesService.aiHistoryMaxChats)
+        val maxDays =
+            PreferencesService.interpretLimit(aiHistoryMaxDaysField.text, preferencesService.aiHistoryMaxDays)
+        preferencesService.aiHistoryMaxChats = maxChats
+        preferencesService.aiHistoryMaxDays = maxDays
+        aiHistoryMaxChatsField.text = maxChats?.toString().orEmpty()
+        aiHistoryMaxDaysField.text = maxDays?.toString().orEmpty()
     }
 
     private fun commitSavingsRateTarget() {

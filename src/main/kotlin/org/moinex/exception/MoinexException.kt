@@ -24,6 +24,11 @@ sealed class MoinexException(
         message: String,
     ) : MoinexException(message)
 
+    /** Exception thrown when a stored assistant conversation cannot be saved, read or changed */
+    class AiChatHistoryException(
+        message: String,
+    ) : MoinexException(message)
+
     /** Exception thrown when the application is shutting down */
     class ApplicationShuttingDownException(
         message: String,

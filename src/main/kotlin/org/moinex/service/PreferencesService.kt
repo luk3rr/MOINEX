@@ -25,6 +25,9 @@ class PreferencesService {
         const val PREF_KEY_THEME = "ui.theme"
         const val PREF_KEY_DB_DIR = "db.directory"
         const val PREF_KEY_SAVINGS_RATE_TARGET = "insights.savingsRateTarget"
+        const val PREF_KEY_AI_CHAT_SIDEBAR_COLLAPSED = "ai.chat.sidebarCollapsed"
+        const val PREF_KEY_AI_HISTORY_MAX_CHATS = "ai.history.maxChats"
+        const val PREF_KEY_AI_HISTORY_MAX_DAYS = "ai.history.maxDays"
         const val PREF_KEY_UPDATE_CHECK_ENABLED = "updates.checkEnabled"
         const val PREF_KEY_LAST_NOTIFIED_VERSION = "updates.lastNotifiedVersion"
         const val DEFAULT_SAVINGS_RATE_TARGET = 20.0
@@ -37,6 +40,18 @@ class PreferencesService {
                 Locale.ENGLISH to "English",
             )
         val preferences: Preferences = Preferences.userRoot().node("org.moinex")
+
+        /**
+         * What a limit field means: blank is no limit, a whole number above zero is that limit, and anything else
+         * leaves the [current] limit as it was.
+         */
+        fun interpretLimit(
+            text: String?,
+            current: Int?,
+        ): Int? {
+            val clean = text?.trim().orEmpty()
+            return if (clean.isEmpty()) null else clean.toIntOrNull()?.takeIf { it > 0 } ?: current
+        }
     }
 
     var locale: Locale = resolveInitialLocale()
@@ -57,6 +72,20 @@ class PreferencesService {
             field = value
             preferences.put(PREF_KEY_THEME, value)
         }
+
+    var aiChatSidebarCollapsed: Boolean
+        get() = preferences.getBoolean(PREF_KEY_AI_CHAT_SIDEBAR_COLLAPSED, false)
+        set(value) = preferences.putBoolean(PREF_KEY_AI_CHAT_SIDEBAR_COLLAPSED, value)
+
+    /** How many stored assistant conversations to keep; null keeps all of them. */
+    var aiHistoryMaxChats: Int?
+        get() = readLimit(PREF_KEY_AI_HISTORY_MAX_CHATS)
+        set(value) = writeLimit(PREF_KEY_AI_HISTORY_MAX_CHATS, value)
+
+    /** How many days a stored assistant conversation is kept after its last activity; null keeps them forever. */
+    var aiHistoryMaxDays: Int?
+        get() = readLimit(PREF_KEY_AI_HISTORY_MAX_DAYS)
+        set(value) = writeLimit(PREF_KEY_AI_HISTORY_MAX_DAYS, value)
 
     var dbDirectory: String
         get() = preferences[PREF_KEY_DB_DIR, "${System.getProperty("user.home")}/.moinex/data"]
@@ -105,6 +134,15 @@ class PreferencesService {
 
     fun toggleHideMonetaryValues() {
         hideMonetaryValues = !hideMonetaryValues
+    }
+
+    private fun readLimit(key: String): Int? = preferences.getInt(key, 0).takeIf { it > 0 }
+
+    private fun writeLimit(
+        key: String,
+        value: Int?,
+    ) {
+        if (value != null && value > 0) preferences.putInt(key, value) else preferences.remove(key)
     }
 
     private fun resolveInitialLocale(): Locale {

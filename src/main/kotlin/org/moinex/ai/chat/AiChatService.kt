@@ -81,6 +81,7 @@ class AiChatService(
             history.lastOrNull()?.let { logger.debug("AI last message ({}): {}", it.role, clip(it.content)) }
         }
         var iterations = 0
+        val turnMessages = mutableListOf<ChatMessage>()
         val proposedChanges = mutableListOf<ProposedChange>()
         val ignoredLines = mutableListOf<IgnoredLine>()
 
@@ -110,7 +111,12 @@ class AiChatService(
                 val changeSet =
                     ChangeSet(UUID.randomUUID().toString(), proposedChanges, ignoredLines)
                         .takeUnless { it.isEmpty }
-                return ChatTurnResult.Success(reply = response.text.orEmpty(), changeSet = changeSet)
+                turnMessages += ChatMessage(role = ChatRole.ASSISTANT, content = response.text.orEmpty())
+                return ChatTurnResult.Success(
+                    reply = response.text.orEmpty(),
+                    changeSet = changeSet,
+                    turnMessages = turnMessages.toList(),
+                )
             }
 
             if (iterations >= aiPromptProperties.maxToolIterations) {
@@ -119,7 +125,12 @@ class AiChatService(
                 val changeSet =
                     ChangeSet(UUID.randomUUID().toString(), proposedChanges, ignoredLines).takeUnless { it.isEmpty }
                 return if (changeSet != null) {
-                    ChatTurnResult.Success(reply = limitMessage, changeSet = changeSet)
+                    turnMessages += ChatMessage(role = ChatRole.ASSISTANT, content = limitMessage)
+                    ChatTurnResult.Success(
+                        reply = limitMessage,
+                        changeSet = changeSet,
+                        turnMessages = turnMessages.toList(),
+                    )
                 } else {
                     ChatTurnResult.Error(limitMessage)
                 }
@@ -158,6 +169,8 @@ class AiChatService(
                     )
                 }
 
+            turnMessages += assistantMessage
+            turnMessages += toolResultMessages
             conversation = compactOldResults(conversation) + assistantMessage + toolResultMessages
             iterations++
         }

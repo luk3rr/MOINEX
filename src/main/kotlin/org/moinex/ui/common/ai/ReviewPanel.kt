@@ -10,6 +10,7 @@ import javafx.beans.value.ChangeListener
 import javafx.collections.ListChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
@@ -134,10 +135,28 @@ class ReviewPanel(
             if (visible.isEmpty()) {
                 listOf(Label(translate(TranslationKeys.AIPANEL_EMPTY)).apply { styleClass.add(STYLE_MUTED) })
             } else {
-                visible.map(::buildCard)
+                buildGroups(visible)
             },
         )
         updateFooter()
+    }
+
+    /** One block per answer of the assistant, numbered in the order the answers came, each with its own cards. */
+    private fun buildGroups(visible: List<ReviewItem>): List<Node> {
+        val numbers =
+            session.items
+                .map { it.changeSetId }
+                .distinct()
+                .withIndex()
+                .associate { it.value to it.index + 1 }
+        return visible
+            .groupBy { it.changeSetId }
+            .flatMap { (changeSetId, items) ->
+                val header =
+                    Label(MessageFormat.format(translate(TranslationKeys.AI_HISTORY_PANEL_GROUP), numbers[changeSetId]))
+                        .apply { styleClass.add(STYLE_GROUP) }
+                listOf<Node>(header) + items.map(::buildCard)
+            }
     }
 
     private fun renderCounters() {
@@ -276,10 +295,11 @@ class ReviewPanel(
             setOnAction { action() }
         }
 
-        when (item.state) {
-            ChangeState.REJECTED ->
+        when {
+            item.readOnly -> Unit
+            item.state == ChangeState.REJECTED ->
                 actions.children.add(button(TranslationKeys.AIPANEL_ACTION_UNDO_REJECT) { session.undoReject(item) })
-            ChangeState.APPROVED -> Unit
+            item.state == ChangeState.APPROVED -> Unit
             else -> {
                 if (session.draftSpecOf(item).isNotEmpty()) {
                     actions.children.add(
@@ -346,6 +366,7 @@ class ReviewPanel(
         private const val STYLE_TITLE = "ai-review-title"
         private const val STYLE_SCROLL = "ai-review-scroll"
         private const val STYLE_FOOTER = "ai-review-footer"
+        private const val STYLE_GROUP = "ai-review-group"
         private const val STYLE_CARD = "ai-review-card"
         private const val STYLE_CARD_SELECTED = "ai-review-card-selected"
         private const val STYLE_CARD_TITLE = "ai-review-card-title"

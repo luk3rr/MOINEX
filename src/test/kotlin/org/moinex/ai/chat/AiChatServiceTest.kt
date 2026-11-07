@@ -155,6 +155,12 @@ class AiChatServiceTest :
                     coVerify(exactly = 1) { provider.chat(any(), any()) }
                 }
 
+                Then("the turn messages hold only the final answer") {
+                    val success = result as ChatTurnResult.Success
+                    success.turnMessages.map { it.role } shouldBe listOf(ChatRole.ASSISTANT)
+                    success.turnMessages.single().content shouldBe "Você gastou R$ 100 esse mês."
+                }
+
                 Then("the system message carries today's date and the existing categories/tickers context") {
                     coVerify {
                         provider.chat(
@@ -198,6 +204,15 @@ class AiChatServiceTest :
 
                 Then("the provider is called twice: once to request the tool, once with the tool result") {
                     coVerify(exactly = 2) { provider.chat(any(), any()) }
+                }
+
+                Then("the turn messages carry the tool request, the tool result and the final answer, in order") {
+                    val turn = (result as ChatTurnResult.Success).turnMessages
+                    turn.map { it.role } shouldBe listOf(ChatRole.ASSISTANT, ChatRole.TOOL, ChatRole.ASSISTANT)
+                    turn[0].toolCalls shouldBe listOf(toolCall)
+                    turn[1].toolCallId shouldBe "call_1"
+                    turn[1].content shouldBe """{"netWorth":1000}"""
+                    turn[2].content shouldBe "Seu patrimônio é R$ 1.000."
                 }
             }
         }

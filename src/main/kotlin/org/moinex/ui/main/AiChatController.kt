@@ -7,6 +7,7 @@
 package org.moinex.ui.main
 
 import javafx.animation.KeyFrame
+import javafx.animation.PauseTransition
 import javafx.animation.Timeline
 import javafx.collections.ListChangeListener
 import javafx.concurrent.Worker
@@ -15,8 +16,12 @@ import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.ListCell
+import javafx.scene.control.ListView
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TextArea
+import javafx.scene.control.TextField
+import javafx.scene.control.TextInputDialog
 import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
@@ -37,13 +42,16 @@ import org.moinex.ai.chat.ChatTurnResult
 import org.moinex.ai.chat.EmojiRenderer
 import org.moinex.ai.chat.MarkdownRenderer
 import org.moinex.ai.chat.ToolLabels
+import org.moinex.ai.chat.isShownInChat
 import org.moinex.ai.ingest.StatementIngestService
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.review.ReviewItem
 import org.moinex.ai.review.ReviewSession
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.Icons
 import org.moinex.common.ui.ThemeColors
+import org.moinex.common.ui.icon
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -52,6 +60,13 @@ import org.moinex.model.dto.ai.IgnoredLine
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
+import org.moinex.service.ai.AiChatHistoryService
+import org.moinex.service.ai.ChatConversationState
+import org.moinex.service.ai.ChatSummary
+import org.moinex.service.ai.PersistOutcome
+import org.moinex.service.ai.SearchHit
+import org.moinex.service.ai.StoredChangeSet
+import org.moinex.service.ai.StoredConversation
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.investment.BondService
 import org.moinex.service.investment.TickerService
@@ -77,6 +92,8 @@ class AiChatController(
     private val preferencesService: PreferencesService,
     private val springContext: ConfigurableApplicationContext,
     private val reviewSession: ReviewSession,
+    private val conversationState: ChatConversationState,
+    private val historyService: AiChatHistoryService,
     private val draftLauncher: DraftDialogLauncher,
     private val walletService: WalletService,
     private val creditCardService: CreditCardService,
@@ -111,10 +128,67 @@ class AiChatController(
     @FXML
     private lateinit var reopenReviewButton: Button
 
+    @FXML
+    private lateinit var conversationsPane: VBox
+
+    @FXML
+    private lateinit var collapsedPane: VBox
+
+    @FXML
+    private lateinit var collapseButton: Button
+
+    @FXML
+    private lateinit var expandButton: Button
+
+    @FXML
+    private lateinit var collapsedNewButton: Button
+
+    @FXML
+    private lateinit var newChatButton: Button
+
+    @FXML
+    private lateinit var searchField: TextField
+
+    @FXML
+    private lateinit var conversationsList: ListView<ConversationRow>
+
+    @FXML
+    private lateinit var deleteAllButton: Button
+
+    @FXML
+    private lateinit var chatTitleLabel: Label
+
+    @FXML
+    private lateinit var renameButton: Button
+
+    @FXML
+    private lateinit var deleteButton: Button
+
     private var reviewPanel: ReviewPanel? = null
     private var reviewHidden = false
 
-    private val history = mutableListOf<ChatMessage>()
+    private val rowsByPosition = mutableMapOf<Int, Node>()
+    private var showEmptyConversation = false
+    private var searchPause: PauseTransition? = null
+    private var knownChats: List<ChatSummary> = emptyList()
+
+    /** What the list beside the chat shows: a stored conversation, or a message that matched the search. */
+    sealed interface ConversationRow {
+        data class Chat(
+            val summary: ChatSummary,
+        ) : ConversationRow
+
+        data class Hit(
+            val hit: SearchHit,
+        ) : ConversationRow
+    }
+
+    private data class TurnOutcome(
+        val result: ChatTurnResult,
+        val elapsedMillis: Long,
+        val persistFailure: String?,
+    )
+
     private val pendingAttachments = mutableListOf<ChatAttachment>()
     private var busy = false
     private var requestStartNanos = 0L
@@ -143,6 +217,13 @@ class AiChatController(
         private const val STYLE_ATTACHMENT_CHIP = "ai-chat-attachment-chip"
         private const val STYLE_ATTACHMENT_LABEL = "ai-chat-attachment-label"
         private const val STYLE_ATTACHMENT_REMOVE = "ai-chat-attachment-remove"
+        private const val STYLE_HISTORY_TITLE = "ai-history-row-title"
+        private const val STYLE_HISTORY_META = "ai-history-row-meta"
+        private const val STYLE_HISTORY_BADGE = "ai-history-row-badge"
+        private const val STYLE_HISTORY_EMPTY = "ai-history-empty"
+        private const val HISTORY_ROW_TEXT_WIDTH = 190.0
+        private const val SEARCH_DEBOUNCE_MILLIS = 300.0
+        private const val SCROLL_SETTLE_MILLIS = 700.0
 
         private const val THINKING_TICK_MILLIS = 1000.0
         private const val THINKING_MAX_DOTS = 3
@@ -175,10 +256,18 @@ class AiChatController(
                 inputField.styleClass.remove(STYLE_INPUT_GROWING)
             }
         }
-        history.forEachIndexed { index, message ->
-            appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
-        }
         refreshAttachmentsUI()
+        setupHistoryColumn()
+        if (conversationState.currentChatId() == null &&
+            conversationState.messages().isEmpty() &&
+            !showEmptyConversation
+        ) {
+            openLatestConversation()
+        } else {
+            renderMessages(conversationState.messages(), emptyList(), null)
+            refreshConversationList()
+        }
+        updateHeader()
     }
 
     @FXML
@@ -202,7 +291,9 @@ class AiChatController(
             }
 
         appendBubble(ChatRole.USER, bubbleText)
-        history.add(ChatMessage(role = ChatRole.USER, content = messageContent, displayText = bubbleText))
+        val userMessage = ChatMessage(role = ChatRole.USER, content = messageContent, displayText = bubbleText)
+        val attachmentNames = attachments.map { it.fileName }
+        showEmptyConversation = false
         inputField.clear()
         clearAttachments()
         requestStartNanos = System.nanoTime()
@@ -211,11 +302,31 @@ class AiChatController(
 
         FxUtils.launchBackgroundThenUI(
             background = {
-                aiChatService.sendMessage(history.toList()) { toolName ->
-                    currentActivity = ToolLabels.of(toolName, preferencesService)
-                }
+                val startOutcome = conversationState.startTurn(userMessage, attachmentNames)
+                val result =
+                    aiChatService.sendMessage(conversationState.messages()) { toolName ->
+                        currentActivity = ToolLabels.of(toolName, preferencesService)
+                    }
+                val elapsedMillis = (System.nanoTime() - requestStartNanos) / NANOS_PER_MILLI
+                val finishOutcome =
+                    if (result is ChatTurnResult.Success) {
+                        conversationState.finishTurn(result, elapsedMillis)
+                    } else {
+                        PersistOutcome.Saved
+                    }
+                val failure =
+                    listOf(
+                        startOutcome,
+                        finishOutcome,
+                    ).filterIsInstance<PersistOutcome.Failed>().firstOrNull()
+                TurnOutcome(result, elapsedMillis, failure?.message)
             },
-            onUI = { result -> handleResult(result) },
+            onUI = { outcome ->
+                handleResult(outcome.result, outcome.elapsedMillis)
+                outcome.persistFailure?.let { appendNotice(it) }
+                updateHeader()
+                refreshConversationList()
+            },
         )
     }
 
@@ -344,15 +455,14 @@ class AiChatController(
         attachButton.isDisable = attaching
     }
 
-    private fun handleResult(result: ChatTurnResult) {
-        val elapsedMillis = (System.nanoTime() - requestStartNanos) / NANOS_PER_MILLI
+    private fun handleResult(
+        result: ChatTurnResult,
+        elapsedMillis: Long,
+    ) {
         setBusy(false)
 
         when (result) {
             is ChatTurnResult.Success -> {
-                history.add(
-                    ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
-                )
                 val changeSet = result.changeSet
                 val hasProposals = changeSet?.changes?.isNotEmpty() == true
                 if (result.reply.isNotBlank() || !hasProposals) {
@@ -396,6 +506,7 @@ class AiChatController(
                 },
             )
         reviewPanel = panel
+        reviewSession.onItemChanged = ::persistItemChange
         VBox.setVgrow(panel, Priority.ALWAYS)
         panel.maxHeight = Double.MAX_VALUE
         reviewContainer.children.setAll(panel)
@@ -422,6 +533,20 @@ class AiChatController(
                 preferencesService.translate(TranslationKeys.AIPANEL_REOPEN),
                 reviewSession.openCount(),
             )
+    }
+
+    private fun persistItemChange(item: ReviewItem) {
+        runCatching {
+            historyService.updateChange(
+                item.change.id,
+                item.state,
+                item.payloadProperty.get(),
+                item.messageProperty.get().ifBlank { null },
+            )
+        }.onFailure {
+            logger.warn("AI proposal state could not be stored: {}", it.javaClass.simpleName)
+            appendNotice(it.message ?: preferencesService.translate(TranslationKeys.AI_HISTORY_ERROR_SAVE))
+        }
     }
 
     private fun editProposal(item: ReviewItem) {
@@ -461,12 +586,335 @@ class AiChatController(
                 )
         }
 
+    @FXML
+    fun handleNewChat() {
+        if (busy) return
+        conversationState.reset()
+        showEmptyConversation = true
+        reviewSession.clear()
+        updateReviewVisibility()
+        renderMessages(emptyList(), emptyList(), null)
+        conversationsList.selectionModel.clearSelection()
+        updateHeader()
+    }
+
+    @FXML
+    fun handleCollapse() = applyCollapsed(true)
+
+    @FXML
+    fun handleExpand() = applyCollapsed(false)
+
+    @FXML
+    fun handleRename() {
+        val chatId = conversationState.currentChatId() ?: return
+        val dialog =
+            TextInputDialog(chatTitleLabel.text).apply {
+                title = preferencesService.translate(TranslationKeys.AI_HISTORY_RENAME_TITLE)
+                headerText = preferencesService.translate(TranslationKeys.AI_HISTORY_RENAME_HEADER)
+                contentText = ""
+            }
+        val newTitle = dialog.showAndWait().orElse(null)?.trim()
+        if (newTitle.isNullOrEmpty()) return
+
+        runHistory({ historyService.renameChat(chatId, newTitle) }) { refreshConversationList() }
+    }
+
+    @FXML
+    fun handleDelete() {
+        val chatId = conversationState.currentChatId() ?: return
+        val confirmed =
+            WindowUtils.showConfirmationDialog(
+                preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_HEADER),
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_MESSAGE),
+                    chatTitleLabel.text,
+                ),
+            )
+        if (!confirmed) return
+
+        runHistory({ historyService.deleteChat(chatId) }) {
+            conversationState.reset()
+            reviewSession.clear()
+            updateReviewVisibility()
+            openLatestConversation()
+        }
+    }
+
+    @FXML
+    fun handleDeleteAll() {
+        val confirmed =
+            WindowUtils.showConfirmationDialog(
+                preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_ALL_HEADER),
+                preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_ALL_MESSAGE),
+            )
+        if (!confirmed) return
+
+        runHistory({ historyService.deleteAllChats() }) {
+            conversationState.reset()
+            showEmptyConversation = true
+            reviewSession.clear()
+            updateReviewVisibility()
+            renderMessages(emptyList(), emptyList(), null)
+            refreshConversationList()
+        }
+    }
+
+    private fun setupHistoryColumn() {
+        collapseButton.graphic = icon(Icons.ARROW_LEFT)
+        collapseButton.tooltip = Tooltip(preferencesService.translate(TranslationKeys.AI_HISTORY_SIDEBAR_COLLAPSE))
+        expandButton.graphic = icon(Icons.ARROW_RIGHT)
+        expandButton.tooltip = Tooltip(preferencesService.translate(TranslationKeys.AI_HISTORY_SIDEBAR_EXPAND))
+        collapsedNewButton.graphic = icon(Icons.ADD)
+        collapsedNewButton.tooltip = Tooltip(preferencesService.translate(TranslationKeys.AI_HISTORY_SIDEBAR_NEW))
+        renameButton.graphic = icon(Icons.EDIT)
+        renameButton.tooltip = Tooltip(preferencesService.translate(TranslationKeys.AI_HISTORY_CHAT_RENAME))
+        deleteButton.graphic = icon(Icons.TRASH)
+        deleteButton.tooltip = Tooltip(preferencesService.translate(TranslationKeys.AI_HISTORY_CHAT_DELETE))
+        applyCollapsed(preferencesService.aiChatSidebarCollapsed, remember = false)
+
+        conversationsList.placeholder =
+            Label(preferencesService.translate(TranslationKeys.AI_HISTORY_SIDEBAR_EMPTY)).apply {
+                styleClass.add(STYLE_HISTORY_EMPTY)
+            }
+        conversationsList.setCellFactory {
+            object : ListCell<ConversationRow>() {
+                override fun updateItem(
+                    item: ConversationRow?,
+                    empty: Boolean,
+                ) {
+                    super.updateItem(item, empty)
+                    text = null
+                    graphic = if (empty || item == null) null else rowGraphic(item)
+                }
+            }
+        }
+        conversationsList.setOnMouseClicked { event ->
+            val cell =
+                generateSequence(
+                    event.target as? Node,
+                ) { it.parent }.filterIsInstance<ListCell<*>>().firstOrNull()
+            val row = conversationsList.selectionModel.selectedItem
+            if (cell != null && !cell.isEmpty && row != null && !busy) openRow(row)
+        }
+        searchField.textProperty().addListener { _, _, text ->
+            searchPause?.stop()
+            searchPause =
+                PauseTransition(Duration.millis(SEARCH_DEBOUNCE_MILLIS)).also {
+                    it.setOnFinished { runSearch(text.trim()) }
+                    it.play()
+                }
+        }
+    }
+
+    private fun applyCollapsed(
+        collapsed: Boolean,
+        remember: Boolean = true,
+    ) {
+        if (remember) preferencesService.aiChatSidebarCollapsed = collapsed
+        conversationsPane.isVisible = !collapsed
+        conversationsPane.isManaged = !collapsed
+        collapsedPane.isVisible = collapsed
+        collapsedPane.isManaged = collapsed
+    }
+
+    private fun rowGraphic(row: ConversationRow): Node =
+        when (row) {
+            is ConversationRow.Chat -> {
+                val summary = row.summary
+                val meta =
+                    Label(
+                        UIUtils.formatDateTimeForDisplay(summary.updatedAt),
+                    ).apply { styleClass.add(STYLE_HISTORY_META) }
+                val line = HBox(6.0, meta)
+                if (summary.pendingProposals > 0) {
+                    line.children.add(
+                        Label(
+                            MessageFormat.format(
+                                preferencesService.translate(TranslationKeys.AI_HISTORY_SIDEBAR_PENDING),
+                                summary.pendingProposals,
+                            ),
+                        ).apply { styleClass.add(STYLE_HISTORY_BADGE) },
+                    )
+                }
+                VBox(2.0, historyTitle(summary.title), line)
+            }
+            is ConversationRow.Hit ->
+                VBox(
+                    2.0,
+                    historyTitle(row.hit.chatTitle),
+                    Label(row.hit.snippet).apply {
+                        styleClass.add(STYLE_HISTORY_META)
+                        isWrapText = false
+                        maxWidth = HISTORY_ROW_TEXT_WIDTH
+                    },
+                )
+        }
+
+    private fun historyTitle(text: String) =
+        Label(text).apply {
+            styleClass.add(STYLE_HISTORY_TITLE)
+            maxWidth = HISTORY_ROW_TEXT_WIDTH
+        }
+
+    private fun openRow(row: ConversationRow) {
+        when (row) {
+            is ConversationRow.Chat -> openConversation(row.summary.id, null)
+            is ConversationRow.Hit ->
+                openConversation(row.hit.chatId, row.hit.position.takeIf { row.hit.messageId != null })
+        }
+    }
+
+    private fun openConversation(
+        chatId: Int,
+        focusPosition: Int?,
+    ) {
+        runHistory({ historyService.openChat(chatId) }) { stored -> applyStored(stored, focusPosition) }
+    }
+
+    private fun openLatestConversation() {
+        runHistory({ historyService.latestChatId()?.let { historyService.openChat(it) } }) { stored ->
+            if (stored != null) {
+                applyStored(stored, null)
+            } else {
+                renderMessages(emptyList(), emptyList(), null)
+                updateHeader()
+            }
+            refreshConversationList()
+        }
+    }
+
+    private fun applyStored(
+        stored: StoredConversation,
+        focusPosition: Int?,
+    ) {
+        conversationState.load(stored)
+        showEmptyConversation = false
+        reviewSession.clear()
+        reviewSession.load(stored.changeSets)
+        reviewHidden = reviewSession.openCount() == 0
+        updateReviewVisibility()
+        renderMessages(stored.messages, stored.changeSets, focusPosition)
+        knownChats = knownChats.filter { it.id != stored.chat.id } + stored.chat
+        updateHeader()
+        selectActiveRow()
+    }
+
+    private fun renderMessages(
+        messages: List<ChatMessage>,
+        changeSets: List<StoredChangeSet>,
+        focusPosition: Int?,
+    ) {
+        messagesContainer.children.clear()
+        rowsByPosition.clear()
+        val setsByMessage = changeSets.groupBy { it.messageIndex }
+        messages.forEachIndexed { index, message ->
+            if (message.isShownInChat) {
+                rowsByPosition[index] =
+                    appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
+            }
+            setsByMessage[index]
+                ?.filter { it.changeSet.ignored.isNotEmpty() }
+                ?.forEach { appendNotice(ignoredLinesText(it.changeSet.ignored)) }
+        }
+        if (focusPosition != null) scrollToPosition(focusPosition) else scrollToBottom()
+    }
+
+    private fun scrollToPosition(position: Int) {
+        val target = rowsByPosition[position]
+        if (target == null) {
+            scrollToBottom()
+            return
+        }
+        PauseTransition(Duration.millis(SCROLL_SETTLE_MILLIS)).apply {
+            setOnFinished {
+                messagesScrollPane.layout()
+                val extra = messagesContainer.layoutBounds.height - messagesScrollPane.viewportBounds.height
+                if (extra > 0) messagesScrollPane.vvalue = (target.boundsInParent.minY / extra).coerceIn(0.0, 1.0)
+            }
+            play()
+        }
+    }
+
+    private fun updateHeader() {
+        val chatId = conversationState.currentChatId()
+        chatTitleLabel.text = knownChats.firstOrNull { it.id == chatId }?.title.orEmpty()
+        val hasChat = chatId != null
+        listOf(renameButton, deleteButton).forEach {
+            it.isVisible = hasChat
+            it.isManaged = hasChat
+        }
+    }
+
+    private fun refreshConversationList() {
+        runHistory({ historyService.listChats() }) { chats ->
+            knownChats = chats
+            if (searchField.text.isNullOrBlank()) {
+                conversationsList.items.setAll(chats.map { ConversationRow.Chat(it) })
+                selectActiveRow()
+            }
+            updateHeader()
+        }
+    }
+
+    private fun selectActiveRow() {
+        val activeId = conversationState.currentChatId()
+        val index = conversationsList.items.indexOfFirst { it is ConversationRow.Chat && it.summary.id == activeId }
+        if (index >= 0) {
+            conversationsList.selectionModel.select(index)
+        } else {
+            conversationsList.selectionModel.clearSelection()
+        }
+    }
+
+    private fun runSearch(text: String) {
+        if (text.isEmpty()) {
+            refreshConversationList()
+            return
+        }
+        conversationsList.placeholder =
+            Label(preferencesService.translate(TranslationKeys.AI_HISTORY_SIDEBAR_NO_RESULTS)).apply {
+                styleClass.add(STYLE_HISTORY_EMPTY)
+            }
+        runHistory({ historyService.search(text) }) { hits ->
+            if (searchField.text.trim() == text) {
+                conversationsList.items.setAll(hits.map { ConversationRow.Hit(it) })
+            }
+        }
+    }
+
+    private fun <T> runHistory(
+        work: () -> T,
+        onSuccess: (T) -> Unit = {},
+    ) {
+        FxUtils.launchBackgroundThenUI(
+            background = { runCatching(work) },
+            onUI = { result ->
+                result.fold(
+                    onSuccess = onSuccess,
+                    onFailure = {
+                        logger.warn("AI chat history action failed: {}", it.javaClass.simpleName)
+                        appendNotice(it.message ?: preferencesService.translate(TranslationKeys.AI_HISTORY_ERROR_SAVE))
+                    },
+                )
+            },
+        )
+    }
+
     private fun setBusy(isBusy: Boolean) {
         busy = isBusy
         inputField.isDisable = isBusy
         sendButton.isDisable = isBusy
         thinkingLabel.isVisible = isBusy
         thinkingLabel.isManaged = isBusy
+        listOf(
+            conversationsList,
+            newChatButton,
+            collapsedNewButton,
+            renameButton,
+            deleteButton,
+            deleteAllButton,
+            searchField,
+        ).forEach { it.isDisable = isBusy }
 
         thinkingTimeline?.stop()
         thinkingTimeline = null
@@ -527,7 +975,7 @@ class AiChatController(
         role: ChatRole,
         text: String,
         responseTimeMillis: Long? = null,
-    ) {
+    ): Node {
         val bubbleStyle = if (role == ChatRole.USER) STYLE_BUBBLE_USER else STYLE_BUBBLE_ASSISTANT
         val (background, textColor) = bubbleColors(bubbleStyle)
         val shown = if (role == ChatRole.USER) text.replace("\n", "  \n") else text
@@ -548,6 +996,7 @@ class AiChatController(
             }
         messagesContainer.children.add(row)
         scrollToBottom()
+        return row
     }
 
     private fun appendNotice(text: String) {

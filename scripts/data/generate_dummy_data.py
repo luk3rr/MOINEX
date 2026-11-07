@@ -216,6 +216,7 @@ def clear_data(cursor):
     """Limpa os dados das tabelas para uma nova inserção."""
     print("Erasing old data from the database...")
     tables_to_clear = [
+        "ai_chat_change", "ai_chat_change_set", "ai_chat_message", "ai_chat",
         "dividend", "ticker_sale", "ticker_purchase", "sale", "purchase", "crypto_exchange",
         "bond_operation", "bond", "ticker",
         "recurring_transaction", "budget_group_categories", "budget_group", "financial_plan", 
@@ -474,6 +475,63 @@ def populate_bond_operations(cursor, data):
     
     print("Bond operations inserted successfully.")
 
+def populate_ai_chats(cursor):
+    """Insere conversas fictícias com o assistente, uma delas com propostas em estados diferentes."""
+    print("Inserting dummy assistant conversations...")
+    chats = [
+        ("Quanto gastei com mercado?", 3, 0, [
+            ("USER", "Quanto gastei com mercado neste mês?"),
+            ("ASSISTANT", "Você gastou **R$ 850,00** com mercado neste mês, 12% a menos que no anterior."),
+            ("USER", "E em transporte?"),
+            ("ASSISTANT", "Em transporte foram **R$ 320,00**."),
+        ]),
+        ("Lança esse extrato do cartão", 1, 1, [
+            ("USER", "Lança esse extrato do cartão"),
+            ("ASSISTANT", "Encontrei 3 lançamentos. Revise as propostas ao lado."),
+        ]),
+        ("Metas de reserva", 9, 0, [
+            ("USER", "Como está minha meta de reserva de emergência?"),
+            ("ASSISTANT", "Você está em **45%** da meta. Faltam R$ 9.000,00."),
+        ]),
+    ]
+    payload = (
+        '{"date":"%s","description":"%s","amount":%s,"movementType":"EXPENSE",'
+        '"walletId":1,"categoryName":"Mercado","existingTransactionId":null}'
+    )
+    for title, days_ago, with_changes, messages in chats:
+        stamp = get_dynamic_date(0, -days_ago)
+        cursor.execute(
+            "INSERT INTO ai_chat (title, created_at, updated_at) VALUES (?, ?, ?)", (title, stamp, stamp)
+        )
+        chat_id = cursor.lastrowid
+        last_message_id = None
+        for position, (role, content) in enumerate(messages):
+            cursor.execute(
+                "INSERT INTO ai_chat_message (chat_id, position, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
+                (chat_id, position, role, content, stamp),
+            )
+            last_message_id = cursor.lastrowid
+        if with_changes:
+            set_id = f"dummy-set-{chat_id}"
+            cursor.execute(
+                "INSERT INTO ai_chat_change_set (id, message_id) VALUES (?, ?)", (set_id, last_message_id)
+            )
+            changes = [
+                ("Supermercado Central", "152.30", "PENDING"),
+                ("Padaria do Bairro", "18.90", "APPROVED"),
+                ("Loja de Conveniência", "9.50", "REJECTED"),
+            ]
+            for index, (description, amount, state) in enumerate(changes):
+                json = payload % (stamp[:10], description, amount)
+                cursor.execute(
+                    "INSERT INTO ai_chat_change (id, change_set_id, position, operation_name, payload_json, "
+                    "original_payload_json, summary, badge, reasons_json, confidence, depends_on_json, "
+                    "match_candidates_json, state, decided_at) "
+                    "VALUES (?, ?, ?, 'create_wallet_transaction', ?, ?, ?, 'NEW', '[]', 0.9, '[]', '[]', ?, ?)",
+                    (f"{set_id}-{index}", set_id, index, json, json, f"{description} {amount}", state,
+                     None if state == "PENDING" else stamp),
+                )
+
 def main():
     """Função principal para executar todo o processo."""
     parser = argparse.ArgumentParser(description="Generate dummy data for the wallet application.")
@@ -507,6 +565,8 @@ def main():
         populate_ticker_operations(cursor, CONFIG["initial_data"])
         populate_dividends(cursor, CONFIG["initial_data"])
         populate_bond_operations(cursor, CONFIG["initial_data"])
+
+        populate_ai_chats(cursor)
 
         update_wallet_balances(cursor)
 

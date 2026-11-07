@@ -247,3 +247,125 @@
   -fx-pref-width: 0;
   -fx-max-width: 0;
 }
+
+.ai-history-column {
+  -fx-background-color: theme-bg-base;
+  -fx-border-color: transparent theme-border transparent transparent;
+  -fx-border-width: 0 1 0 0;
+}
+
+.ai-history-heading {
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-title;
+}
+
+.ai-history-chat-title {
+  -fx-font-size: 14px;
+  -fx-text-fill: theme-text-muted;
+  -fx-padding: 0 0 0 8;
+}
+
+.ai-history-new-button {
+  -fx-background-color: theme-bg-sidebar;
+  -fx-background-radius: 20;
+  -fx-border-color: theme-bg-sidebar;
+  -fx-border-radius: 20;
+  -fx-border-width: 2;
+  -fx-padding: 5 12;
+  -fx-text-fill: theme-text-on-dark;
+  -fx-font-weight: bold;
+  -fx-cursor: hand;
+}
+
+.ai-history-new-button:hover {
+  -fx-background-color: theme-bg-sidebar-hover;
+  -fx-border-color: theme-bg-sidebar-hover;
+}
+
+.ai-history-new-button:disabled {
+  -fx-background-color: theme-bg-disabled;
+  -fx-border-color: theme-border-disabled;
+  -fx-text-fill: theme-text-disabled;
+}
+
+.ai-history-search {
+  -fx-background-radius: 20;
+  -fx-border-radius: 20;
+  -fx-padding: 5 12;
+}
+
+.ai-history-icon-button {
+  -fx-background-color: transparent;
+  -fx-background-radius: 20;
+  -fx-padding: 4;
+  -fx-cursor: hand;
+}
+
+.ai-history-icon-button:hover {
+  -fx-background-color: theme-bg-hover;
+}
+
+.ai-history-icon-button:disabled {
+  -fx-opacity: 0.5;
+}
+
+.ai-history-link-button {
+  -fx-background-color: transparent;
+  -fx-text-fill: theme-text-muted;
+  -fx-font-size: 11px;
+  -fx-cursor: hand;
+}
+
+.ai-history-link-button:hover {
+  -fx-text-fill: theme-negative;
+}
+
+.ai-history-list {
+  -fx-background-color: transparent;
+  -fx-background-insets: 0;
+  -fx-border-color: transparent;
+  -fx-box-border: transparent;
+  -fx-padding: 0;
+}
+
+.ai-history-list .list-cell {
+  -fx-background-color: transparent;
+  -fx-background-radius: 8;
+  -fx-padding: 6 8;
+}
+
+.ai-history-list .list-cell:filled:hover {
+  -fx-background-color: theme-bg-hover;
+}
+
+.ai-history-list .list-cell:filled:selected {
+  -fx-background-color: theme-bg-hover;
+}
+
+.ai-history-row-title {
+  -fx-font-size: 13px;
+  -fx-text-fill: theme-text-primary;
+}
+
+.ai-history-row-meta {
+  -fx-font-size: 10px;
+  -fx-text-fill: theme-text-faint;
+}
+
+.ai-history-row-badge {
+  -fx-font-size: 10px;
+  -fx-text-fill: theme-accent-text;
+}
+
+.ai-history-empty {
+  -fx-font-size: 12px;
+  -fx-text-fill: theme-text-faint;
+}
+
+.ai-review-group {
+  -fx-font-size: 12px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-muted;
+  -fx-padding: 6 0 0 2;
+}
