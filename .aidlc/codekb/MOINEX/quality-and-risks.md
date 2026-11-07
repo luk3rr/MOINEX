@@ -46,3 +46,6 @@ Nenhuma levantada no walkthrough; o usuário confirmou os 9 riscos sem acréscim
 ## Atualização 2026-11-01 (fim do intent fundamentals-and-portfolio-views, commitado em f426f361)
 **Baseline:** `./gradlew ktlintCheck spotlessCheck test` → 1553 testes Kotlin, 0 falhas; 36 testes Python, OK. Cobertura 27,3% (base 25,7%).
 **Riscos novos:** (a) as faixas da nota de qualidade foram conferidas com uma cópia de um banco real: bancos não têm dívida/caixa pontuados (setor Financial Services); o veredito de Graham ainda marca "caro" para quase tudo e não foi alterado; (b) os testes Python não rodam no CI; (c) telas novas só têm captura em pt-BR e no tema escuro; (d) só o tema escuro e pt-BR foram vistos nas abas novas do detalhe do ativo. [src: .aidlc/261101-fundamentals-and-portfolio-views/state.md]
+
+## Baseline 2026-11-07 (intent 261107-financial-calculations-review)
+- HEAD 6c94ec03: Kotlin 2041 testes, 0 falhas, 0 erros (resultado reaproveitado pelo Gradle, tarefas `UP-TO-DATE`); ktlint e spotless sem pendências; Python 109 testes, OK. Sem falhas pré-existentes.
