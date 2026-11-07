@@ -859,9 +859,12 @@ class HomeController(
 
         UIUtils.applyDefaultChartStyle(netWorthChart)
 
-        graphView.children.add(netWorthChart)
+        val interactiveChart = netWorthChart.withCrosshair()
 
-        netWorthChart.setAnchorPaneConstraints()
+        graphView.children.clear()
+        graphView.children.add(interactiveChart)
+
+        interactiveChart.setAnchorPaneConstraints()
     }
 
     private fun calculateNetWorthData(): List<NetWorthDataPointDTO> {

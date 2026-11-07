@@ -15,7 +15,6 @@ import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.Chart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.ComboBox
@@ -127,17 +126,6 @@ class UIUtils(
                 is Control -> node.tooltip = tooltip
                 else -> Tooltip.install(node, tooltip)
             }
-        }
-
-        fun addTooltipToAxisLabel(
-            axis: CategoryAxis,
-            labelText: String,
-            tooltipText: String,
-        ) {
-            axis.childrenUnmodifiable
-                .filterIsInstance<Text>()
-                .firstOrNull { it.text == labelText }
-                ?.let { addTooltipToNode(it, tooltipText) }
         }
 
         fun removeTooltipFromNode(node: Node) {

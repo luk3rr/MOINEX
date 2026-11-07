@@ -53,6 +53,7 @@ object CapturePlan {
     const val HEAVY_SETTLE_MILLIS = 4000L
     const val SAVINGS_PERFORMANCE_TAB_INDEX = "1"
     const val HOVER_SUFFIX = ":hover"
+    const val HOME_NET_WORTH_PAGE_CLICKS = "2"
     const val INCOME_TAB = ":income"
 
     val themes: List<String> = listOf(PreferencesService.THEME_LIGHT, PreferencesService.THEME_DARK)
@@ -157,6 +158,24 @@ object CapturePlan {
                 CaptureKind.TICKER_DETAIL,
                 Files.TICKER_DETAIL_FXML,
                 detail = INCOME_TAB,
+            ),
+            CaptureTarget(
+                31,
+                "fire-hover",
+                CaptureKind.SCREEN,
+                Files.FIRE_CALCULATOR_FXML,
+                Files.FIRE_CALCULATOR_STYLE_SHEET,
+                HEAVY_SETTLE_MILLIS,
+                detail = HOVER_SUFFIX,
+            ),
+            CaptureTarget(
+                32,
+                "home-net-worth-hover",
+                CaptureKind.SCREEN,
+                Files.HOME_FXML,
+                Files.HOME_STYLE_SHEET,
+                HEAVY_SETTLE_MILLIS,
+                detail = HOME_NET_WORTH_PAGE_CLICKS + HOVER_SUFFIX,
             ),
         )
 

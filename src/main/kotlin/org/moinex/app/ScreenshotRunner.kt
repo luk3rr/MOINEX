@@ -74,6 +74,21 @@ class ScreenshotRunner(
         private const val OVERVIEW_SETTLE_MILLIS = 4000L
         private const val TAB_SETTLE_MILLIS = 5000L
         private const val HOVER_SETTLE_MILLIS = 600L
+        private const val GRAPH_NEXT_BUTTON_SELECTOR = "#graphNextButton"
+        private const val HOME_RECALCULATE_BUTTON_SELECTOR = "#recalculateNetWorthButton"
+        private const val FIRE_CALCULATE_BUTTON_SELECTOR = "#calculateButton"
+        private const val FIRE_HOVER_TARGET = "fire-hover"
+        private const val HOME_NET_WORTH_HOVER_TARGET = "home-net-worth-hover"
+        private const val CHART_DATA_SETTLE_MILLIS = 6000L
+        private val FIRE_CAPTURE_INPUTS =
+            mapOf(
+                "#currentNetWorthField" to "20000",
+                "#monthlyContributionField" to "1500",
+                "#monthlyExpenseField" to "4000",
+                "#annualReturnRateField" to "8",
+                "#withdrawalRateField" to "4",
+                "#currentAgeField" to "30",
+            )
         private const val HOVER_X_FRACTION = 0.62
         private const val HOVER_Y_FRACTION = 0.4
         private const val FUNDAMENTAL_CAPTURE_SYMBOL = "PETR4.SA"
@@ -172,6 +187,15 @@ class ScreenshotRunner(
             CaptureKind.SCREEN -> {
                 mainController.loadContent(target.fxml, target.styleSheet!!)
                 delay(target.settleMillis.milliseconds)
+                target.detail?.takeIf { it.endsWith(CapturePlan.HOVER_SUFFIX) }?.let { detail ->
+                    repeat(detail.removeSuffix(CapturePlan.HOVER_SUFFIX).toIntOrNull() ?: 0) {
+                        (stage.scene.root.lookup(GRAPH_NEXT_BUTTON_SELECTOR) as? javafx.scene.control.Button)?.fire()
+                        delay(TAB_SETTLE_MILLIS.milliseconds)
+                    }
+                    fillChartData(stage.scene.root, target.id)
+                    hoverOverChart(stage.scene.root)
+                    delay(HOVER_SETTLE_MILLIS.milliseconds)
+                }
                 writePng(snapshot(stage), file)
             }
 
@@ -338,6 +362,30 @@ class ScreenshotRunner(
             { controller: TickerDetailController -> controller.setTicker(ticker) {} },
             emptyList(),
         )
+    }
+
+    /**
+     * The capture database has no data for some charts, so the screen gets what it needs to draw them: the FIRE
+     * calculator is filled in and calculated, and the net worth of the home screen is recalculated.
+     */
+    private suspend fun fillChartData(
+        root: javafx.scene.Parent,
+        targetId: String,
+    ) {
+        when (targetId) {
+            FIRE_HOVER_TARGET -> {
+                FIRE_CAPTURE_INPUTS.forEach { (selector, value) ->
+                    (root.lookup(selector) as? javafx.scene.control.TextField)?.text = value
+                }
+                (root.lookup(FIRE_CALCULATE_BUTTON_SELECTOR) as? javafx.scene.control.Button)?.fire()
+                delay(CHART_DATA_SETTLE_MILLIS.milliseconds)
+            }
+
+            HOME_NET_WORTH_HOVER_TARGET -> {
+                (root.lookup(HOME_RECALCULATE_BUTTON_SELECTOR) as? javafx.scene.control.Button)?.fire()
+                delay(CHART_DATA_SETTLE_MILLIS.milliseconds)
+            }
+        }
     }
 
     /**

@@ -66,7 +66,7 @@ Every app source file (`.kt` in `src/main`, `.py` scripts) starts with the heade
 
 ## Screenshots for visual checks
 
-`scripts/dev/capture-screens.sh <dir>` renders the screens of `CapturePlan` (30 targets) from a fake home and a dummy database, never touching `~/.moinex`. Limit it with `CAPTURE_ONLY=<ids>`, `CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR`. Validation images from an AI-DLC intent go in `.aidlc/<intent>/construction/screenshots/`, which git ignores; do not commit them.
+`scripts/dev/capture-screens.sh <dir>` renders the screens of `CapturePlan` (32 targets) from a fake home and a dummy database, never touching `~/.moinex`. Limit it with `CAPTURE_ONLY=<ids>`, `CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR`. Validation images from an AI-DLC intent go in `.aidlc/<intent>/construction/screenshots/`, which git ignores; do not commit them.
 
 ## Linux packages
 

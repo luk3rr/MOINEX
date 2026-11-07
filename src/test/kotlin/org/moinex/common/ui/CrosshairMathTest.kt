@@ -67,4 +67,29 @@ class CrosshairMathTest :
                 CrosshairMath.previousDay(days, day("2026-10-01")) shouldBe null
             }
         }
+
+        Given("the display positions of the columns of a category axis") {
+            val positions = listOf(30.0, 80.0, 130.0, 180.0)
+
+            Then("the mouse snaps to the closest column") {
+                CrosshairMath.nearestIndex(positions, 40.0) shouldBe 0
+                CrosshairMath.nearestIndex(positions, 60.0) shouldBe 1
+                CrosshairMath.nearestIndex(positions, 150.0) shouldBe 2
+            }
+
+            Then("a tie goes to the earlier column, and positions beyond the ends go to the first and last") {
+                CrosshairMath.nearestIndex(positions, 55.0) shouldBe 0
+                CrosshairMath.nearestIndex(positions, -500.0) shouldBe 0
+                CrosshairMath.nearestIndex(positions, 900.0) shouldBe 3
+            }
+
+            Then("columns without a position are ignored") {
+                CrosshairMath.nearestIndex(listOf(Double.NaN, 80.0, Double.NaN), 5.0) shouldBe 1
+                CrosshairMath.nearestIndex(listOf(Double.NaN), 5.0) shouldBe null
+            }
+
+            Then("there is no column when there are no positions") {
+                CrosshairMath.nearestIndex(emptyList(), 1.0) shouldBe null
+            }
+        }
     })

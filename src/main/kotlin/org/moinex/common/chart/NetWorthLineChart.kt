@@ -12,10 +12,12 @@ import javafx.geometry.Side
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
+import javafx.scene.layout.StackPane
 import javafx.scene.shape.Line
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.ChartCrosshair
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.NetWorthDataPointDTO
@@ -23,6 +25,10 @@ import org.moinex.service.PreferencesService
 import java.time.YearMonth
 
 class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()) {
+    private companion object {
+        const val CHART_STYLE_CLASS = "net-worth-chart"
+    }
+
     var preferencesService: PreferencesService? = null
     private var currentDateLine: Line? = null
     private val currentMonth: YearMonth = YearMonth.now()
@@ -31,6 +37,9 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
     init {
         setupChart()
         stylesheets.add(javaClass.getResource(Files.TIMELINE_CHART_STYLE_SHEET)!!.toExternalForm())
+
+        widthProperty().addListener { _, _, _ -> FxUtils.launchOnFxThread { addCurrentDateLine(dataPoints) } }
+        heightProperty().addListener { _, _, _ -> FxUtils.launchOnFxThread { addCurrentDateLine(dataPoints) } }
     }
 
     private fun setupChart() {
@@ -87,10 +96,26 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
 
         applyStyling()
 
-        FxUtils.launchOnFxThread {
-            addTooltipsToAxisLabels(dataPoints)
-            addCurrentDateLine(dataPoints)
-        }
+        FxUtils.launchOnFxThread { addCurrentDateLine(dataPoints) }
+    }
+
+    /**
+     * Wraps this chart with the crosshair: a vertical line that snaps to the month under the mouse, a dot on each
+     * series and a box with the assets, the liabilities and the net worth of that month. Call it after [updateData]
+     * and put the returned node in the screen in place of the chart.
+     */
+    fun withCrosshair(): StackPane {
+        val headers =
+            dataPoints.associate {
+                UIUtils.formatShortMonthYear(it.period) to UIUtils.formatFullMonthYear(it.period)
+            }
+
+        return ChartCrosshair.wrapCategories(
+            this,
+            CHART_STYLE_CLASS,
+            { UIUtils.formatCurrency(it) },
+            { headers[it] ?: it },
+        )
     }
 
     private fun applyStyling() {
@@ -109,55 +134,6 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
                 series.node.styleClass.add(styleClass)
             }
         }
-    }
-
-    private fun addTooltipsToAxisLabels(dataPoints: List<NetWorthDataPointDTO>) {
-        val xAxis = xAxis as CategoryAxis
-
-        widthProperty().addListener { _, _, _ ->
-            FxUtils.launchOnFxThread {
-                reapplyTooltips(dataPoints, xAxis)
-                addCurrentDateLine(dataPoints)
-            }
-        }
-
-        heightProperty().addListener { _, _, _ ->
-            FxUtils.launchOnFxThread {
-                reapplyTooltips(dataPoints, xAxis)
-                addCurrentDateLine(dataPoints)
-            }
-        }
-
-        FxUtils.launchOnFxThread {
-            reapplyTooltips(dataPoints, xAxis)
-            addCurrentDateLine(dataPoints)
-        }
-    }
-
-    private fun reapplyTooltips(
-        dataPoints: List<NetWorthDataPointDTO>,
-        xAxis: CategoryAxis,
-    ) {
-        dataPoints.forEach { dataPoint ->
-            val periodLabel = UIUtils.formatShortMonthYear(dataPoint.period)
-            val tooltipText = createTooltipText(dataPoint)
-            UIUtils.addTooltipToAxisLabel(xAxis, periodLabel, tooltipText)
-        }
-    }
-
-    private fun createTooltipText(dataPoint: NetWorthDataPointDTO): String {
-        val prefs = preferencesService!!
-        val assetsLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_ASSETS)
-        val liabilitiesLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_LIABILITIES)
-        val netWorthLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_NET_WORTH)
-        val periodLabel = UIUtils.formatFullMonthYear(dataPoint.period)
-
-        return """
-            $periodLabel
-            $assetsLabel: ${UIUtils.formatCurrency(dataPoint.assets)}
-            $liabilitiesLabel: ${UIUtils.formatCurrency(dataPoint.liabilities)}
-            $netWorthLabel: ${UIUtils.formatCurrency(dataPoint.netWorth)}
-            """.trimIndent()
     }
 
     private fun addCurrentDateLine(dataPoints: List<NetWorthDataPointDTO>) {

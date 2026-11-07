@@ -7,7 +7,6 @@
 package org.moinex.ui.main
 
 import javafx.fxml.FXML
-import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
@@ -15,8 +14,11 @@ import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
+import javafx.scene.layout.AnchorPane
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.ChartCrosshair
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -72,9 +74,6 @@ class FIRECalculatorController(
     private lateinit var projectionChart: LineChart<String, Number>
 
     @FXML
-    private lateinit var xAxis: CategoryAxis
-
-    @FXML
     private lateinit var yAxis: NumberAxis
 
     @FXML
@@ -84,10 +83,10 @@ class FIRECalculatorController(
     private var suppressChartYearsAction = false
 
     // Stores year -> (patrimony, fireTarget) for tooltip reapplication after resize
-    private var chartTooltipData: Map<String, Pair<BigDecimal, BigDecimal>> = emptyMap()
 
     companion object {
         private val logger = LoggerFactory.getLogger(FIRECalculatorController::class.java)
+        private const val CHART_STYLE_CLASS = "fire-chart"
         private val CHART_YEAR_PRESETS = listOf(10, 15, 20, 25, 30, 35, 40, 45, 50)
     }
 
@@ -259,25 +258,9 @@ class FIRECalculatorController(
 
         projectionChart.data.addAll(patrimonySeries, targetSeries)
 
-        chartTooltipData = yearlyPoints.mapValues { (_, patrimony) -> patrimony to result.fireTarget }
         FxUtils.launchOnFxThread {
             projectionChart.applyCss()
             projectionChart.layout()
-            reapplyTooltips()
-        }
-    }
-
-    private fun reapplyTooltips() {
-        val patrimonyLabel = preferencesService.translate(TranslationKeys.FIRE_CHART_SERIES_PATRIMONY)
-        val targetLabel = preferencesService.translate(TranslationKeys.FIRE_CHART_SERIES_TARGET)
-
-        chartTooltipData.forEach { (year, values) ->
-            val (patrimony, target) = values
-            val tooltipText =
-                "$year\n" +
-                    "$patrimonyLabel: ${UIUtils.formatCurrency(patrimony)}\n" +
-                    "$targetLabel: ${UIUtils.formatCurrency(target)}"
-            UIUtils.addTooltipToAxisLabel(xAxis, year, tooltipText)
         }
     }
 
@@ -287,12 +270,26 @@ class FIRECalculatorController(
         projectionChart.animated = false
         projectionChart.createSymbols = false
 
-        projectionChart.widthProperty().addListener { _, _, _ ->
-            FxUtils.launchOnFxThread { reapplyTooltips() }
-        }
-        projectionChart.heightProperty().addListener { _, _, _ ->
-            FxUtils.launchOnFxThread { reapplyTooltips() }
-        }
+        installCrosshair()
+    }
+
+    /**
+     * Replaces the chart of the layout with the same chart under the crosshair, keeping its place and its anchors. Wrapping
+     * takes the chart out of its parent, so the wrapper goes in at the position the chart had.
+     */
+    private fun installCrosshair() {
+        val parent = projectionChart.parent as? AnchorPane ?: return
+        val index = parent.children.indexOf(projectionChart)
+        val wrapper =
+            ChartCrosshair.wrapCategories(projectionChart, CHART_STYLE_CLASS, { UIUtils.formatCurrency(it) })
+
+        wrapper.setAnchorPaneConstraints(
+            top = AnchorPane.getTopAnchor(projectionChart),
+            bottom = AnchorPane.getBottomAnchor(projectionChart),
+            left = AnchorPane.getLeftAnchor(projectionChart),
+            right = AnchorPane.getRightAnchor(projectionChart),
+        )
+        parent.children.add(index, wrapper)
     }
 
     private fun configureListeners() {

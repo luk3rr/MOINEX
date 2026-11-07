@@ -36,6 +36,29 @@ object CrosshairMath {
     }
 
     /**
+     * The index of the position in [positions] closest to [target], or null when there are none or none is a number.
+     * A tie goes to the earlier index. The positions are in any order; they are display positions of the columns of a
+     * category axis.
+     */
+    fun nearestIndex(
+        positions: List<Double>,
+        target: Double,
+    ): Int? {
+        var best: Int? = null
+        var bestDistance = Double.MAX_VALUE
+
+        positions.forEachIndexed { index, position ->
+            val distance = kotlin.math.abs(position - target)
+            if (!position.isNaN() && distance < bestDistance) {
+                best = index
+                bestDistance = distance
+            }
+        }
+
+        return best
+    }
+
+    /**
      * The value of a series (points sorted by date) on [day]: the point of that day or, failing it, the last one before.
      * Null before the series starts.
      */

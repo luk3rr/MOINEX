@@ -45,11 +45,13 @@ class CapturePlanTest :
                             "ticker-detail-hover",
                             "bond-interest-history",
                             "ticker-detail-income",
+                            "fire-hover",
+                            "home-net-worth-hover",
                         )
                 }
 
-                Then("the indexes are the fixed ones, with all 30 slots filled") {
-                    targets.map { it.index } shouldContainExactly (1..30).toList()
+                Then("the indexes are the fixed ones, with all 32 slots filled") {
+                    targets.map { it.index } shouldContainExactly (1..32).toList()
                 }
 
                 Then("every screen has a stylesheet and every dialog or alert has none") {
