@@ -12,4 +12,5 @@ enum class InterestType {
     FIXED,
     FLOATING,
     ZERO_COUPON,
+    FLOATING_SPREAD,
 }

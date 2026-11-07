@@ -2,7 +2,9 @@
 
 <?import atlantafx.base.controls.SegmentedControl?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -23,6 +25,16 @@
                                  <children>
                                     <Label styleClass="title" text="%savings.performance.benchmarks.title" />
                                     <Region HBox.hgrow="ALWAYS" />
+                                    <CheckBox fx:id="fixedIncomeCheck" text="%savings.performance.fixedIncome">
+                                       <tooltip>
+                                          <Tooltip text="%savings.performance.fixedIncome.hint" />
+                                       </tooltip>
+                                    </CheckBox>
+                                    <CheckBox fx:id="totalReturnCheck" text="%savings.performance.totalReturn">
+                                       <tooltip>
+                                          <Tooltip text="%savings.performance.totalReturn.hint" />
+                                       </tooltip>
+                                    </CheckBox>
                                     <SegmentedControl fx:id="periodSegment" styleClass="filter-segment" />
                                  </children>
                               </HBox>

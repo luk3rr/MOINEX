@@ -664,6 +664,7 @@ class UIUtils(
                 "fixed" to TranslationKeys.INTEREST_TYPE_FIXED,
                 "floating" to TranslationKeys.INTEREST_TYPE_FLOATING,
                 "zero_coupon" to TranslationKeys.INTEREST_TYPE_ZERO_COUPON,
+                "floating_spread" to TranslationKeys.INTEREST_TYPE_FLOATING_SPREAD,
             )[interestType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: interestType.name
 

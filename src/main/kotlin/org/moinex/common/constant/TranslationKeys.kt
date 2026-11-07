@@ -92,6 +92,24 @@ object TranslationKeys {
     const val SETTINGS_THEME: String = "settings.theme"
     const val SETTINGS_THEME_DARK: String = "settings.theme.dark"
     const val SETTINGS_THEME_LIGHT: String = "settings.theme.light"
+    const val BOND_INTEREST_HISTORY_LABEL_NET_INTEREST: String = "bond.interestHistory.label.netInterest"
+    const val BOND_INTEREST_HISTORY_NET_INTEREST_NOT_APPLICABLE: String =
+        "bond.interestHistory.netInterest.notApplicable"
+    const val BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_NONE: String = "bond.interestHistory.recalculate.preview.none"
+    const val BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_SUMMARY: String =
+        "bond.interestHistory.recalculate.preview.summary"
+    const val BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_LINE: String = "bond.interestHistory.recalculate.preview.line"
+    const val BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_MANUAL: String =
+        "bond.interestHistory.recalculate.preview.manual"
+    const val BOND_LABEL_AMOUNT: String = "bond.label.amount"
+    const val BOND_TABLE_QUANTITY_OR_AMOUNT: String = "bond.table.quantityOrAmount"
+    const val BOND_LABEL_GROSS_REDEEMED: String = "bond.label.grossRedeemed"
+    const val SETTINGS_INTEGRITY_TITLE: String = "settings.integrity.title"
+    const val SETTINGS_INTEGRITY_HINT: String = "settings.integrity.hint"
+    const val SETTINGS_INTEGRITY_CHECK: String = "settings.integrity.check"
+    const val SETTINGS_INTEGRITY_NONE: String = "settings.integrity.none"
+    const val SETTINGS_INTEGRITY_TICKER_LINE: String = "settings.integrity.tickerLine"
+    const val SETTINGS_INTEGRITY_BOND_LINE: String = "settings.integrity.bondLine"
     const val SETTINGS_DATABASE_LOCATION: String = "settings.database.location"
     const val SETTINGS_DATABASE_CHANGE: String = "settings.database.change"
     const val SETTINGS_DATABASE_RESTART_REQUIRED: String = "settings.database.restartRequired"
@@ -400,6 +418,7 @@ object TranslationKeys {
     const val INTEREST_TYPE_FIXED: String = "interest.type.fixed"
     const val INTEREST_TYPE_FLOATING: String = "interest.type.floating"
     const val INTEREST_TYPE_ZERO_COUPON: String = "interest.type.zeroCoupon"
+    const val INTEREST_TYPE_FLOATING_SPREAD: String = "interest.type.floatingSpread"
 
     // Interest indices
     const val INTEREST_INDEX_CDI: String = "interest.index.cdi"

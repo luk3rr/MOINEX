@@ -441,7 +441,7 @@ class InvestmentPerformanceServiceTest :
                         bond = bond,
                         operationType = OperationType.SELL,
                         quantity = BigDecimal("50"),
-                        unitPrice = BigDecimal("12.00"),
+                        unitPrice = BigDecimal("10.00"),
                         netProfit = BigDecimal("100.00"),
                         walletTransaction =
                             WalletTransactionFactory.create(

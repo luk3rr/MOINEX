@@ -8,7 +8,9 @@ package org.moinex.common.extension
 
 import org.moinex.model.dto.BondOperationStateDTO
 import org.moinex.model.enums.AssetType
+import org.moinex.model.enums.BondType
 import org.moinex.model.enums.OperationType
+import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondOperation
 import org.moinex.model.investment.FundamentalAnalysis
 import org.moinex.model.investment.Ticker
@@ -66,6 +68,25 @@ fun List<BondOperation>.calculateOperationStateUntil(date: LocalDate): BondOpera
                     )
             }
         }
+
+/**
+ * Bonds held in reais (CDB, LCI and LCA) have no unit price: what is held is an amount, saved as a quantity at a unit
+ * price of one.
+ */
+fun Bond.isHeldInReais(): Boolean = type == BondType.CDB || type == BondType.LCI || type == BondType.LCA
+
+/**
+ * An operation that was entered as an amount: a bond held in reais at a unit price of one. Older operations of the same
+ * bond types, saved with another unit price, keep showing their quantity and price.
+ */
+fun BondOperation.isAmountOnly(): Boolean = bond.isHeldInReais() && unitPrice.compareTo(BigDecimal.ONE) == 0
+
+/**
+ * Interest that leaves the bond with a sale: what the user received as profit plus the taxes and fees paid on it, never
+ * negative. A purchase takes no interest out.
+ */
+fun BondOperation.realizedInterest(): BigDecimal =
+    if (isSale()) netProfit.add(taxes).add(fees).max(BigDecimal.ZERO) else BigDecimal.ZERO
 
 fun List<BondOperation>.calculateQuantityUntil(date: LocalDate): BigDecimal =
     calculateOperationStateUntil(date).quantity

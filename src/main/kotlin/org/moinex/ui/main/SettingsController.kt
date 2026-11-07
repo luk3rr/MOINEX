@@ -31,9 +31,11 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.model.dto.QuantityIssueKind
 import org.moinex.model.enums.LlmProviderType
 import org.moinex.service.PreferencesService
 import org.moinex.service.ThemeService
+import org.moinex.service.investment.QuantityIntegrityService
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -52,6 +54,7 @@ class SettingsController(
     private val springContext: ConfigurableApplicationContext,
     private val aiCredentialStore: AiCredentialStore,
     private val llmProviderFactory: LlmProviderFactory,
+    private val quantityIntegrityService: QuantityIntegrityService,
 ) {
     @FXML
     private lateinit var languageComboBox: ComboBox<Locale>
@@ -362,6 +365,45 @@ class SettingsController(
                 ?: preferencesService.savingsRateTarget
         preferencesService.savingsRateTarget = target
         savingsRateTargetField.text = target.stripTrailingZeros().toPlainString()
+    }
+
+    @FXML
+    fun handleCheckIntegrity() {
+        val issues = quantityIntegrityService.findIssues()
+
+        val message =
+            if (issues.isEmpty()) {
+                preferencesService.translate(TranslationKeys.SETTINGS_INTEGRITY_NONE)
+            } else {
+                issues.joinToString("\n") { issue ->
+                    when (issue.kind) {
+                        QuantityIssueKind.TICKER_QUANTITY_DIFFERS ->
+                            preferencesService
+                                .translate(TranslationKeys.SETTINGS_INTEGRITY_TICKER_LINE)
+                                .replace("{0}", issue.name)
+                                .replace("{1}", issue.heldQuantity.stripTrailingZeros().toPlainString())
+                                .replace("{2}", issue.registeredQuantity.stripTrailingZeros().toPlainString())
+                                .replace("{3}", issue.difference.stripTrailingZeros().toPlainString())
+                        QuantityIssueKind.BOND_WITHOUT_PURCHASE ->
+                            preferencesService
+                                .translate(TranslationKeys.SETTINGS_INTEGRITY_BOND_LINE)
+                                .replace("{0}", issue.name)
+                                .replace(
+                                    "{1}",
+                                    issue.difference
+                                        .abs()
+                                        .stripTrailingZeros()
+                                        .toPlainString(),
+                                )
+                    }
+                }
+            }
+
+        WindowUtils.showInformationDialog(
+            preferencesService.translate(TranslationKeys.SETTINGS_INTEGRITY_TITLE),
+            message,
+            preferencesService.bundle,
+        )
     }
 
     @FXML

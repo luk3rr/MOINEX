@@ -22,6 +22,9 @@ import yf_resilience as res
 res.use_explicit_dns_on_windows()
 
 DEFAULT_CURRENCY = "BRL"
+DEFAULT_BOND_YIELD = 0.10
+SELIC_TARGET_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json"
+SELIC_TIMEOUT_SECONDS = 10
 
 EPS_DIVERGENCE_THRESHOLD = 0.25
 NON_MONETARY_ROW_MARKERS = ("shares", "rate", "ratio", "percent")
@@ -218,11 +221,23 @@ def get_unit_from_type(obj_type):
         return ""
     return ""
 
-def calculate_eps_cagr(eps_values):
+def years_spanned(period_count, periods_per_year=1):
+    """
+    Years between the first and the last of [period_count] consecutive periods
+
+    :param period_count: Number of periods in the series
+    :param periods_per_year: 1 for annual statements, 4 for quarterly ones
+    :return: Years covered by the series
+    """
+    return (period_count - 1) / periods_per_year
+
+
+def calculate_eps_cagr(eps_values, periods_per_year=1):
     """
     Calculate CAGR of EPS
 
     :param eps_values: List of EPS values (most recent first)
+    :param periods_per_year: 1 for annual statements, 4 for quarterly ones
     :return: CAGR percentage or None
     """
     try:
@@ -232,7 +247,7 @@ def calculate_eps_cagr(eps_values):
         if eps_values[-1] <= 0:
             return None
 
-        n_years = len(eps_values) - 1
+        n_years = years_spanned(len(eps_values), periods_per_year)
         return (((eps_values[0] / eps_values[-1]) ** (1 / n_years)) - 1) * 100
     except Exception:
         return None
@@ -425,7 +440,28 @@ def calculate_graham_number(eps, book_value_per_share):
     return None
 
 
-def calculate_graham_fair_value(eps, growth_rate, bond_yield=0.10):
+def fetch_reference_yield(currency):
+    """
+    Long-term interest rate used by the revised Graham formula, as a fraction: the latest Selic target for
+    Brazilian companies, and the default for the others or when the central bank does not answer
+
+    :param currency: Currency the company reports in
+    :return: Yearly rate as a fraction
+    """
+    if currency != DEFAULT_CURRENCY:
+        return DEFAULT_BOND_YIELD
+
+    try:
+        import requests
+
+        response = requests.get(SELIC_TARGET_URL, timeout=SELIC_TIMEOUT_SECONDS)
+        value = float(response.json()[-1]["valor"]) / 100
+        return value if value > 0 else DEFAULT_BOND_YIELD
+    except Exception:
+        return DEFAULT_BOND_YIELD
+
+
+def calculate_graham_fair_value(eps, growth_rate, bond_yield=DEFAULT_BOND_YIELD):
     """
     Calculate Fair Value using Benjamin Graham's revised formula,
     adapted to the Brazilian market.
@@ -435,7 +471,7 @@ def calculate_graham_fair_value(eps, growth_rate, bond_yield=0.10):
     Where:
     - EPS = Earnings per share
     - g = Expected growth rate (decimal, e.g. 0.10 for 10%)
-    - Y = Long-term Brazilian interest rate (fixed at 10%)
+    - Y = Long-term interest rate (the Selic target for Brazilian companies, 10% by default)
     """
     try:
         if eps and eps > 0 and growth_rate is not None:
@@ -548,7 +584,7 @@ def get_price_performance(ticker):
         return None
 
 
-def calculate_revenue_growth(revenues, reference_date=None):
+def calculate_revenue_growth(revenues, reference_date=None, periods_per_year=1):
     """
     Calculate revenue growth (YoY and CAGR)
 
@@ -566,7 +602,7 @@ def calculate_revenue_growth(revenues, reference_date=None):
         # CAGR (if we have enough data)
         cagr = None
         if len(revenues) >= 3:
-            n_years = len(revenues) - 1
+            n_years = years_spanned(len(revenues), periods_per_year)
             if revenues[-1] != 0:
                 cagr = (((revenues[0] / revenues[-1]) ** (1 / n_years)) - 1) * 100
 
@@ -992,6 +1028,8 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             balance_sheet = ticker.balance_sheet
             cashflow = ticker.cashflow
 
+        periods_per_year = 4 if period == "quarterly" else 1
+
         asset_kind = classify_asset(symbol, info, not financials.empty and not balance_sheet.empty)
         if asset_kind != ASSET_KIND_COMPANY:
             return build_fund_result(symbol, ticker, info, period, asset_kind)
@@ -1090,7 +1128,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             if not financials.empty and len(financials.columns) > 1:
                 revenues = [safe_get(financials.iloc[:, i], "Total Revenue", 0)
                            for i in range(min(5, len(financials.columns)))]
-                revenue_growth = calculate_revenue_growth(revenues, financials_date)
+                revenue_growth = calculate_revenue_growth(revenues, financials_date, periods_per_year)
 
             result["growth"] = {
                 "revenue_growth": revenue_growth,
@@ -1150,7 +1188,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             except Exception:
                 eps_history = None
 
-            eps_cagr = calculate_eps_cagr(eps_history) if eps_history else None
+            eps_cagr = calculate_eps_cagr(eps_history, periods_per_year) if eps_history else None
 
             peg_ratio = None
             if pe_ratio and eps_cagr and eps_cagr > 0:
@@ -1180,13 +1218,18 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 )
             graham_number = calculate_graham_number(eps, book_value_per_share) if eps and book_value_per_share else None
 
-            # For Graham revised formula, use revenue CAGR as growth estimate
+            # For Graham revised formula, the growth estimate is the EPS CAGR; revenue CAGR is the fallback
             growth_estimate = None
             graham_fair_value = None
-            if revenue_growth and revenue_growth.get("cagr") and revenue_growth["cagr"]:
+            if eps_cagr is not None:
+                growth_estimate = eps_cagr / 100
+            elif revenue_growth and revenue_growth.get("cagr") and revenue_growth["cagr"]:
                 cagr_value = revenue_growth["cagr"]["value"] if isinstance(revenue_growth["cagr"], dict) else revenue_growth["cagr"]
                 growth_estimate = cagr_value / 100  # Convert to decimal
-                graham_fair_value = calculate_graham_fair_value(eps, growth_estimate)
+
+            if growth_estimate is not None:
+                reference_yield = fetch_reference_yield(safe_get(info, "currency", DEFAULT_CURRENCY))
+                graham_fair_value = calculate_graham_fair_value(eps, growth_estimate, reference_yield)
 
             # Calculate margin of safety
             margin_of_safety = None

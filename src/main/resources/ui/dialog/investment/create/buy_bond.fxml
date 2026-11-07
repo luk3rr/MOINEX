@@ -67,9 +67,9 @@
             <TextField fx:id="descriptionField" promptText="%dialog.label.description" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <HBox spacing="10.0">
+      <HBox fx:id="amountRow" spacing="10.0">
          <children>
-            <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+            <HBox fx:id="unitPriceGroup" alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                <children>
                   <VBox alignment="CENTER">
                      <children>
@@ -93,7 +93,7 @@
                   </VBox>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <HBox fx:id="quantityGroup" alignment="CENTER_LEFT" spacing="5.0">
                <children>
                   <VBox alignment="CENTER">
                      <children>
@@ -102,12 +102,12 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <FontIcon iconLiteral="mdal-format_list_numbered" styleClass="app-icon, icon-size-20" />
+                        <FontIcon fx:id="quantityIcon" iconLiteral="mdal-format_list_numbered" styleClass="app-icon, icon-size-20" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER">
                      <children>
-                        <Label text="%investment.label.quantity">
+                        <Label fx:id="quantityLabel" text="%investment.label.quantity">
                            <font>
                               <Font size="10.0" />
                            </font>

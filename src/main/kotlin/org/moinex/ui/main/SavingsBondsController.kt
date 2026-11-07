@@ -20,6 +20,9 @@ import javafx.scene.text.Text
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.BondTableColumns
+import org.moinex.common.ui.BondTableColumns.asQuantityColumn
+import org.moinex.common.ui.BondTableColumns.asUnitPriceColumn
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.ui.ScreenActionProvider
@@ -350,6 +353,8 @@ class SavingsBondsController(
     }
 
     private fun configureBondTableView() {
+        BondTableColumns.hideWhenAllHeldInReais(bondsTabBondTable) { bondService.isAmountOnly(it) }
+
         bondsTabBondTable.columns.addAll(
             createColumn(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME,
@@ -361,11 +366,16 @@ class SavingsBondsController(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE,
             ) { UIUtils.translateBondType(it.type) },
             createColumn(
-                TranslationKeys.BOND_TABLE_QUANTITY,
-            ) { bondService.getCurrentQuantity(it).toString() },
+                TranslationKeys.BOND_TABLE_QUANTITY_OR_AMOUNT,
+            ) {
+                val quantity = bondService.getCurrentQuantity(it)
+                if (bondService.isAmountOnly(it)) UIUtils.formatCurrency(quantity) else quantity.toString()
+            }.asQuantityColumn(),
             createColumn(
                 TranslationKeys.BOND_TABLE_UNIT_PRICE,
-            ) { UIUtils.formatCurrency(bondService.getAverageUnitPrice(it)) },
+            ) {
+                if (bondService.isAmountOnly(it)) "—" else UIUtils.formatCurrency(bondService.getAverageUnitPrice(it))
+            }.asUnitPriceColumn(),
             createColumn(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE,
             ) { UIUtils.formatCurrency(bondService.getTotalInvestedValue(it)) },

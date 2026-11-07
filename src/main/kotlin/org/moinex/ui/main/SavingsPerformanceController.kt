@@ -9,6 +9,7 @@ package org.moinex.ui.main
 import atlantafx.base.controls.SegmentedControl
 import javafx.fxml.FXML
 import javafx.geometry.Pos
+import javafx.scene.control.CheckBox
 import javafx.scene.control.Label
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
@@ -62,6 +63,12 @@ class SavingsPerformanceController(
     @FXML
     private lateinit var dividendProjectionLabel: Label
 
+    @FXML
+    private lateinit var totalReturnCheck: CheckBox
+
+    @FXML
+    private lateinit var fixedIncomeCheck: CheckBox
+
     private lateinit var periodFilter: SegmentedFilter<PerformancePeriod>
     private var loadSequence = 0
     private var benchmarksRefreshed = false
@@ -85,6 +92,8 @@ class SavingsPerformanceController(
             )
         periodFilter.value = PerformancePeriod.M12
         periodFilter.onChange { load() }
+        totalReturnCheck.selectedProperty().addListener { _, _, _ -> load() }
+        fixedIncomeCheck.selectedProperty().addListener { _, _, _ -> load() }
 
         load()
         refreshBenchmarksOnce()
@@ -105,13 +114,15 @@ class SavingsPerformanceController(
 
     private fun load() {
         val period = periodFilter.value
+        val includeDividends = totalReturnCheck.isSelected
+        val includeFixedIncome = fixedIncomeCheck.isSelected
         val request = ++loadSequence
 
         FxUtils.launchBackgroundThenUI(
             background = {
                 runCatching {
                     Triple(
-                        performanceBenchmarkService.benchmarkSeries(period),
+                        performanceBenchmarkService.benchmarkSeries(period, includeDividends, includeFixedIncome),
                         performanceBenchmarkService.contributions(period),
                         portfolioAnalyticsService.dividendPanel(),
                     )

@@ -52,6 +52,7 @@ class EditBondPurchaseController(
 
         val symbol = bond.symbol
         bondNameLabel.text = bond.name + if (!symbol.isNullOrBlank()) " ($symbol)" else ""
+        applyAmountOnlyEntry(bond)
 
         setWalletComboBox(operation.walletTransaction!!.wallet)
 

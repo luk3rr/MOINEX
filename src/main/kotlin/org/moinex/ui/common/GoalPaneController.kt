@@ -23,7 +23,6 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.applyIconTheme
-import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
@@ -214,17 +213,7 @@ class GoalPaneController(
             Constants.calculateDaysUntilTarget(LocalDate.now(), currentGoal.targetDate)
         missingDays.text = missingDaysValue.toString()
 
-        return if (currentGoal.targetBalance.isZero()) {
-            0.0
-        } else {
-            currentGoal.balance
-                .divide(
-                    currentGoal.targetBalance,
-                    2,
-                    RoundingMode.HALF_UP,
-                ).multiply(BigDecimal(PERCENTAGE_MULTIPLIER))
-                .toDouble()
-        }
+        return currentGoal.progressPercentage().toDouble()
     }
 
     @FXML

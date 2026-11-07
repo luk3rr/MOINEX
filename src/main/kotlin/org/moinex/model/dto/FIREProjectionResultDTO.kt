@@ -16,4 +16,5 @@ data class FIREProjectionResultDTO(
     val fireTarget: BigDecimal,
     val projectedNetWorthAtFire: BigDecimal?,
     val dataPoints: List<Pair<Int, BigDecimal>>,
+    val ageMonthsAtFire: Int? = null,
 )

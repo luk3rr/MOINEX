@@ -491,9 +491,9 @@ class CreditCardServicePayInvoiceTest :
                 )
 
                 Then("should distribute rebate to all payments") {
-                    payment1.rebateUsed.compareTo(BigDecimal("19.80")) shouldBe 0
-                    payment2.rebateUsed.compareTo(BigDecimal("19.80")) shouldBe 0
-                    payment3.rebateUsed.compareTo(BigDecimal("20.40")) shouldBe 0
+                    payment1.rebateUsed.compareTo(BigDecimal("20.00")) shouldBe 0
+                    payment2.rebateUsed.compareTo(BigDecimal("20.00")) shouldBe 0
+                    payment3.rebateUsed.compareTo(BigDecimal("20.00")) shouldBe 0
                     (payment1.rebateUsed + payment2.rebateUsed + payment3.rebateUsed).compareTo(
                         BigDecimal("60.00"),
                     ) shouldBe 0

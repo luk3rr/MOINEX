@@ -46,6 +46,13 @@
                   </VBox>
                   <VBox styleClass="card" spacing="10.0">
                       <children>
+                      <Label text="%settings.integrity.title" style="-fx-font-weight: bold;" />
+                      <Label text="%settings.integrity.hint" wrapText="true" maxWidth="520.0" style="-fx-text-fill: theme-text-secondary;" />
+                      <Button text="%settings.integrity.check" onAction="#handleCheckIntegrity" />
+                      </children>
+                  </VBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
                       <CheckBox fx:id="updateCheckBox" text="%settings.updates.checkEnabled" />
                       <Label text="%settings.updates.checkEnabled.hint" wrapText="true" maxWidth="520.0" style="-fx-text-fill: theme-text-secondary;" />
                       </children>

@@ -16,6 +16,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.extension.isZero
 import org.moinex.model.enums.AssetType
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 @MappedSuperclass
 abstract class Asset(
@@ -57,11 +58,11 @@ abstract class Asset(
     @Column(name = "average_unit_value", nullable = false)
     var averageUnitValue: BigDecimal = averageUnitValue
         set(value) {
-            require(averageUnitValue >= BigDecimal.ZERO) {
+            require(value >= BigDecimal.ZERO) {
                 "Average unit value must be non-negative"
             }
 
-            field = Constants.roundPrice(value, type)
+            field = value.setScale(Constants.INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP)
         }
 
     init {

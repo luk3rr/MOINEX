@@ -430,7 +430,6 @@ class CreditCardService(
 
         distributePayment(
             pendingPayments = pendingPayments,
-            totalRemaining = totalRemaining,
             amountToDistribute = amountToDistribute,
             effectiveRebate = effectiveRebate,
             billingWallet = if (isPartial) null else walletFromDatabase,
@@ -474,42 +473,22 @@ class CreditCardService(
 
     private fun distributePayment(
         pendingPayments: List<CreditCardPayment>,
-        totalRemaining: BigDecimal,
         amountToDistribute: BigDecimal,
         effectiveRebate: BigDecimal,
         billingWallet: Wallet?,
     ) {
-        var remainingToDistribute = amountToDistribute
-        var remainingRebate = effectiveRebate
+        val owed = pendingPayments.map { it.remainingAmount() }
+        val paidShares = InvoicePaymentDistribution.distribute(owed, amountToDistribute)
+        val rebateShares = InvoicePaymentDistribution.distribute(owed, effectiveRebate)
 
-        pendingPayments.forEach { p ->
-            val remaining = p.remainingAmount()
-            val fraction = remaining.divide(totalRemaining, 2, RoundingMode.HALF_UP)
-
-            val partialForThisPayment =
-                if (p.id == pendingPayments.last().id) {
-                    remainingToDistribute
-                } else {
-                    amountToDistribute.multiply(fraction).setScale(2, RoundingMode.HALF_UP)
-                }
-
-            val rebateForThisPayment =
-                if (p.id == pendingPayments.last().id) {
-                    remainingRebate
-                } else {
-                    effectiveRebate.multiply(fraction).setScale(2, RoundingMode.HALF_UP)
-                }
-
-            p.paidAmount += partialForThisPayment
-            p.rebateUsed += rebateForThisPayment
+        pendingPayments.forEachIndexed { index, p ->
+            p.paidAmount += paidShares[index]
+            p.rebateUsed += rebateShares[index]
 
             if (billingWallet != null) {
                 p.wallet = billingWallet
                 p.paidAmount = p.amount
             }
-
-            remainingToDistribute -= partialForThisPayment
-            remainingRebate -= rebateForThisPayment
         }
     }
 

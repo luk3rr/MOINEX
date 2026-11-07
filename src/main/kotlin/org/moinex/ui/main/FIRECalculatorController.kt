@@ -204,7 +204,14 @@ class FIRECalculatorController(
                 )
             }
 
-        ageAtFireLabel.text = result.ageAtFire?.toString() ?: "-"
+        ageAtFireLabel.text =
+            result.ageAtFire?.let { age ->
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.FIRE_RESULT_YEARS),
+                    age,
+                    result.ageMonthsAtFire ?: 0,
+                )
+            } ?: "-"
     }
 
     private fun setDefaultChartYears(result: FIREProjectionResultDTO) {

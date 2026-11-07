@@ -10,7 +10,10 @@ package org.moinex.ui.dialog.investment.create
 
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
+import javafx.scene.control.CheckBox
 import javafx.scene.control.TextField
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
@@ -22,6 +25,7 @@ import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionType
+import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondOperation
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
@@ -30,6 +34,7 @@ import org.moinex.service.wallet.WalletService
 import org.moinex.ui.dialog.investment.base.BaseBondTransactionManagement
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Controller
 class AddBondSaleController(
@@ -51,6 +56,12 @@ class AddBondSaleController(
     @FXML
     private lateinit var grossYieldField: TextField
 
+    @FXML
+    private lateinit var autoCalculateCheck: CheckBox
+
+    @FXML
+    private lateinit var grossYieldGroup: HBox
+
     init {
         walletTransactionType = WalletTransactionType.INCOME
     }
@@ -60,16 +71,27 @@ class AddBondSaleController(
         super.initialize()
 
         unitPriceField.textProperty().addListener { _, _, _ ->
+            suggestRedemption()
             if (!netProfitField.isFocused) {
                 calculateProfit()
             }
         }
 
         quantityField.textProperty().addListener { _, _, _ ->
+            suggestRedemption()
             if (!netProfitField.isFocused) {
                 calculateProfit()
             }
         }
+
+        transactionDatePicker.valueProperty().addListener { _, _, _ ->
+            suggestRedemption()
+        }
+
+        autoCalculateCheck.selectedProperty().addListener { _, _, _ ->
+            applyAutoCalculation()
+        }
+        applyAutoCalculation()
 
         feesField.textProperty().addListener { _, _, _ ->
             if (!netProfitField.isFocused) {
@@ -133,7 +155,7 @@ class AddBondSaleController(
 
         runCatching {
             val unitPrice = unitPriceStr.toBigDecimal()
-            val quantity = quantityStr.toBigDecimal()
+            val quantity = principalQuantity(quantityStr)
             val fees = if (!feesStr.isNullOrBlank()) feesStr.toBigDecimal() else BigDecimal.ZERO
             val taxes = if (!taxesStr.isNullOrBlank()) taxesStr.toBigDecimal() else BigDecimal.ZERO
 
@@ -194,7 +216,7 @@ class AddBondSaleController(
 
         runCatching {
             val unitPrice = unitPriceStr.toBigDecimal()
-            val quantity = quantityStr.toBigDecimal()
+            val quantity = principalQuantity(quantityStr)
             val netProfit = if (!netProfitStr.isNullOrBlank()) netProfitStr.toBigDecimal() else BigDecimal.ZERO
 
             totalPrice = unitPrice.multiply(quantity).add(netProfit)
@@ -218,7 +240,7 @@ class AddBondSaleController(
 
         runCatching {
             val unitPrice = unitPriceStr.toBigDecimal()
-            val quantity = quantityStr.toBigDecimal()
+            val quantity = principalQuantity(quantityStr)
             val netProfit = if (!netProfitStr.isNullOrBlank()) netProfitStr.toBigDecimal() else BigDecimal.ZERO
 
             val transactionValue = unitPrice.multiply(quantity).add(netProfit)
@@ -275,6 +297,78 @@ class AddBondSaleController(
         }
     }
 
+    override fun initializeBond(bond: Bond) {
+        super.initializeBond(bond)
+
+        if (isHeldInReais(bond)) {
+            quantityLabel?.text = preferencesService.translate(TranslationKeys.BOND_LABEL_GROSS_REDEEMED)
+
+            val row = amountRow
+            if (row != null && grossYieldGroup.parent != row) {
+                (grossYieldGroup.parent as? Pane)?.children?.remove(grossYieldGroup)
+                row.children.add(grossYieldGroup)
+            }
+        }
+    }
+
+    /**
+     * With the automatic calculation on, the interest and the tax follow the amount and cannot be typed; turning it
+     * off leaves the values as they are and lets the user change them, and turning it on calculates them again.
+     */
+    private fun applyAutoCalculation() {
+        val automatic = autoCalculateCheck.isSelected
+
+        grossYieldField.isEditable = !automatic
+        taxesField.isEditable = !automatic
+
+        if (automatic) {
+            suggestRedemption()
+        }
+    }
+
+    /**
+     * What leaves the bond as principal: for a bond held in reais the field holds the gross amount redeemed, and the
+     * principal is that amount less the interest taken out in it; for any other bond it is the quantity typed.
+     */
+    private fun principalQuantity(quantityText: String): BigDecimal {
+        val typed = quantityText.toBigDecimal()
+        val heldInReais = runCatching { isHeldInReais(bond) }.getOrDefault(false)
+
+        if (!heldInReais) return typed
+
+        val interestText = grossYieldField.text
+        val interest = if (interestText.isNullOrBlank()) BigDecimal.ZERO else interestText.toBigDecimal()
+
+        return typed.subtract(interest).max(BigDecimal.ZERO)
+    }
+
+    private fun suggestRedemption() {
+        if (!::grossYieldField.isInitialized || !::autoCalculateCheck.isInitialized) return
+        if (!autoCalculateCheck.isSelected) return
+
+        val selectedBond = runCatching { bond }.getOrNull()
+        val quantity = quantityField.text?.toBigDecimalOrNull()
+        val unitPrice = unitPriceField.text?.toBigDecimalOrNull()
+
+        if (selectedBond == null || quantity == null || unitPrice == null) {
+            grossYieldField.text = ""
+            taxesField.text = ""
+            return
+        }
+
+        val date = transactionDatePicker.value ?: LocalDate.now()
+
+        val estimate =
+            if (isHeldInReais(selectedBond)) {
+                bondService.estimateRedemptionByGross(selectedBond, quantity, date)
+            } else {
+                bondService.estimateRedemption(selectedBond, quantity, unitPrice, date)
+            }
+
+        grossYieldField.text = estimate.interestShare.toPlainString()
+        taxesField.text = if (estimate.taxApplicable) estimate.estimatedTax.toPlainString() else ""
+    }
+
     private fun calculateProfit() {
         if (!::netProfitField.isInitialized || !::grossYieldField.isInitialized) {
             return
@@ -293,7 +387,7 @@ class AddBondSaleController(
 
         runCatching {
             val saleUnitPrice = unitPriceStr.toBigDecimal()
-            val quantity = quantityStr.toBigDecimal()
+            val quantity = principalQuantity(quantityStr)
             val interest = interestStr.toBigDecimal()
             val fees = if (!feesStr.isNullOrBlank()) feesStr.toBigDecimal() else BigDecimal.ZERO
             val taxes = if (!taxesStr.isNullOrBlank()) taxesStr.toBigDecimal() else BigDecimal.ZERO

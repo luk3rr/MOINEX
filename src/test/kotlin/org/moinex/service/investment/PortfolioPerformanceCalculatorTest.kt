@@ -48,6 +48,48 @@ class PortfolioPerformanceCalculatorTest :
             }
         }
 
+        Given("a dividend of R$ 50 paid on the second day on a position of 100 units") {
+            val prices =
+                listOf(price(1, "2026-10-01", "10"), price(1, "2026-10-02", "11"), price(1, "2026-10-05", "12.1"))
+            val held =
+                Position(
+                    TickerFactory.create(id = 1, symbol = "T1", currentQuantity = BigDecimal("100")),
+                    emptyList(),
+                    prices,
+                    listOf(PortfolioPerformanceCalculator.Payout(day("2026-10-02"), BigDecimal("50"))),
+                )
+
+            Then("the price return leaves the dividend out") {
+                PortfolioPerformanceCalculator
+                    .portfolioReturn(listOf(held), start, end)
+                    .map { it.pct } shouldBe listOf(BigDecimal("0.00"), BigDecimal("10.00"), BigDecimal("21.00"))
+            }
+
+            Then("the total return counts it on the day it was paid: 1.15 x 1.10") {
+                PortfolioPerformanceCalculator
+                    .portfolioReturn(listOf(held), start, end, includeDividends = true)
+                    .map { it.pct } shouldBe listOf(BigDecimal("0.00"), BigDecimal("15.00"), BigDecimal("26.50"))
+            }
+        }
+
+        Given("a bond bought for R$ 1.000 that earns 0.05% a day") {
+            val bond =
+                PortfolioPerformanceCalculator.FixedIncomePosition(
+                    listOf(
+                        day("2026-10-01") to BigDecimal("1000"),
+                        day("2026-10-02") to BigDecimal("1000.5"),
+                        day("2026-10-05") to BigDecimal("1001.00025"),
+                    ),
+                    listOf(day("2026-10-01") to BigDecimal("1000")),
+                )
+
+            Then("the line follows the bond: the purchase is not a gain, 0.05% then 0.10% accumulated") {
+                PortfolioPerformanceCalculator
+                    .portfolioReturn(emptyList(), start, end, fixedIncome = listOf(bond))
+                    .map { it.pct } shouldBe listOf(BigDecimal("0.00"), BigDecimal("0.05"), BigDecimal("0.10"))
+            }
+        }
+
         Given("money put in during the period") {
             val prices =
                 listOf(price(1, "2026-10-01", "10"), price(1, "2026-10-02", "11"), price(1, "2026-10-05", "12.1"))

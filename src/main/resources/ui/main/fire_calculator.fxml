@@ -148,6 +148,8 @@
             <!-- No convergence warning -->
             <Label fx:id="noConvergenceLabel" managed="false" styleClass="fire-no-convergence-label" text="%fire.result.noConvergence" visible="false" />
 
+            <Label fx:id="assumptionsLabel" text="%fire.result.assumptions" wrapText="true" />
+
             <!-- Projection chart -->
             <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                <children>

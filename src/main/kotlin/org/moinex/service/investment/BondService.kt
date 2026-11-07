@@ -9,9 +9,12 @@
 package org.moinex.service.investment
 
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.calculateInvestedAmountUntil
+import org.moinex.common.extension.calculateQuantityUntil
 import org.moinex.common.extension.findByIdOrThrow
-import org.moinex.common.extension.isZero
+import org.moinex.common.extension.isHeldInReais
 import org.moinex.common.extension.toRounded
+import org.moinex.model.dto.BondRedemptionEstimateDTO
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.OperationType
@@ -29,9 +32,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 import java.text.MessageFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 @Service
 class BondService(
@@ -43,6 +50,11 @@ class BondService(
     private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(BondService::class.java)
+
+    companion object {
+        private const val PRICE_SCALE = 8
+        private const val SHARE_SCALE = 10
+    }
 
     @Transactional
     fun createBond(bond: Bond) {
@@ -318,31 +330,159 @@ class BondService(
 
     @Transactional(readOnly = true)
     fun getAverageUnitPrice(bond: Bond): BigDecimal {
-        val purchases =
-            bondOperationRepository.findByBondAndOperationTypeOrderByOperationDateAsc(
-                bond,
-                OperationType.BUY,
-            )
+        val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
+        val heldQuantity = operations.calculateQuantityUntil(LocalDate.MAX)
 
-        if (purchases.isEmpty()) {
+        if (heldQuantity.signum() > 0) {
+            return operations
+                .calculateInvestedAmountUntil(LocalDate.MAX)
+                .divide(heldQuantity, PRICE_SCALE, RoundingMode.HALF_UP)
+                .toRounded()
+        }
+
+        val purchases = operations.filter { it.isPurchase() }
+        val purchasedQuantity = purchases.fold(BigDecimal.ZERO) { acc, purchase -> acc.add(purchase.quantity) }
+
+        if (purchasedQuantity.signum() <= 0) {
             return BigDecimal.ZERO
         }
 
-        val totalValue =
-            purchases.fold(BigDecimal.ZERO) { acc, purchase ->
-                acc.add(purchase.unitPrice.multiply(purchase.quantity))
+        return purchases
+            .fold(BigDecimal.ZERO) { acc, purchase -> acc.add(purchase.unitPrice.multiply(purchase.quantity)) }
+            .divide(purchasedQuantity, PRICE_SCALE, RoundingMode.HALF_UP)
+            .toRounded()
+    }
+
+    /**
+     * Whether [bond] is held as an amount in reais: a CDB, LCI or LCA whose units cost one. Bonds of those types saved
+     * with another unit price keep showing quantity and price.
+     */
+    @Transactional(readOnly = true)
+    fun isAmountOnly(bond: Bond): Boolean =
+        bond.isHeldInReais() && getAverageUnitPrice(bond).compareTo(BigDecimal.ONE) == 0
+
+    /**
+     * What a redemption of [quantity] units at [unitPrice] on [date] takes out besides the principal: the same share
+     * of the interest held in the bond as the share of the principal redeemed, and the estimated tax on it.
+     */
+    @Transactional(readOnly = true)
+    fun estimateRedemption(
+        bond: Bond,
+        quantity: BigDecimal,
+        unitPrice: BigDecimal,
+        date: LocalDate,
+    ): BondRedemptionEstimateDTO {
+        val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
+        val principalHeld = operations.calculateInvestedAmountUntil(date)
+
+        val share =
+            if (principalHeld.signum() > 0) {
+                quantity
+                    .multiply(
+                        unitPrice,
+                    ).divide(principalHeld, SHARE_SCALE, RoundingMode.HALF_UP)
+                    .min(BigDecimal.ONE)
+            } else {
+                BigDecimal.ZERO
             }
 
-        val totalQuantity =
-            purchases.fold(BigDecimal.ZERO) { acc, purchase ->
-                acc.add(purchase.quantity)
+        return redemption(bond, operations, principalHeld, share, date)
+    }
+
+    /**
+     * What redeeming [gross] reais on [date] takes out of [bond]: the principal and the interest in the proportion in
+     * which both are held, and the estimated tax on that interest.
+     */
+    @Transactional(readOnly = true)
+    fun estimateRedemptionByGross(
+        bond: Bond,
+        gross: BigDecimal,
+        date: LocalDate,
+    ): BondRedemptionEstimateDTO {
+        val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
+        val principalHeld = operations.calculateInvestedAmountUntil(date)
+        val interestHeld = interestHeld(bond)
+        val balance = principalHeld.add(interestHeld)
+
+        val share =
+            if (balance.signum() > 0) {
+                gross.divide(balance, SHARE_SCALE, RoundingMode.HALF_UP).min(BigDecimal.ONE)
+            } else {
+                BigDecimal.ZERO
             }
 
-        if (totalQuantity.isZero()) {
-            return BigDecimal.ZERO
-        }
+        return redemption(bond, operations, principalHeld, share, date)
+    }
 
-        return totalValue.divide(totalQuantity).toRounded()
+    private fun interestHeld(bond: Bond): BigDecimal =
+        (bondInterestCalculationService.getLatestCalculation(bond.id!!)?.accumulatedInterest ?: BigDecimal.ZERO)
+            .max(BigDecimal.ZERO)
+
+    private fun redemption(
+        bond: Bond,
+        operations: List<BondOperation>,
+        principalHeld: BigDecimal,
+        share: BigDecimal,
+        date: LocalDate,
+    ): BondRedemptionEstimateDTO {
+        val interest = interestHeld(bond).multiply(share).setScale(2, RoundingMode.HALF_UP)
+        val lots = taxLotsAt(operations, date).map { BondTaxEstimator.Lot(it.principal.multiply(share), it.ageDays) }
+        val estimate = BondTaxEstimator.estimate(bond.type, lots, interest)
+
+        return BondRedemptionEstimateDTO(
+            interest,
+            estimate.tax,
+            estimate.applicable,
+            principalHeld.multiply(share).setScale(2, RoundingMode.HALF_UP),
+        )
+    }
+
+    /**
+     * The interest held in [bond], its estimated tax and the net, as if everything were redeemed on [date].
+     */
+    @Transactional(readOnly = true)
+    fun estimateNetInterest(
+        bond: Bond,
+        date: LocalDate,
+    ): BondRedemptionEstimateDTO {
+        val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
+        val interest =
+            (bondInterestCalculationService.getLatestCalculation(bond.id!!)?.accumulatedInterest ?: BigDecimal.ZERO)
+                .max(BigDecimal.ZERO)
+        val estimate = BondTaxEstimator.estimate(bond.type, taxLotsAt(operations, date), interest)
+
+        return BondRedemptionEstimateDTO(interest, estimate.tax, estimate.applicable)
+    }
+
+    private fun taxLotsAt(
+        operations: List<BondOperation>,
+        date: LocalDate,
+    ): List<BondTaxEstimator.Lot> {
+        val lots = mutableListOf<Pair<LocalDate, BigDecimal>>()
+
+        operations
+            .filter { it.localDate <= date }
+            .sortedBy { it.localDate }
+            .forEach { operation ->
+                val value = operation.quantity.multiply(operation.unitPrice)
+
+                if (operation.isPurchase()) {
+                    lots.add(operation.localDate to value)
+                } else {
+                    val total = lots.fold(BigDecimal.ZERO) { acc, lot -> acc.add(lot.second) }
+
+                    if (total.signum() > 0) {
+                        val kept =
+                            BigDecimal.ONE
+                                .subtract(
+                                    value.divide(total, MathContext.DECIMAL64),
+                                ).max(BigDecimal.ZERO)
+                        lots.replaceAll { it.first to it.second.multiply(kept) }
+                    }
+                }
+            }
+
+        return lots.map { BondTaxEstimator.Lot(it.second, ChronoUnit.DAYS.between(it.first, date)) }
     }
 
     @Transactional(readOnly = true)
@@ -378,11 +518,7 @@ class BondService(
 
         return bonds
             .filter { getCurrentQuantity(it) > BigDecimal.ZERO }
-            .fold(BigDecimal.ZERO) { total, bond ->
-                val currentQuantity = getCurrentQuantity(bond)
-                val averagePrice = getAverageUnitPrice(bond)
-                total.add(averagePrice.multiply(currentQuantity))
-            }
+            .fold(BigDecimal.ZERO) { total, bond -> total.add(getTotalInvestedValue(bond)) }
     }
 
     @Transactional(readOnly = true)
@@ -395,7 +531,10 @@ class BondService(
     }
 
     @Transactional(readOnly = true)
-    fun getTotalInvestedValue(bond: Bond): BigDecimal = getAverageUnitPrice(bond).multiply(getCurrentQuantity(bond))
+    fun getTotalInvestedValue(bond: Bond): BigDecimal =
+        bondOperationRepository
+            .findByBondOrderByOperationDateAsc(bond)
+            .calculateInvestedAmountUntil(LocalDate.MAX)
 
     @Transactional(readOnly = true)
     fun getAllBondsTotalAccumulatedInterest(): BigDecimal {

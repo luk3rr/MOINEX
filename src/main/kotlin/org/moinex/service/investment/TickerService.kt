@@ -9,6 +9,7 @@
 package org.moinex.service.investment
 
 import org.moinex.common.ClockProvider
+import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
@@ -99,6 +100,7 @@ class TickerService(
             currentUnitValue = updatedTicker.currentUnitValue
             currentQuantity = updatedTicker.currentQuantity
             averageUnitValue = updatedTicker.averageUnitValue
+            averageUnitValueCount = updatedTicker.currentQuantity
         }
 
         logger.info("$tickerFromDatabase updated successfully")
@@ -204,10 +206,24 @@ class TickerService(
             "${updatedPurchase.ticker} not found and cannot update purchase"
         }
 
+        val purchasedTicker = tickerPurchaseFromDatabase.ticker
+
+        check(
+            purchasedTicker.currentQuantity
+                .subtract(tickerPurchaseFromDatabase.quantity)
+                .add(updatedPurchase.quantity) >= BigDecimal.ZERO,
+        ) {
+            "The new quantity would leave a negative quantity held"
+        }
+
+        reversePurchaseOnPosition(purchasedTicker, tickerPurchaseFromDatabase)
+
         tickerPurchaseFromDatabase.apply {
             quantity = updatedPurchase.quantity
             unitPrice = updatedPurchase.unitPrice
         }
+
+        updateTickerAfterPurchase(purchasedTicker, tickerPurchaseFromDatabase)
 
         val walletTransaction = updatedPurchase.walletTransaction!!
         walletTransaction.amount = updatedPurchase.unitPrice.multiply(updatedPurchase.quantity)
@@ -229,6 +245,12 @@ class TickerService(
     @Transactional
     fun deleteTickerPurchase(purchaseId: Int) {
         val purchaseFromDatabase = tickerPurchaseRepository.findByIdOrThrow(purchaseId)
+
+        check(purchaseFromDatabase.ticker.currentQuantity >= purchaseFromDatabase.quantity) {
+            "Deleting the purchase would leave a negative quantity held"
+        }
+
+        reversePurchaseOnPosition(purchaseFromDatabase.ticker, purchaseFromDatabase)
 
         tickerPurchaseRepository.delete(purchaseFromDatabase)
         walletService.deleteWalletTransaction(purchaseFromDatabase.walletTransaction!!.id!!)
@@ -269,7 +291,7 @@ class TickerService(
 
         val newTickerSale = tickerSaleRepository.save(tickerSale)
 
-        tickerFromDatabase.currentQuantity = tickerFromDatabase.currentQuantity.subtract(tickerSale.quantity)
+        applySaleOnPosition(tickerFromDatabase, tickerSale.quantity)
 
         notificationService.send(
             type = NotificationType.SUCCESS,
@@ -291,10 +313,20 @@ class TickerService(
             "Ticker with id ${updatedSale.ticker.id} not found and cannot update sale"
         }
 
+        val soldTicker = tickerSaleFromDatabase.ticker
+
+        reverseSaleOnPosition(soldTicker, tickerSaleFromDatabase)
+
+        check(updatedSale.quantity <= soldTicker.currentQuantity) {
+            "Quantity must be less than or equal to the available quantity"
+        }
+
         tickerSaleFromDatabase.apply {
             quantity = updatedSale.quantity
             unitPrice = updatedSale.unitPrice
         }
+
+        applySaleOnPosition(soldTicker, updatedSale.quantity)
 
         val walletTransaction = updatedSale.walletTransaction!!
 
@@ -317,6 +349,8 @@ class TickerService(
     @Transactional
     fun deleteTickerSale(saleId: Int) {
         val saleFromDatabase = tickerSaleRepository.findByIdOrThrow(saleId)
+
+        reverseSaleOnPosition(saleFromDatabase.ticker, saleFromDatabase)
 
         tickerSaleRepository.delete(saleFromDatabase)
         walletService.deleteWalletTransaction(saleFromDatabase.walletTransaction!!.id!!)
@@ -730,6 +764,54 @@ class TickerService(
         )
     }
 
+    private fun applySaleOnPosition(
+        ticker: Ticker,
+        quantity: BigDecimal,
+    ) {
+        ticker.currentQuantity = ticker.currentQuantity.subtract(quantity)
+        ticker.averageUnitValueCount = ticker.averageUnitValueCount.subtract(quantity).max(BigDecimal.ZERO)
+    }
+
+    private fun reverseSaleOnPosition(
+        ticker: Ticker,
+        sale: TickerSale,
+    ) {
+        val heldBefore = ticker.averageUnitValueCount
+        val totalQuantity = heldBefore.add(sale.quantity)
+
+        ticker.averageUnitValue =
+            if (heldBefore.isZero()) {
+                sale.averageCost
+            } else {
+                ticker.averageUnitValue
+                    .multiply(heldBefore)
+                    .add(sale.averageCost.multiply(sale.quantity))
+                    .divide(totalQuantity, Constants.INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP)
+            }
+        ticker.averageUnitValueCount = totalQuantity
+        ticker.currentQuantity = ticker.currentQuantity.add(sale.quantity)
+    }
+
+    private fun reversePurchaseOnPosition(
+        ticker: Ticker,
+        purchase: TickerPurchase,
+    ) {
+        val remaining = ticker.averageUnitValueCount.subtract(purchase.quantity)
+
+        ticker.averageUnitValue =
+            if (remaining.signum() <= 0) {
+                BigDecimal.ZERO
+            } else {
+                ticker.averageUnitValue
+                    .multiply(ticker.averageUnitValueCount)
+                    .subtract(purchase.unitPrice.multiply(purchase.quantity))
+                    .divide(remaining, Constants.INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP)
+                    .max(BigDecimal.ZERO)
+            }
+        ticker.averageUnitValueCount = remaining.max(BigDecimal.ZERO)
+        ticker.currentQuantity = ticker.currentQuantity.subtract(purchase.quantity)
+    }
+
     private fun updateTickerAfterPurchase(
         ticker: Ticker,
         tickerPurchase: TickerPurchase,
@@ -746,7 +828,7 @@ class TickerService(
             ticker.averageUnitValue =
                 currentTotalValue
                     .add(newTotalValue)
-                    .divide(totalQuantity, 2, RoundingMode.HALF_UP)
+                    .divide(totalQuantity, Constants.INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP)
         }
 
         ticker.averageUnitValueCount = totalQuantity

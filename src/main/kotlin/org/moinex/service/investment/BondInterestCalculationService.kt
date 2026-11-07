@@ -11,24 +11,20 @@ package org.moinex.service.investment
 import org.moinex.common.ClockProvider
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.calculateInvestedAmountUntil
-import org.moinex.common.extension.calculateOperationStateUntil
 import org.moinex.common.extension.calculateQuantityUntil
 import org.moinex.common.extension.findByIdOrThrow
-import org.moinex.common.extension.getLastBuyPrice
-import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual
+import org.moinex.common.extension.realizedInterest
 import org.moinex.common.extension.toRounded
 import org.moinex.model.dto.BondInterestCalculationContextDTO
-import org.moinex.model.dto.BondOperationStateDTO
 import org.moinex.model.dto.BondPeriodInterestResultDTO
-import org.moinex.model.dto.BondPeriodStateDTO
+import org.moinex.model.dto.InterestRecalculationRowDTO
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.InterestType
 import org.moinex.model.enums.NotificationType
 import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondInterestCalculation
 import org.moinex.model.investment.BondOperation
-import org.moinex.model.investment.MarketIndicatorHistory
 import org.moinex.repository.investment.BondInterestCalculationRepository
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
@@ -37,10 +33,12 @@ import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.interceptor.TransactionAspectSupport
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.math.BigDecimal
+import java.math.MathContext
 import java.time.LocalDate
 import java.time.YearMonth
-import kotlin.math.pow
 
 @Service
 class BondInterestCalculationService(
@@ -55,10 +53,10 @@ class BondInterestCalculationService(
     private val logger = LoggerFactory.getLogger(BondInterestCalculationService::class.java)
 
     companion object {
-        private const val DAYS_PER_YEAR = 252
         private val HUNDRED = BigDecimal("100")
         private const val FIXED_FORMAT = "FIXED: %s%% a.a."
-        private const val FLOATING_FORMAT = "FLOATING: %s + %s%%"
+        private const val FLOATING_FORMAT = "FLOATING: %s%% of %s"
+        private const val FLOATING_SPREAD_FORMAT = "FLOATING: %s + %s%% a.a."
         private const val ZERO_COUPON_METHOD = "ZERO_COUPON"
     }
 
@@ -91,7 +89,10 @@ class BondInterestCalculationService(
     }
 
     @Transactional
-    fun calculateAndStoreMonthlyInterest(bond: Bond) {
+    fun calculateAndStoreMonthlyInterest(
+        bond: Bond,
+        fromStart: Boolean = false,
+    ) {
         requireBondConfiguration(bond)
 
         val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
@@ -107,7 +108,7 @@ class BondInterestCalculationService(
         val currentMonth = YearMonth.from(clockProvider.now())
 
         val context =
-            resolveCalculationContext(bond, startMonth, currentMonth) ?: run {
+            resolveCalculationContext(bond, startMonth, currentMonth, fromStart) ?: run {
                 logger.debug("No recalculation needed for {}", bond)
                 return
             }
@@ -135,10 +136,44 @@ class BondInterestCalculationService(
             return
         }
 
-        bondInterestCalculationRepository.deleteByBond(bond)
-
-        calculateAndStoreMonthlyInterest(bond)
+        calculateAndStoreMonthlyInterest(bond, fromStart = true)
         logger.info("Completed full recalculation of interest history for $bond")
+    }
+
+    /**
+     * What recalculating the history of [bondId] would change, without changing anything: the recalculation runs and
+     * its transaction is rolled back. Months adjusted by hand keep their interest.
+     */
+    @Transactional
+    fun previewRecalculation(bondId: Int): List<InterestRecalculationRowDTO> {
+        val bond = bondRepository.findByIdOrThrow(bondId)
+
+        val before =
+            bondInterestCalculationRepository
+                .findByBondOrderByReferenceMonthAsc(bond)
+                .associate { it.referenceMonth to (it.monthlyInterest to it.accumulatedInterest) }
+
+        calculateAndStoreMonthlyInterest(bond, fromStart = true)
+
+        val rows =
+            bondInterestCalculationRepository
+                .findByBondOrderByReferenceMonthAsc(bond)
+                .map { after ->
+                    InterestRecalculationRowDTO(
+                        month = after.referenceMonth,
+                        manuallyAdjusted = after.manuallyAdjusted,
+                        monthlyBefore = before[after.referenceMonth]?.first,
+                        monthlyAfter = after.monthlyInterest,
+                        accumulatedBefore = before[after.referenceMonth]?.second,
+                        accumulatedAfter = after.accumulatedInterest,
+                    )
+                }
+
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+        }
+
+        return rows
     }
 
     @Transactional
@@ -265,407 +300,12 @@ class BondInterestCalculationService(
     fun getMonthlyInterestHistory(bond: Bond): List<BondInterestCalculation> =
         bondInterestCalculationRepository.findByBondOrderByReferenceMonthAsc(bond)
 
-    private fun calculateMonthlyInterest(
-        bond: Bond,
-        month: YearMonth,
-        operations: List<BondOperation>,
-    ): BigDecimal {
-        if (operations.isEmpty()) return BigDecimal.ZERO
-
-        val monthStart = month.atDay(1)
-        val monthEnd = month.atEndOfMonth()
-
-        val initialOperationState = operations.calculateOperationStateUntil(monthStart.minusDays(1))
-        val initialState =
-            BondOperationStateDTO(
-                quantity = initialOperationState.quantity,
-                lastSpread = initialOperationState.lastSpread,
-                lastBuyPrice = initialOperationState.lastBuyPrice,
-                interest = BigDecimal.ZERO,
-                lastDate = monthStart,
-            )
-
-        val state =
-            operations
-                .asSequence()
-                .filter { it.localDate.isAfterOrEqual(monthStart) }
-                .takeWhile { it.localDate.isBeforeOrEqual(monthEnd) }
-                .fold(initialState) { state, operation ->
-                    val operationDate = operation.localDate
-                    val newInterest = calculateInterestUntilOperation(bond, state, operationDate)
-                    updateStateWithOperation(state, operation, newInterest, operationDate)
-                }
-
-        if (shouldSkipFinalInterestCalculation(state, monthEnd)) {
-            return state.interest ?: BigDecimal.ZERO
-        }
-
-        return calculateFinalMonthInterest(bond, state, monthEnd, operations)
-    }
-
-    private fun calculateInterestUntilOperation(
-        bond: Bond,
-        state: BondOperationStateDTO,
-        operationDate: LocalDate,
-    ): BigDecimal {
-        if (!shouldCalculateInterestBetweenOperations(state, operationDate)) {
-            return state.interest ?: BigDecimal.ZERO
-        }
-
-        val spread = getSpreadToUse(state.lastSpread, bond.interestRate)
-        val buyPrice = state.lastBuyPrice ?: BigDecimal.ZERO
-
-        val interest =
-            calculatePeriodInterest(
-                bond,
-                state.lastDate!!,
-                operationDate,
-                state.quantity,
-                buyPrice,
-                spread,
-            )
-
-        return (state.interest ?: BigDecimal.ZERO).add(interest)
-    }
-
-    private fun calculateFinalMonthInterest(
-        bond: Bond,
-        state: BondOperationStateDTO,
-        monthEnd: LocalDate,
-        operations: List<BondOperation>,
-    ): BigDecimal {
-        val lastBuyPrice = state.lastBuyPrice ?: operations.getLastBuyPrice() ?: BigDecimal.ZERO
-        val spread = getSpreadToUse(state.lastSpread, bond.interestRate)
-
-        val finalInterest =
-            calculatePeriodInterest(
-                bond,
-                state.lastDate!!,
-                monthEnd,
-                state.quantity,
-                lastBuyPrice,
-                spread,
-            )
-
-        return (state.interest ?: BigDecimal.ZERO).add(finalInterest)
-    }
-
-    private fun shouldCalculateInterestBetweenOperations(
-        state: BondOperationStateDTO,
-        operationDate: LocalDate,
-    ): Boolean =
-        state.quantity > BigDecimal.ZERO &&
-            state.lastDate != null &&
-            operationDate > state.lastDate
-
-    private fun shouldSkipFinalInterestCalculation(
-        state: BondOperationStateDTO,
-        monthEnd: LocalDate,
-    ): Boolean =
-        state.quantity <= BigDecimal.ZERO ||
-            state.lastDate == null ||
-            state.lastDate >= monthEnd
-
-    private fun updateStateWithOperation(
-        state: BondOperationStateDTO,
-        operation: BondOperation,
-        newInterest: BigDecimal,
-        operationDate: LocalDate = operation.localDate,
-    ): BondOperationStateDTO {
-        val newQuantity =
-            when {
-                operation.isPurchase() -> state.quantity.add(operation.quantity)
-                else -> state.quantity.minus(operation.quantity)
-            }
-
-        val newSpread = operation.spread ?: state.lastSpread
-
-        val newLastBuyPrice =
-            when {
-                operation.isPurchase() -> operation.unitPrice
-                else -> state.lastBuyPrice ?: BigDecimal.ZERO
-            }
-
-        return state.copy(
-            interest = newInterest,
-            quantity = newQuantity,
-            lastSpread = newSpread,
-            lastDate = operationDate,
-            lastBuyPrice = newLastBuyPrice,
-        )
-    }
-
-    private fun updatePeriodStateWithOperation(
-        bond: Bond,
-        state: BondPeriodStateDTO,
-        operation: BondOperation,
-    ): BondPeriodStateDTO {
-        val operationDate = operation.localDate
-
-        var newInterest = state.interest
-        if (state.quantity > BigDecimal.ZERO && operationDate.isAfter(state.lastCalculationDate)) {
-            val spreadToUse = getSpreadToUse(state.lastSpread, bond.interestRate)
-            val buyPrice = state.lastBuyPrice ?: BigDecimal.ZERO
-
-            val interest =
-                calculatePeriodInterest(
-                    bond,
-                    state.lastCalculationDate,
-                    operationDate,
-                    state.quantity,
-                    buyPrice,
-                    spreadToUse,
-                )
-
-            newInterest = newInterest.add(interest)
-        }
-
-        val newQuantity =
-            when {
-                operation.isPurchase() -> state.quantity.add(operation.quantity)
-                else -> state.quantity.subtract(operation.quantity)
-            }
-
-        val newSpread = operation.spread ?: state.lastSpread
-        val newLastBuyPrice =
-            when {
-                operation.isPurchase() -> operation.unitPrice
-                else -> state.lastBuyPrice
-            }
-
-        return state.copy(
-            quantity = newQuantity,
-            lastSpread = newSpread,
-            lastBuyPrice = newLastBuyPrice,
-            interest = newInterest,
-            lastCalculationDate = operationDate,
-        )
-    }
-
-    private fun calculatePeriodInterest(
-        bond: Bond,
-        startDate: LocalDate,
-        endDate: LocalDate,
-        quantity: BigDecimal,
-        unitPrice: BigDecimal,
-        spread: BigDecimal,
-    ): BigDecimal =
-        when (bond.interestType) {
-            InterestType.FIXED -> calculateFixedInterest(bond, startDate, endDate, quantity, unitPrice)
-            InterestType.FLOATING ->
-                calculateFloatingInterest(
-                    bond,
-                    startDate,
-                    endDate,
-                    quantity,
-                    unitPrice,
-                    bond.interestIndex!!,
-                    spread,
-                )
-            else -> BigDecimal.ZERO
-        }
-
-    private fun calculateFinalPeriodInterest(
-        bond: Bond,
-        state: BondPeriodStateDTO,
-        adjustedEnd: LocalDate,
-        operations: List<BondOperation>,
-    ): BondPeriodStateDTO {
-        if (state.quantity <= BigDecimal.ZERO || state.lastCalculationDate >= adjustedEnd) {
-            return state
-        }
-
-        val lastBuyPrice =
-            state.lastBuyPrice
-                ?: operations.getLastBuyPrice()
-                ?: throw IllegalStateException("Cannot calculate interest without buy operations for bond ${bond.name}")
-
-        val spreadToUse = getSpreadToUse(state.lastSpread, bond.interestRate)
-        val indicatorIndex =
-            bond.interestIndex
-                ?: throw IllegalStateException("Bond ${bond.name} must have an interest index configured")
-
-        val availableData =
-            marketIndicatorService.getIndicatorHistoryBetween(
-                indicatorIndex,
-                state.lastCalculationDate,
-                adjustedEnd,
-            )
-
-        if (availableData.isEmpty()) {
-            return state
-        }
-
-        val actualLastDate = availableData.maxOf { it.referenceDate }
-        val interest =
-            calculatePeriodInterest(
-                bond,
-                state.lastCalculationDate,
-                actualLastDate,
-                state.quantity,
-                lastBuyPrice,
-                spreadToUse,
-            )
-
-        return state.copy(
-            interest = state.interest.add(interest),
-            actualLastDate = actualLastDate,
-        )
-    }
-
-    private fun calculateFloatingInterest(
-        bond: Bond,
-        startDate: LocalDate,
-        endDate: LocalDate,
-        quantity: BigDecimal,
-        unitPrice: BigDecimal,
-        indicatorType: InterestIndex,
-        spread: BigDecimal,
-    ): BigDecimal {
-        val investedAmount = quantity.multiply(unitPrice)
-
-        return runCatching {
-            val accumulatedRate =
-                getAccumulatedIndicatorRate(
-                    indicatorType,
-                    startDate,
-                    endDate,
-                    spread,
-                )
-
-            investedAmount.multiply(accumulatedRate.subtract(BigDecimal.ONE)).also { interest ->
-                logger.debug(
-                    "Floating interest: bond={}, indicator={}, spread={}, accumulated={}, invested={}, interest={}",
-                    bond,
-                    indicatorType,
-                    spread,
-                    accumulatedRate.toRounded(6),
-                    investedAmount.toRounded(),
-                    interest.toRounded(),
-                )
-            }
-        }.getOrElse { e ->
-            logger.warn(
-                "Could not calculate floating interest for {}: {}",
-                bond,
-                e.message,
-            )
-            BigDecimal.ZERO
-        }
-    }
-
-    private fun calculateFixedInterest(
-        bond: Bond,
-        startDate: LocalDate,
-        endDate: LocalDate,
-        quantity: BigDecimal,
-        unitPrice: BigDecimal,
-    ): BigDecimal {
-        val investedAmount = quantity.multiply(unitPrice)
-
-        val index =
-            requireNotNull(bond.interestIndex) {
-                "Bond must have an interest index"
-            }
-
-        val indexData =
-            marketIndicatorService.getIndicatorHistoryBetween(
-                index,
-                startDate,
-                endDate,
-            )
-
-        val businessDays = indexData.size
-
-        if (businessDays == 0) {
-            logger.warn(
-                "No business days found between {} and {} using {}",
-                startDate,
-                endDate,
-                index,
-            )
-            return BigDecimal.ZERO
-        }
-
-        val interestRate =
-            requireNotNull(bond.interestRate) {
-                "Bond must have an interest rate"
-            }
-
-        val annualFactor = BigDecimal.ONE.add(interestRate.divide(HUNDRED))
-
-        val exponent = businessDays / DAYS_PER_YEAR.toDouble()
-
-        val accumulatedFactor = BigDecimal(annualFactor.toDouble().pow(exponent))
-
-        val interest = investedAmount.multiply(accumulatedFactor.subtract(BigDecimal.ONE))
-
-        logger.debug(
-            "Fixed interest: bond={}, days={}, rate={}, invested={}, factor={}, interest={}",
-            bond,
-            businessDays,
-            bond.interestRate,
-            investedAmount.toRounded(),
-            accumulatedFactor.toRounded(6),
-            interest.toRounded(),
-        )
-
-        return interest
-    }
-
-    private fun getAccumulatedIndicatorRate(
-        indicatorType: InterestIndex,
-        startDate: LocalDate,
-        endDate: LocalDate,
-        percentageOfIndicator: BigDecimal,
-    ): BigDecimal {
-        val historicalData =
-            marketIndicatorService.getIndicatorHistoryBetween(
-                indicatorType,
-                startDate,
-                endDate,
-            )
-
-        if (historicalData.isEmpty()) {
-            logger.warn(
-                "No historical data found for {} between {} and {}",
-                indicatorType,
-                startDate,
-                endDate,
-            )
-            return BigDecimal.ONE
-        }
-
-        val factor = getAccumulatedFactor(percentageOfIndicator, historicalData)
-
-        logger.debug(
-            "Accumulated rate {} from {} to {}: {} days factor={}",
-            indicatorType,
-            startDate,
-            endDate,
-            historicalData.size,
-            factor.toRounded(6),
-        )
-
-        return factor
-    }
-
-    private fun getAccumulatedFactor(
-        percentageOfIndicator: BigDecimal,
-        historicalData: List<MarketIndicatorHistory>,
-    ): BigDecimal =
-        historicalData.fold(BigDecimal.ONE) { acc, data ->
-            val adjustedRate = data.rateValue.add(percentageOfIndicator)
-
-            val dailyFactor = BigDecimal.ONE.add(adjustedRate.divide(HUNDRED))
-
-            acc.multiply(dailyFactor)
-        }
-
     private fun getCalculationMethod(bond: Bond): String =
         when (bond.interestType) {
             InterestType.FIXED -> String.format(FIXED_FORMAT, bond.interestRate)
-            InterestType.FLOATING -> String.format(FLOATING_FORMAT, bond.interestIndex, bond.interestRate)
+            InterestType.FLOATING -> String.format(FLOATING_FORMAT, bond.interestRate, bond.interestIndex)
+            InterestType.FLOATING_SPREAD ->
+                String.format(FLOATING_SPREAD_FORMAT, bond.interestIndex, bond.interestRate)
             InterestType.ZERO_COUPON -> ZERO_COUPON_METHOD
             else -> ""
         }
@@ -693,57 +333,175 @@ class BondInterestCalculationService(
         return data.maxOfOrNull { it.referenceDate } ?: startDate
     }
 
+    private fun indexFor(bond: Bond): InterestIndex = bond.interestIndex ?: InterestIndex.CDI
+
+    private fun indexPoints(
+        bond: Bond,
+        start: LocalDate,
+        end: LocalDate,
+    ): List<BondAccrualCalculator.IndexPoint> =
+        marketIndicatorService
+            .getIndicatorHistoryBetween(indexFor(bond), start, end)
+            .filter { it.referenceDate in start..end }
+            .map { BondAccrualCalculator.IndexPoint(it.referenceDate, it.rateValue) }
+
+    private fun flowsBetween(
+        operations: List<BondOperation>,
+        start: LocalDate,
+        end: LocalDate,
+    ): List<BondAccrualCalculator.Flow> =
+        operations
+            .filter { it.localDate in start..end }
+            .map {
+                val amount = it.quantity.multiply(it.unitPrice)
+                BondAccrualCalculator.Flow(
+                    date = it.localDate,
+                    amount = if (it.isPurchase()) amount else amount.add(it.realizedInterest()).negate(),
+                    rate = it.spread?.takeIf { rate -> rate.signum() > 0 },
+                )
+            }
+
+    private fun openingLotsAt(
+        operations: List<BondOperation>,
+        date: LocalDate,
+    ): List<BondAccrualCalculator.OpeningLot> {
+        val lots = mutableListOf<Pair<BigDecimal?, BigDecimal>>()
+
+        operations
+            .filter { it.localDate <= date }
+            .sortedBy { it.localDate }
+            .forEach { operation ->
+                val value = operation.quantity.multiply(operation.unitPrice)
+
+                if (operation.isPurchase()) {
+                    lots.add(operation.spread?.takeIf { it.signum() > 0 } to value)
+                } else {
+                    val total = lots.fold(BigDecimal.ZERO) { acc, lot -> acc.add(lot.second) }
+
+                    if (total.signum() > 0) {
+                        val kept =
+                            BigDecimal.ONE
+                                .subtract(
+                                    value.divide(total, MathContext.DECIMAL64),
+                                ).max(BigDecimal.ZERO)
+                        lots.replaceAll { it.first to it.second.multiply(kept) }
+                    }
+                }
+            }
+
+        return lots.map { BondAccrualCalculator.OpeningLot(it.second, it.first) }
+    }
+
+    private fun openingBalance(
+        bond: Bond,
+        month: YearMonth,
+        operations: List<BondOperation>,
+    ): BigDecimal =
+        bondInterestCalculationRepository
+            .findByBondAndReferenceMonth(bond, month.minusMonths(1))
+            ?.finalValue
+            ?: operations.calculateInvestedAmountUntil(month.atDay(1).minusDays(1))
+
+    private fun accrue(
+        bond: Bond,
+        opening: BigDecimal,
+        start: LocalDate,
+        end: LocalDate,
+        operations: List<BondOperation>,
+    ): BigDecimal {
+        val type = bond.interestType ?: return BigDecimal.ZERO
+        val rate = requireNotNull(bond.interestRate) { "Bond ${bond.name} must have an interest rate configured" }
+
+        return BondAccrualCalculator.periodInterest(
+            type = type,
+            index = indexFor(bond),
+            bondRate = rate,
+            opening = opening,
+            openingLots = openingLotsAt(operations, start.minusDays(1)),
+            flows = flowsBetween(operations, start, end),
+            points = indexPoints(bond, start, end),
+        )
+    }
+
+    private fun calculateMonthlyInterest(
+        bond: Bond,
+        month: YearMonth,
+        operations: List<BondOperation>,
+    ): BigDecimal {
+        if (operations.isEmpty()) return BigDecimal.ZERO
+
+        return accrue(bond, openingBalance(bond, month, operations), month.atDay(1), month.atEndOfMonth(), operations)
+    }
+
     private fun calculatePeriodInterestForMonth(
         bond: Bond,
         month: YearMonth,
         periodStart: LocalDate,
         periodEnd: LocalDate,
         previousCalculatedUntil: LocalDate,
+        accumulatedSoFar: BigDecimal,
         operations: List<BondOperation>,
     ): BondPeriodInterestResultDTO {
         if (operations.isEmpty()) {
             return BondPeriodInterestResultDTO(BigDecimal.ZERO, previousCalculatedUntil)
         }
 
-        val period =
+        val (adjustedStart, adjustedEnd) =
             clampPeriodToMonth(month, periodStart, periodEnd)
                 ?: return BondPeriodInterestResultDTO(BigDecimal.ZERO, previousCalculatedUntil)
 
-        val (adjustedStart, adjustedEnd) = period
+        val points = indexPoints(bond, adjustedStart, adjustedEnd)
+        if (points.isEmpty()) return BondPeriodInterestResultDTO(BigDecimal.ZERO, previousCalculatedUntil)
 
-        val initialState = operations.calculateOperationStateUntil(adjustedStart.minusDays(1))
-        val initialPeriodState =
-            BondPeriodStateDTO(
-                quantity = initialState.quantity,
-                lastSpread = initialState.lastSpread,
-                lastBuyPrice = initialState.lastBuyPrice,
-                interest = BigDecimal.ZERO,
-                lastCalculationDate = adjustedStart,
-                actualLastDate = previousCalculatedUntil,
-            )
-
-        val state =
+        val opening =
             operations
-                .asSequence()
-                .filter { it.localDate >= adjustedStart }
-                .takeWhile { it.localDate <= adjustedEnd }
-                .fold(initialPeriodState) { state, operation ->
-                    updatePeriodStateWithOperation(bond, state, operation)
-                }
+                .calculateInvestedAmountUntil(adjustedStart.minusDays(1))
+                .add(accumulatedSoFar)
 
-        val finalState = calculateFinalPeriodInterest(bond, state, adjustedEnd, operations)
-
-        logger.info(
-            "Period interest calculated for bond {} from {} to {}",
-            bond.name,
-            adjustedStart,
-            adjustedEnd,
+        return BondPeriodInterestResultDTO(
+            accrue(bond, opening, adjustedStart, adjustedEnd, operations),
+            points.maxOf { it.date },
         )
-        logger.info("Period interest total: {}", finalState.interest)
-        logger.info("Actual last date with data: {}", finalState.actualLastDate)
-
-        return BondPeriodInterestResultDTO(finalState.interest, finalState.actualLastDate)
     }
+
+    private fun rechain(
+        calculation: BondInterestCalculation,
+        context: BondInterestCalculationContextDTO,
+        month: YearMonth,
+        operations: List<BondOperation>,
+    ) {
+        val chained =
+            context.accumulatedInterest
+                .add(
+                    calculation.monthlyInterest,
+                ).subtract(realizedInterestInMonth(operations, month))
+        val invested = calculateInvestedAmountForMonth(month, operations)
+        val final = invested.add(chained)
+
+        if (chained.compareTo(calculation.accumulatedInterest) == 0 &&
+            invested.compareTo(calculation.investedAmount) == 0 &&
+            final.compareTo(calculation.finalValue) == 0
+        ) {
+            return
+        }
+
+        calculation.apply {
+            accumulatedInterest = chained
+            investedAmount = invested
+            quantity = operations.calculateQuantityUntil(month.atEndOfMonth())
+            finalValue = final
+        }
+
+        bondInterestCalculationRepository.save(calculation)
+    }
+
+    private fun realizedInterestInMonth(
+        operations: List<BondOperation>,
+        month: YearMonth,
+    ): BigDecimal =
+        operations
+            .filter { YearMonth.from(it.localDate) == month }
+            .fold(BigDecimal.ZERO) { acc, operation -> acc.add(operation.realizedInterest()) }
 
     private fun calculateInvestedAmountForMonth(
         month: YearMonth,
@@ -758,6 +516,8 @@ class BondInterestCalculationService(
         operations: List<BondOperation>,
     ) {
         val calculatedUntil = calculation.calculatedUntilDate ?: return
+
+        rechain(calculation, context, month, operations)
 
         val today = clockProvider.now().toLocalDate()
         val monthEnd = month.atEndOfMonth()
@@ -782,6 +542,7 @@ class BondInterestCalculationService(
                 periodStart,
                 periodEnd,
                 calculatedUntil,
+                calculation.accumulatedInterest,
                 operations,
             )
 
@@ -802,10 +563,8 @@ class BondInterestCalculationService(
 
         val newMonthlyInterest = calculation.monthlyInterest.add(result.interest)
 
-        val previousAccumulated =
-            calculation.accumulatedInterest.subtract(calculation.monthlyInterest)
-
-        val newAccumulated = previousAccumulated.add(newMonthlyInterest)
+        val newAccumulated =
+            context.accumulatedInterest.add(newMonthlyInterest).subtract(realizedInterestInMonth(operations, month))
 
         calculation.apply {
             calculationDate = clockProvider.now().toLocalDate()
@@ -842,7 +601,11 @@ class BondInterestCalculationService(
         val investedAmount = calculateInvestedAmountForMonth(month, operations)
         val quantity = operations.calculateQuantityUntil(month.atEndOfMonth())
 
-        val accumulated = context.accumulatedInterest.add(monthlyInterest)
+        val accumulated =
+            context.accumulatedInterest
+                .add(
+                    monthlyInterest,
+                ).subtract(realizedInterestInMonth(operations, month))
 
         val calculation =
             BondInterestCalculation(
@@ -947,7 +710,10 @@ class BondInterestCalculationService(
         bond: Bond,
         startMonth: YearMonth,
         currentMonth: YearMonth,
+        fromStart: Boolean = false,
     ): BondInterestCalculationContextDTO? {
+        if (fromStart) return BondInterestCalculationContextDTO(startMonth, BigDecimal.ZERO)
+
         val lastCalculation =
             bondInterestCalculationRepository
                 .findLastCalculatedMonth(bond) ?: run {
@@ -962,7 +728,15 @@ class BondInterestCalculationService(
             }
 
         val lastMonth = lastCalculation.referenceMonth
-        val accumulated = lastCalculation.accumulatedInterest
+        val accumulated =
+            if (lastMonth == currentMonth) {
+                bondInterestCalculationRepository
+                    .findByBondAndReferenceMonth(bond, currentMonth.minusMonths(1))
+                    ?.accumulatedInterest
+                    ?: BigDecimal.ZERO
+            } else {
+                lastCalculation.accumulatedInterest
+            }
 
         val start =
             when {
@@ -1037,7 +811,8 @@ class BondInterestCalculationService(
         val investedAmount = calculateInvestedAmountForMonth(month, operations)
         val quantity = operations.calculateQuantityUntil(month.atEndOfMonth())
 
-        val newAccumulated = context.accumulatedInterest.add(monthlyInterest)
+        val newAccumulated =
+            context.accumulatedInterest.add(monthlyInterest).subtract(realizedInterestInMonth(operations, month))
 
         calculation.apply {
             calculationDate = clockProvider.now().toLocalDate()
@@ -1054,11 +829,6 @@ class BondInterestCalculationService(
 
         context.accumulatedInterest = newAccumulated
     }
-
-    private fun getSpreadToUse(
-        lastSpread: BigDecimal?,
-        defaultSpread: BigDecimal?,
-    ): BigDecimal = lastSpread ?: defaultSpread ?: BigDecimal.ZERO
 
     private fun requireBondConfiguration(bond: Bond) {
         requireNotNull(bond.interestRate) {

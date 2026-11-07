@@ -33,6 +33,7 @@ import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
+import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
@@ -54,6 +55,7 @@ class NetWorthCalculationService(
     private val tickerService: TickerService,
     private val bondService: BondService,
     private val bondInterestCalculationService: BondInterestCalculationService,
+    private val tickerPriceHistoryService: TickerPriceHistoryService,
     private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(NetWorthCalculationService::class.java)
@@ -367,6 +369,8 @@ class NetWorthCalculationService(
             targetMonth.year,
         )
 
+        if (!targetMonth.isAfter(clockProvider.currentMonth())) return BigDecimal.ZERO
+
         val startOfMonth = targetMonth.atDay(1)
         val endOfMonth = targetMonth.atEndOfMonth()
 
@@ -392,7 +396,8 @@ class NetWorthCalculationService(
         startOfMonth: LocalDate,
         endOfMonth: LocalDate,
     ): BigDecimal {
-        var currentDate = advanceDateToMonthStart(recurring.startDate, startOfMonth, recurring)
+        var currentDate =
+            advanceDateToMonthStart(maxOf(recurring.startDate, recurring.nextDueDate), startOfMonth, recurring)
         var amount = BigDecimal.ZERO
 
         while (currentDate.isBeforeOrEqual(endOfMonth) && currentDate.isBeforeOrEqual(recurring.endDate)) {
@@ -470,7 +475,10 @@ class NetWorthCalculationService(
                 val historicalQuantity = ticker.currentQuantity - changesAfter
 
                 if (historicalQuantity > BigDecimal.ZERO) {
-                    historicalQuantity.multiply(ticker.currentUnitValue)
+                    val price =
+                        tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, date.toLocalDate())
+                            ?: ticker.currentUnitValue
+                    historicalQuantity.multiply(price)
                 } else {
                     null
                 }

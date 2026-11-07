@@ -285,7 +285,7 @@ class TickerServiceCRUDTickerPurchaseTest :
                     service.createTickerPurchase(purchase, walletTransactionContext)
 
                     Then("should set average unit value to purchase unit price") {
-                        ticker.averageUnitValue shouldBe BigDecimal("150.00")
+                        ticker.averageUnitValue.compareTo(BigDecimal("150.00")) shouldBe 0
                     }
 
                     Then("should update average unit value count") {

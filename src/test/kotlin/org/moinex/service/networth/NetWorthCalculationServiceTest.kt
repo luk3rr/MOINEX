@@ -32,6 +32,7 @@ import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
+import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
@@ -50,6 +51,7 @@ class NetWorthCalculationServiceTest :
         val bondService = mockk<BondService>()
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
         val recurringCreditCardDebtService = mockk<RecurringCreditCardDebtService>(relaxed = true)
+        val tickerPriceHistoryService = mockk<TickerPriceHistoryService>()
         val clockProvider = ClockProvider()
 
         val service =
@@ -62,10 +64,16 @@ class NetWorthCalculationServiceTest :
                 tickerService,
                 bondService,
                 bondInterestCalculationService,
+                tickerPriceHistoryService,
                 clockProvider,
             )
 
-        afterContainer { clearAllMocks(answers = true) }
+        every { tickerPriceHistoryService.getClosestPriceBeforeDate(any(), any()) } returns null
+
+        afterContainer {
+            clearAllMocks(answers = true)
+            every { tickerPriceHistoryService.getClosestPriceBeforeDate(any(), any()) } returns null
+        }
 
         Given("a system with wallets and transactions from past months") {
             val wallet1 = WalletFactory.create(id = 1, name = "Wallet 1", balance = BigDecimal("5000.00"))

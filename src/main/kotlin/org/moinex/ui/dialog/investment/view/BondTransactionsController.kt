@@ -21,6 +21,10 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.isAmountOnly
+import org.moinex.common.ui.BondTableColumns
+import org.moinex.common.ui.BondTableColumns.asQuantityColumn
+import org.moinex.common.ui.BondTableColumns.asUnitPriceColumn
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
@@ -255,9 +259,18 @@ class BondTransactionsController(
 
         val quantityColumn =
             TableColumn<BondOperation, String>(
-                preferencesService.translate(TranslationKeys.BOND_TABLE_QUANTITY),
+                preferencesService.translate(TranslationKeys.BOND_TABLE_QUANTITY_OR_AMOUNT),
             ).apply {
-                setCellValueFactory { param -> SimpleObjectProperty(param.value.quantity.toString()) }
+                setCellValueFactory { param ->
+                    val operation = param.value
+                    SimpleObjectProperty(
+                        if (operation.isAmountOnly()) {
+                            UIUtils.formatCurrency(operation.quantity)
+                        } else {
+                            operation.quantity.toString()
+                        },
+                    )
+                }
             }
 
         val unitPriceColumn =
@@ -265,7 +278,9 @@ class BondTransactionsController(
                 preferencesService.translate(TranslationKeys.BOND_TABLE_UNIT_PRICE),
             ).apply {
                 setCellValueFactory { param ->
-                    SimpleObjectProperty(UIUtils.formatCurrency(param.value.unitPrice))
+                    SimpleObjectProperty(
+                        if (param.value.isAmountOnly()) "—" else UIUtils.formatCurrency(param.value.unitPrice),
+                    )
                 }
             }
 
@@ -352,12 +367,14 @@ class BondTransactionsController(
             bondNameColumn,
             bondTypeColumn,
             dateColumn,
-            quantityColumn,
-            unitPriceColumn,
+            quantityColumn.asQuantityColumn(),
+            unitPriceColumn.asUnitPriceColumn(),
             feesColumn,
             taxesColumn,
             profitLossColumn,
             walletNameColumn,
         )
+
+        BondTableColumns.hideWhenAllHeldInReais(operationTableView) { it.isAmountOnly() }
     }
 }

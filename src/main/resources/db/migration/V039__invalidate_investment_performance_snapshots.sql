@@ -1,0 +1,1 @@
+DELETE FROM investment_performance_snapshot;

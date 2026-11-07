@@ -26,7 +26,6 @@ import javafx.scene.layout.HBox
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.isZero
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
@@ -656,15 +655,7 @@ class GoalController(
                 if (param.value.isCompleted()) {
                     SimpleObjectProperty(UIUtils.formatPercentage(100))
                 } else {
-                    val progress =
-                        if (param.value.balance.isZero()) {
-                            BigDecimal.ZERO
-                        } else {
-                            param.value.balance
-                                .divide(param.value.targetBalance, 2, RoundingMode.HALF_UP)
-                                .multiply(BigDecimal(100))
-                        }
-                    SimpleObjectProperty(UIUtils.formatPercentage(progress))
+                    SimpleObjectProperty(UIUtils.formatPercentage(param.value.progressPercentage()))
                 }
             }
         }

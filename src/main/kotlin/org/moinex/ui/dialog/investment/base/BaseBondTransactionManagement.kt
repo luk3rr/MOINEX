@@ -9,16 +9,22 @@
 package org.moinex.ui.dialog.investment.base
 
 import javafx.fxml.FXML
+import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
+import javafx.scene.layout.HBox
 import javafx.stage.Stage
+import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.isHeldInReais
 import org.moinex.common.helper.SuggestionsHandlerHelper
+import org.moinex.common.ui.Icons
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -56,6 +62,21 @@ abstract class BaseBondTransactionManagement(
 
     @FXML
     protected lateinit var quantityField: TextField
+
+    @FXML
+    protected var unitPriceGroup: Node? = null
+
+    @FXML
+    protected var quantityLabel: Label? = null
+
+    @FXML
+    protected var quantityIcon: FontIcon? = null
+
+    @FXML
+    protected var quantityGroup: HBox? = null
+
+    @FXML
+    protected var amountRow: HBox? = null
 
     @FXML
     protected lateinit var feesField: TextField
@@ -98,11 +119,31 @@ abstract class BaseBondTransactionManagement(
         UIUtils.updateWalletBalanceLabelStyle(wt, walletCurrentBalanceValueLabel)
     }
 
-    fun initializeBond(bond: Bond) {
+    open fun initializeBond(bond: Bond) {
         this.bond = bond
         val symbol = bond.symbol
         bondNameLabel.text = bond.name + if (!symbol.isNullOrBlank()) " ($symbol)" else ""
+        applyAmountOnlyEntry(bond)
     }
+
+    /**
+     * Bonds that are held in reais (CDB, LCI and LCA) have no unit price: the user gives the amount, which is saved
+     * as the quantity at a unit price of one.
+     */
+    protected fun applyAmountOnlyEntry(bond: Bond) {
+        if (!isHeldInReais(bond)) return
+
+        unitPriceField.text = "1.00"
+        unitPriceGroup?.isVisible = false
+        unitPriceGroup?.isManaged = false
+        quantityLabel?.text = preferencesService.translate(TranslationKeys.BOND_LABEL_AMOUNT)
+        quantityIcon?.iconLiteral = Icons.COIN
+        quantityField.promptText = "\$ 0.00"
+        amountRow?.alignment = Pos.CENTER
+        quantityGroup?.alignment = Pos.CENTER
+    }
+
+    protected fun isHeldInReais(bond: Bond): Boolean = bond.isHeldInReais()
 
     @FXML
     protected open fun initialize() {

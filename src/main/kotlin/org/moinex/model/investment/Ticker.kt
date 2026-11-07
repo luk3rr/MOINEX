@@ -45,7 +45,7 @@ class Ticker(
     currentQuantity: BigDecimal,
     currentUnitValue: BigDecimal,
     averageUnitValue: BigDecimal,
-    averageUnitValueCount: BigDecimal = BigDecimal.ONE,
+    averageUnitValueCount: BigDecimal? = null,
 ) : Asset(
         name = name,
         symbol = symbol,
@@ -53,7 +53,7 @@ class Ticker(
         currentQuantity = currentQuantity,
         currentUnitValue = currentUnitValue,
         averageUnitValue = averageUnitValue,
-        averageUnitValueCount = averageUnitValueCount,
+        averageUnitValueCount = averageUnitValueCount ?: currentQuantity,
     ) {
     override fun toString(): String = "Ticker [id=$id, symbol='$symbol', type=$type]"
 }

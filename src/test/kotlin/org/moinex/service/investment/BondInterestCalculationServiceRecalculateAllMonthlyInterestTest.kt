@@ -2,6 +2,7 @@ package org.moinex.service.investment
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -111,8 +112,8 @@ class BondInterestCalculationServiceRecalculateAllMonthlyInterestTest :
 
                 service.recalculateAllMonthlyInterest(1)
 
-                Then("should delete existing calculations") {
-                    verify { bondInterestCalculationRepository.deleteByBond(bond) }
+                Then("should keep the stored calculations and recompute them in place") {
+                    verify(exactly = 0) { bondInterestCalculationRepository.deleteByBond(any()) }
                 }
 
                 Then("should recalculate from scratch") {
@@ -183,6 +184,7 @@ class BondInterestCalculationServiceRecalculateAllMonthlyInterestTest :
                         referenceMonth = YearMonth.of(2026, 1),
                         manuallyAdjusted = true,
                         monthlyInterest = BigDecimal("50.00"),
+                        calculatedUntilDate = LocalDate.of(2026, 1, 31),
                     )
 
                 val marketData =
@@ -206,20 +208,17 @@ class BondInterestCalculationServiceRecalculateAllMonthlyInterestTest :
                 } returns marketData
                 every { bondInterestCalculationRepository.findLastCalculatedMonth(bond) } returns null
                 every { bondInterestCalculationRepository.findByBondAndReferenceMonth(any(), any()) } returns null
+                every {
+                    bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, YearMonth.of(2026, 1))
+                } returns manuallyAdjustedCalculation
                 every { bondInterestCalculationRepository.save(any()) } returnsArgument 0
 
                 service.recalculateAllMonthlyInterest(1)
 
-                Then("should delete manually adjusted calculations") {
-                    verify { bondInterestCalculationRepository.deleteByBond(bond) }
-                }
-
-                Then("should recalculate with automatic values") {
-                    verify(atLeast = 1) {
-                        bondInterestCalculationRepository.save(
-                            match { !it.manuallyAdjusted },
-                        )
-                    }
+                Then("should keep the month adjusted by hand and its interest") {
+                    verify(exactly = 0) { bondInterestCalculationRepository.deleteByBond(any()) }
+                    manuallyAdjustedCalculation.manuallyAdjusted shouldBe true
+                    manuallyAdjustedCalculation.monthlyInterest.compareTo(BigDecimal("50.00")) shouldBe 0
                 }
             }
         }

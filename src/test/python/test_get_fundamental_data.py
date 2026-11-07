@@ -28,6 +28,9 @@ spec = importlib.util.spec_from_file_location("get_fundamental_data", SCRIPT)
 gfd = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gfd)
 
+real_fetch_reference_yield = gfd.fetch_reference_yield
+gfd.fetch_reference_yield = lambda currency: gfd.DEFAULT_BOND_YIELD
+
 DATES = [pd.Timestamp(f"{year}-12-31") for year in (2025, 2024, 2023, 2022, 2021)]
 
 
@@ -430,6 +433,45 @@ class FundAndEtfTest(unittest.TestCase):
         months = gfd.monthly_dividends([], datetime_of(2026, 2, 10), months=4)
 
         self.assertEqual([m["month"] for m in months], ["2025-11", "2025-12", "2026-01", "2026-02"])
+
+
+
+class ReferenceYieldAndGrowthTest(unittest.TestCase):
+    def test_a_yearly_series_spans_one_year_less_than_its_periods(self):
+        self.assertEqual(gfd.years_spanned(5, 1), 4)
+
+    def test_five_quarters_span_one_year(self):
+        self.assertEqual(gfd.years_spanned(5, 4), 1)
+
+    def test_eps_cagr_of_yearly_values(self):
+        self.assertAlmostEqual(gfd.calculate_eps_cagr([2.0, 1.0], 1), 100.0)
+
+    def test_eps_cagr_of_five_quarters_is_the_growth_of_one_year(self):
+        self.assertAlmostEqual(gfd.calculate_eps_cagr([2.0, 1.8, 1.6, 1.3, 1.0], 4), 100.0)
+
+    def test_revenue_cagr_of_five_quarters_is_the_growth_of_one_year(self):
+        growth = gfd.calculate_revenue_growth([200.0, 180.0, 160.0, 130.0, 100.0], None, 4)
+        self.assertAlmostEqual(growth["cagr"]["value"], 100.0)
+
+    def test_graham_fair_value_follows_the_reference_yield(self):
+        self.assertAlmostEqual(gfd.calculate_graham_fair_value(1.0, 0.0, 0.10), 3.74)
+        self.assertAlmostEqual(gfd.calculate_graham_fair_value(1.0, 0.0, 0.15), 2.4933, places=3)
+
+    def test_reference_yield_of_a_brazilian_company_is_the_selic_target(self):
+        response = mock.Mock()
+        response.json.return_value = [{"data": "01/11/2026", "valor": "15.00"}]
+
+        with mock.patch("requests.get", return_value=response):
+            self.assertAlmostEqual(real_fetch_reference_yield("BRL"), 0.15)
+
+    def test_reference_yield_falls_back_to_the_default_when_the_bank_does_not_answer(self):
+        with mock.patch("requests.get", side_effect=Exception("down")):
+            self.assertAlmostEqual(real_fetch_reference_yield("BRL"), gfd.DEFAULT_BOND_YIELD)
+
+    def test_reference_yield_of_a_company_outside_brazil_is_the_default(self):
+        with mock.patch("requests.get") as get:
+            self.assertAlmostEqual(real_fetch_reference_yield("USD"), gfd.DEFAULT_BOND_YIELD)
+            get.assert_not_called()
 
 
 if __name__ == "__main__":

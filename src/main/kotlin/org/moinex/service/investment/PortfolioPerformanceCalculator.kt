@@ -36,10 +36,28 @@ object PortfolioPerformanceCalculator {
         val price: BigDecimal,
     )
 
+    /**
+     * Money received from holding a ticker (a dividend), on the [date] it was paid.
+     */
+    data class Payout(
+        val date: LocalDate,
+        val amount: BigDecimal,
+    )
+
+    /**
+     * A bond or any holding valued directly in money: its value at the close of each day it has one ([values]) and the
+     * money put in (positive) or taken out (negative) on each date ([flows]).
+     */
+    data class FixedIncomePosition(
+        val values: List<Pair<LocalDate, BigDecimal>>,
+        val flows: List<Pair<LocalDate, BigDecimal>>,
+    )
+
     data class Position(
         val ticker: Ticker,
         val trades: List<Trade>,
         val prices: List<DailyPricePointDTO>,
+        val payouts: List<Payout> = emptyList(),
     )
 
     /**
@@ -54,28 +72,47 @@ object PortfolioPerformanceCalculator {
         positions: List<Position>,
         start: LocalDate,
         end: LocalDate,
+        includeDividends: Boolean = false,
+        fixedIncome: List<FixedIncomePosition> = emptyList(),
     ): List<SeriesPointDTO> {
         val priced = positions.filter { it.prices.isNotEmpty() }
         val days =
-            priced
-                .flatMap { it.prices.map { point -> point.date } }
-                .filter { !it.isBefore(start) && !it.isAfter(end) }
+            (
+                priced.flatMap { it.prices.map { point -> point.date } } +
+                    fixedIncome.flatMap { it.values.map { v -> v.first } }
+            ).filter { !it.isBefore(start) && !it.isAfter(end) }
                 .distinct()
                 .sorted()
         if (days.size < 2) return emptyList()
 
         val effective = withEffectiveDates(priced, days)
+        val effectiveFixed = fixedIncome.map { fixed -> fixed.copy(flows = fixed.flows.map { moveToDay(it, days) }) }
         var index = BigDecimal.ONE
         var previousValue: BigDecimal? = null
         val points = mutableListOf<SeriesPointDTO>()
 
         days.forEach { day ->
-            val value = effective.fold(BigDecimal.ZERO) { total, position -> total.add(valueOn(position, day)) }
-            val flow = effective.fold(BigDecimal.ZERO) { total, position -> total.add(flowOn(position, day)) }
+            val value =
+                effective
+                    .fold(BigDecimal.ZERO) { total, position -> total.add(valueOn(position, day)) }
+                    .add(effectiveFixed.fold(BigDecimal.ZERO) { total, fixed -> total.add(fixedValueOn(fixed, day)) })
+            val flow =
+                effective
+                    .fold(BigDecimal.ZERO) { total, position -> total.add(flowOn(position, day)) }
+                    .add(effectiveFixed.fold(BigDecimal.ZERO) { total, fixed -> total.add(fixedFlowOn(fixed, day)) })
 
-            val base = previousValue?.add(boughtOn(effective, day))
+            val paid = if (includeDividends) payoutsOn(effective, day, days) else BigDecimal.ZERO
+
+            val base =
+                previousValue
+                    ?.add(
+                        boughtOn(effective, day),
+                    )?.add(
+                        effectiveFixed.fold(BigDecimal.ZERO) { total, fixed -> total.add(fixedBoughtOn(fixed, day)) },
+                    )
             if (base != null && base.signum() > 0) {
-                val dayReturn = BigDecimal.ONE.add(value.subtract(previousValue!!).subtract(flow).divide(base, MC), MC)
+                val profit = value.subtract(previousValue).subtract(flow).add(paid)
+                val dayReturn = BigDecimal.ONE.add(profit.divide(base, MC), MC)
                 index = index.multiply(dayReturn, MC)
             }
             previousValue = value
@@ -223,6 +260,50 @@ object PortfolioPerformanceCalculator {
             )
         }
     }
+
+    /**
+     * Dividends paid on [day], or since the previous day with prices when [day] follows a weekend or holiday.
+     */
+    private fun payoutsOn(
+        positions: List<Position>,
+        day: LocalDate,
+        days: List<LocalDate>,
+    ): BigDecimal {
+        val previousDay = days.lastOrNull { it.isBefore(day) }
+
+        return positions.fold(BigDecimal.ZERO) { total, position ->
+            total.add(
+                position.payouts
+                    .filter { (previousDay == null || it.date.isAfter(previousDay)) && !it.date.isAfter(day) }
+                    .fold(BigDecimal.ZERO) { acc, payout -> acc.add(payout.amount) },
+            )
+        }
+    }
+
+    private fun moveToDay(
+        flow: Pair<LocalDate, BigDecimal>,
+        days: List<LocalDate>,
+    ): Pair<LocalDate, BigDecimal> =
+        (days.firstOrNull { !it.isBefore(flow.first) } ?: days.last().plusDays(1)) to flow.second
+
+    private fun fixedValueOn(
+        fixed: FixedIncomePosition,
+        day: LocalDate,
+    ): BigDecimal = fixed.values.lastOrNull { !it.first.isAfter(day) }?.second ?: BigDecimal.ZERO
+
+    private fun fixedFlowOn(
+        fixed: FixedIncomePosition,
+        day: LocalDate,
+    ): BigDecimal = fixed.flows.filter { it.first == day }.fold(BigDecimal.ZERO) { acc, flow -> acc.add(flow.second) }
+
+    private fun fixedBoughtOn(
+        fixed: FixedIncomePosition,
+        day: LocalDate,
+    ): BigDecimal =
+        fixed.flows
+            .filter {
+                it.first == day && it.second.signum() > 0
+            }.fold(BigDecimal.ZERO) { acc, flow -> acc.add(flow.second) }
 
     private fun boughtOn(
         positions: List<Position>,

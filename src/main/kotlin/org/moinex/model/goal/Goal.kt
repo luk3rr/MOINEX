@@ -18,6 +18,7 @@ import org.moinex.common.extension.toRounded
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 
 @Entity
@@ -67,4 +68,14 @@ class Goal(
     }
 
     fun isCompleted(): Boolean = completionDate != null
+
+    /**
+     * How much of the target is saved, in percent, with the precision of the amounts: rounding is left to the display.
+     */
+    fun progressPercentage(): BigDecimal =
+        if (targetBalance.signum() <= 0) {
+            BigDecimal.ZERO
+        } else {
+            balance.multiply(BigDecimal(100)).divide(targetBalance, 6, RoundingMode.HALF_UP)
+        }
 }

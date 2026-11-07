@@ -7,12 +7,15 @@
 package org.moinex.service.investment
 
 import org.moinex.common.ClockProvider
+import org.moinex.common.extension.realizedInterest
 import org.moinex.model.dto.BenchmarkSeriesDTO
 import org.moinex.model.dto.ContributionDTO
 import org.moinex.model.dto.DailyPricePointDTO
 import org.moinex.model.dto.PerformancePeriod
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.Ticker
+import org.moinex.repository.investment.BondOperationRepository
+import org.moinex.repository.investment.BondRepository
 import org.moinex.repository.investment.DividendRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
@@ -34,6 +37,8 @@ class PerformanceBenchmarkService(
     private val tickerPriceHistoryService: TickerPriceHistoryService,
     private val marketIndicatorService: MarketIndicatorService,
     private val benchmarkService: BenchmarkService,
+    private val bondRepository: BondRepository,
+    private val bondOperationRepository: BondOperationRepository,
     private val clockProvider: ClockProvider,
 ) {
     /**
@@ -47,15 +52,26 @@ class PerformanceBenchmarkService(
         marketIndicatorService.ensureHistory(InterestIndex.IPCA, start)
     }
 
-    fun benchmarkSeries(period: PerformancePeriod): BenchmarkSeriesDTO {
+    fun benchmarkSeries(
+        period: PerformancePeriod,
+        includeDividends: Boolean = false,
+        includeFixedIncome: Boolean = false,
+    ): BenchmarkSeriesDTO {
         val today = clockProvider.today()
         val start = today.minusMonths(period.months.toLong())
         val tickers = tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
         val points = tickerPriceHistoryService.getPricePoints(tickers.mapNotNull { it.id }, start, today)
 
-        val positions = loadPositions(tickers, points)
+        val positions = loadPositions(tickers, points, includeDividends)
 
-        val portfolio = PortfolioPerformanceCalculator.portfolioReturn(positions, start, today)
+        val portfolio =
+            PortfolioPerformanceCalculator.portfolioReturn(
+                positions,
+                start,
+                today,
+                includeDividends,
+                if (includeFixedIncome) loadFixedIncome(today) else emptyList(),
+            )
         val days = portfolio.map { it.date }
         if (days.size < 2) return BenchmarkSeriesDTO(portfolio, emptyList(), emptyList(), emptyList())
 
@@ -94,8 +110,24 @@ class PerformanceBenchmarkService(
     private fun loadPositions(
         tickers: List<Ticker>,
         points: Map<Int, List<DailyPricePointDTO>>,
-    ): List<PortfolioPerformanceCalculator.Position> =
-        tickers.map { ticker ->
+        includeDividends: Boolean = false,
+    ): List<PortfolioPerformanceCalculator.Position> {
+        val payoutsByTicker =
+            if (includeDividends) {
+                dividendRepository
+                    .findAll()
+                    .filter { it.walletTransaction != null }
+                    .groupBy({ it.ticker.id }, {
+                        PortfolioPerformanceCalculator.Payout(
+                            it.walletTransaction!!.date.toLocalDate(),
+                            it.walletTransaction!!.amount,
+                        )
+                    })
+            } else {
+                emptyMap()
+            }
+
+        return tickers.map { ticker ->
             val trades =
                 tickerPurchaseRepository.findAllByTickerId(ticker.id!!).mapNotNull {
                     toTrade(it.walletTransaction?.date?.toLocalDate(), it.quantity, it.unitPrice)
@@ -104,7 +136,49 @@ class PerformanceBenchmarkService(
                         toTrade(it.walletTransaction?.date?.toLocalDate(), it.quantity.negate(), it.unitPrice)
                     }
 
-            PortfolioPerformanceCalculator.Position(ticker, trades, points[ticker.id].orEmpty())
+            PortfolioPerformanceCalculator.Position(
+                ticker,
+                trades,
+                points[ticker.id].orEmpty(),
+                payoutsByTicker[ticker.id].orEmpty(),
+            )
+        }
+    }
+
+    /**
+     * The non-archived bonds valued day by day by the same rules that give their monthly interest, with the money put
+     * in and taken out. A bond without rate, type or index history is left out.
+     */
+    private fun loadFixedIncome(today: LocalDate): List<PortfolioPerformanceCalculator.FixedIncomePosition> =
+        bondRepository.findByArchivedFalseOrderByNameAsc().mapNotNull { bond ->
+            val type = bond.interestType ?: return@mapNotNull null
+            val rate = bond.interestRate ?: return@mapNotNull null
+            val operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond).filter { it.walletTransaction != null }
+            val first = operations.firstOrNull { it.isPurchase() }?.localDate ?: return@mapNotNull null
+            val index = bond.interestIndex ?: InterestIndex.CDI
+
+            val points =
+                marketIndicatorService
+                    .getIndicatorHistoryBetween(index, first, today)
+                    .filter { it.referenceDate in first..today }
+                    .map { BondAccrualCalculator.IndexPoint(it.referenceDate, it.rateValue) }
+            if (points.isEmpty()) return@mapNotNull null
+
+            val flows =
+                operations.map {
+                    val base = it.quantity.multiply(it.unitPrice)
+                    BondAccrualCalculator.Flow(
+                        date = it.localDate,
+                        amount = if (it.isPurchase()) base else base.add(it.realizedInterest()).negate(),
+                        rate = it.spread?.takeIf { spread -> spread.signum() > 0 },
+                    )
+                }
+
+            PortfolioPerformanceCalculator.FixedIncomePosition(
+                BondAccrualCalculator.dailyValues(type, index, rate, flows, points).map { it.date to it.value },
+                flows.map { it.date to it.amount },
+            )
         }
 
     private fun rates(

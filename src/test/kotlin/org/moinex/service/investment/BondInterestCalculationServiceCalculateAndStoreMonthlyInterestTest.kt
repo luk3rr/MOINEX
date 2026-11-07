@@ -413,10 +413,10 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                     )
 
                 val marketData =
-                    (1..20).map { day ->
+                    (0 until 120).map { offset ->
                         MarketIndicatorHistoryFactory.create(
                             indicatorType = InterestIndex.CDI,
-                            referenceDate = LocalDate.of(2026, 1, day),
+                            referenceDate = LocalDate.of(2026, 1, 1).plusDays(offset.toLong()),
                             rateValue = BigDecimal("0.04"),
                         )
                     }

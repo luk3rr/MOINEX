@@ -27,16 +27,19 @@ import org.moinex.model.investment.BondInterestCalculation
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.service.investment.BondInterestCalculationService
+import org.moinex.service.investment.BondService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.text.MessageFormat
+import java.time.LocalDate
 
 @Controller
 class BondInterestHistoryController(
     private val bondInterestCalculationService: BondInterestCalculationService,
     private val preferencesService: PreferencesService,
     private val notificationService: NotificationService,
+    private val bondService: BondService,
 ) {
     @FXML
     private lateinit var bondNameLabel: Label
@@ -46,6 +49,9 @@ class BondInterestHistoryController(
 
     @FXML
     private lateinit var bondInterestTypeLabel: Label
+
+    @FXML
+    private lateinit var bondNetInterestLabel: Label
 
     @FXML
     private lateinit var historyTable: TableView<BondInterestCalculation>
@@ -60,6 +66,7 @@ class BondInterestHistoryController(
 
     companion object {
         private val logger = LoggerFactory.getLogger(BondInterestHistoryController::class.java)
+        private const val PREVIEW_MAX_LINES = 12
     }
 
     fun setBond(b: Bond) {
@@ -95,6 +102,14 @@ class BondInterestHistoryController(
         bondNameLabel.text = bond.name
         bondTypeLabel.text = bond.type.toString()
         bondInterestTypeLabel.text = "${bond.interestType} - ${bond.interestIndex}"
+
+        val net = bondService.estimateNetInterest(bond, LocalDate.now())
+        bondNetInterestLabel.text =
+            if (net.taxApplicable) {
+                UIUtils.formatCurrency(net.netInterest)
+            } else {
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_NET_INTEREST_NOT_APPLICABLE)
+            }
     }
 
     private fun setupTableColumns() {
@@ -310,11 +325,54 @@ class BondInterestHistoryController(
         }
     }
 
+    private fun recalculationPreviewText(): String {
+        val rows = bondInterestCalculationService.previewRecalculation(bond.id!!)
+
+        val changed =
+            rows.filter {
+                it.monthlyBefore == null || it.monthlyBefore.subtract(it.monthlyAfter).abs() >= BigDecimal("0.01")
+            }
+
+        if (changed.isEmpty()) {
+            return preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_NONE)
+        }
+
+        val lines =
+            changed.take(PREVIEW_MAX_LINES).joinToString("\n") { row ->
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_LINE),
+                    row.month.toString(),
+                    UIUtils.formatCurrency(row.monthlyBefore ?: BigDecimal.ZERO),
+                    UIUtils.formatCurrency(row.monthlyAfter),
+                )
+            }
+
+        val summary =
+            MessageFormat.format(
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_SUMMARY),
+                changed.size,
+                UIUtils.formatCurrency(rows.lastOrNull()?.accumulatedBefore ?: BigDecimal.ZERO),
+                UIUtils.formatCurrency(rows.lastOrNull()?.accumulatedAfter ?: BigDecimal.ZERO),
+            )
+
+        val manual =
+            if (rows.any { it.manuallyAdjusted }) {
+                "\n" + preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_RECALCULATE_PREVIEW_MANUAL)
+            } else {
+                ""
+            }
+
+        return "$summary\n$lines$manual"
+    }
+
     @FXML
     private fun handleRecalculateHistory() {
+        val preview = runCatching { recalculationPreviewText() }.getOrElse { it.message ?: "" }
+
         if (!WindowUtils.showConfirmationDialog(
                 preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_HEADER),
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_MESSAGE),
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_MESSAGE) +
+                    "\n\n" + preview,
             )
         ) {
             return

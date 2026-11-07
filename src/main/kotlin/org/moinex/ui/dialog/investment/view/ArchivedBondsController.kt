@@ -18,6 +18,9 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.BondTableColumns
+import org.moinex.common.ui.BondTableColumns.asQuantityColumn
+import org.moinex.common.ui.BondTableColumns.asUnitPriceColumn
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
@@ -201,11 +204,13 @@ class ArchivedBondsController(
         issuerColumn.setCellValueFactory { param -> SimpleStringProperty(param.value.issuer) }
 
         val quantityColumn =
-            TableColumn<Bond, String>(preferencesService.translate(TranslationKeys.BOND_TABLE_QUANTITY))
+            TableColumn<Bond, String>(preferencesService.translate(TranslationKeys.BOND_TABLE_QUANTITY_OR_AMOUNT))
         quantityColumn.setCellValueFactory { param ->
             val bond = param.value
             val quantity = bondService.getCurrentQuantity(bond)
-            SimpleStringProperty(quantity.toString())
+            SimpleStringProperty(
+                if (bondService.isAmountOnly(bond)) UIUtils.formatCurrency(quantity) else quantity.toString(),
+            )
         }
 
         val avgPriceColumn =
@@ -213,7 +218,7 @@ class ArchivedBondsController(
         avgPriceColumn.setCellValueFactory { param ->
             val bond = param.value
             val avgPrice = bondService.getAverageUnitPrice(bond)
-            SimpleStringProperty(UIUtils.formatCurrency(avgPrice))
+            SimpleStringProperty(if (bondService.isAmountOnly(bond)) "—" else UIUtils.formatCurrency(avgPrice))
         }
 
         val investedValueColumn =
@@ -240,8 +245,9 @@ class ArchivedBondsController(
         bondTableView.columns.add(symbolColumn)
         bondTableView.columns.add(typeColumn)
         bondTableView.columns.add(issuerColumn)
-        bondTableView.columns.add(quantityColumn)
-        bondTableView.columns.add(avgPriceColumn)
+        bondTableView.columns.add(quantityColumn.asQuantityColumn())
+        bondTableView.columns.add(avgPriceColumn.asUnitPriceColumn())
+        BondTableColumns.hideWhenAllHeldInReais(bondTableView) { bondService.isAmountOnly(it) }
         bondTableView.columns.add(investedValueColumn)
         bondTableView.columns.add(maturityDateColumn)
     }

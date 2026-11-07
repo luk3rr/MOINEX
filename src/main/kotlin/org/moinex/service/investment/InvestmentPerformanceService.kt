@@ -13,15 +13,10 @@ import kotlinx.coroutines.sync.withLock
 import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.getEffectiveEndDate
-import org.moinex.common.extension.isBeforeOrEqual
-import org.moinex.common.extension.isNotZero
+import org.moinex.common.extension.calculateInvestedAmountUntil
+import org.moinex.common.extension.realizedInterest
 import org.moinex.model.dto.InvestmentPerformanceDTO
 import org.moinex.model.enums.NotificationType
-import org.moinex.model.enums.OperationType
-import org.moinex.model.investment.Bond
-import org.moinex.model.investment.BondOperation
-import org.moinex.model.investment.Dividend
 import org.moinex.model.investment.InvestmentPerformanceSnapshot
 import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPurchase
@@ -34,7 +29,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Service
@@ -59,13 +53,7 @@ class InvestmentPerformanceService(
 
             snapshotRepository.deleteAll()
 
-            val investmentPerformanceDTO =
-                InvestmentPerformanceDTO(
-                    monthlyInvested = calculateMonthlyInvestedValue(),
-                    portfolioValues = calculateMonthlyPortfolioValue(),
-                    accumulatedGains = calculateAccumulatedCapitalGains(),
-                    monthlyGains = calculateMonthlyCapitalGains(),
-                )
+            val investmentPerformanceDTO = computePerformance()
 
             val currentMonth = clockProvider.currentMonth()
             val allMonths = (Constants.XYBAR_CHART_MONTHS downTo 0).map { currentMonth.minusMonths(it.toLong()) }
@@ -115,10 +103,11 @@ class InvestmentPerformanceService(
             if (missingMonths.isNotEmpty()) {
                 logger.info("Found {} missing months in cache, calculating...", missingMonths.size)
 
-                val calculatedInvested = calculateMonthlyInvestedValue()
-                val calculatedAccGains = calculateAccumulatedCapitalGains()
-                val calculatedMonthlyGains = calculateMonthlyCapitalGains()
-                val calculatedPortfolio = calculateMonthlyPortfolioValue()
+                val computed = computePerformance()
+                val calculatedInvested = computed.monthlyInvested
+                val calculatedAccGains = computed.accumulatedGains
+                val calculatedMonthlyGains = computed.monthlyGains
+                val calculatedPortfolio = computed.portfolioValues
 
                 missingMonths.forEach { month ->
                     val invested = calculatedInvested.getOrDefault(month, BigDecimal.ZERO)
@@ -146,10 +135,11 @@ class InvestmentPerformanceService(
             }
         } else {
             logger.info("No cache found, calculating all data...")
-            monthlyInvested.putAll(calculateMonthlyInvestedValue())
-            accumulatedGains.putAll(calculateAccumulatedCapitalGains())
-            monthlyGains.putAll(calculateMonthlyCapitalGains())
-            portfolioValues.putAll(calculateMonthlyPortfolioValue())
+            val computed = computePerformance()
+            monthlyInvested.putAll(computed.monthlyInvested)
+            accumulatedGains.putAll(computed.accumulatedGains)
+            monthlyGains.putAll(computed.monthlyGains)
+            portfolioValues.putAll(computed.portfolioValues)
 
             val investmentPerformanceDTO =
                 InvestmentPerformanceDTO(
@@ -170,393 +160,6 @@ class InvestmentPerformanceService(
         snapshotRepository.findByReferenceMonth(referenceMonth)
 
     private fun hasSnapshots(): Boolean = snapshotRepository.count() > 0
-
-    private fun calculateMonthlyInvestedValue(): Map<YearMonth, BigDecimal> {
-        val result = mutableMapOf<YearMonth, BigDecimal>()
-
-        processTickersWithTransactions { ticker, purchases, sales ->
-            val referenceDate = determineTickerReferenceDate(ticker, purchases) ?: return@processTickersWithTransactions
-            val firstMonth = YearMonth.from(referenceDate)
-            val quantityByMonth = calculateQuantityAtMonthEnd(ticker, purchases, sales, firstMonth)
-
-            quantityByMonth.forEach { (month, quantity) ->
-                if (quantity > BigDecimal.ZERO) {
-                    val investedValue = ticker.averageUnitValue.multiply(quantity)
-                    result.merge(month, investedValue, BigDecimal::add)
-                }
-            }
-        }
-
-        processBondsWithOperations { operations ->
-            val bondInvestedByMonth = calculateBondCumulativeValueByMonth(operations)
-            bondInvestedByMonth.forEach { (month, value) ->
-                result.merge(month, value, BigDecimal::add)
-            }
-        }
-
-        return result
-    }
-
-    private fun calculateMonthlyCapitalGains(): Map<YearMonth, BigDecimal> {
-        val monthlyGains = mutableMapOf<YearMonth, BigDecimal>()
-        val allBonds = bondService.getAllNonArchivedBonds()
-
-        tickerService
-            .getAllDividends()
-            .groupBy { YearMonth.from(it.walletTransaction!!.date) }
-            .forEach { (month, dividends) ->
-                monthlyGains.merge(month, dividends.sumOf { it.walletTransaction!!.amount }, BigDecimal::add)
-            }
-
-        bondService
-            .getAllOperations()
-            .filter { it.isSale() }
-            .groupBy { YearMonth.from(it.walletTransaction!!.date) }
-            .forEach { (month, operations) ->
-                monthlyGains.merge(month, operations.sumOf { it.netProfit }, BigDecimal::add)
-            }
-
-        tickerService.getAllNonArchivedSales().forEach { tickerSale ->
-            val month = YearMonth.from(tickerSale.walletTransaction!!.date)
-            val saleValue = tickerSale.unitPrice.multiply(tickerSale.quantity)
-            val costBasis = tickerSale.averageCost.multiply(tickerSale.quantity)
-            val profitLoss = saleValue.subtract(costBasis)
-            monthlyGains.merge(month, profitLoss, BigDecimal::add)
-        }
-
-        calculateTickerAppreciationByMonth().forEach { (month, gains) ->
-            monthlyGains.merge(month, gains, BigDecimal::add)
-        }
-
-        val interestHistoryByBond =
-            allBonds.associate { bond ->
-                bond.id!! to bondService.getMonthlyInterestHistory(bond.id!!)
-            }
-
-        interestHistoryByBond.values.flatten().forEach { calculation ->
-            calculation.referenceMonth.let { month ->
-                monthlyGains.merge(month, calculation.monthlyInterest, BigDecimal::add)
-            }
-        }
-
-        return monthlyGains
-    }
-
-    private fun calculateAccumulatedCapitalGains(): Map<YearMonth, BigDecimal> {
-        val accumulatedGains = mutableMapOf<YearMonth, BigDecimal>()
-
-        val allTickers = tickerService.getAllNonArchivedTickers()
-        val allDividends = tickerService.getAllDividends()
-        val allBonds = bondService.getAllNonArchivedBonds()
-
-        val purchasesByTicker = tickerService.getAllPurchases().groupBy { it.ticker.id!! }
-        val salesByTicker = tickerService.getAllSales().groupBy { it.ticker.id!! }
-        val interestHistoryByBond =
-            allBonds.associate { bond ->
-                bond.id!! to bondService.getMonthlyInterestHistory(bond.id!!)
-            }
-
-        val currentMonth = clockProvider.currentMonth()
-        var month = determineFirstMonth(allTickers, allDividends, allBonds)
-
-        while (month.isBeforeOrEqual(currentMonth)) {
-            var monthAccumulatedGain = BigDecimal.ZERO
-
-            allTickers.forEach { ticker ->
-                val purchases = purchasesByTicker[ticker.id!!] ?: emptyList()
-                val sales = salesByTicker[ticker.id!!] ?: emptyList()
-
-                val monthEnd = month.getEffectiveEndDate(clockProvider.today())
-                val quantityAtMonthEnd = calculateQuantityAtDate(ticker, purchases, sales, monthEnd)
-
-                if (quantityAtMonthEnd > BigDecimal.ZERO) {
-                    val costBasis = ticker.averageUnitValue.multiply(quantityAtMonthEnd)
-                    val priceAtMonthEnd = tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, monthEnd)
-
-                    if (priceAtMonthEnd != null) {
-                        val currentValue = priceAtMonthEnd.multiply(quantityAtMonthEnd)
-                        val unrealizedGain = currentValue.subtract(costBasis)
-                        monthAccumulatedGain = monthAccumulatedGain.add(unrealizedGain)
-                    }
-                }
-            }
-
-            val accumulatedDividends =
-                allDividends
-                    .asSequence()
-                    .filter {
-                        it.walletTransaction!!
-                            .date
-                            .toLocalDate()
-                            .isBeforeOrEqual(month.atEndOfMonth())
-                    }.sumOf { it.walletTransaction!!.amount }
-
-            monthAccumulatedGain = monthAccumulatedGain.add(accumulatedDividends)
-
-            val bondAccumulated =
-                interestHistoryByBond.values
-                    .flatten()
-                    .filter { it.referenceMonth.isBeforeOrEqual(month) }
-                    .maxByOrNull { it.referenceMonth }
-                    ?.accumulatedInterest ?: BigDecimal.ZERO
-
-            monthAccumulatedGain = monthAccumulatedGain.add(bondAccumulated)
-
-            accumulatedGains[month] = monthAccumulatedGain
-            month = month.plusMonths(1)
-        }
-
-        return accumulatedGains
-    }
-
-    private fun calculateMonthlyPortfolioValue(): Map<YearMonth, BigDecimal> {
-        val result = mutableMapOf<YearMonth, BigDecimal>()
-
-        processTickersWithTransactions { ticker, purchases, sales ->
-            val referenceDate = determineTickerReferenceDate(ticker, purchases) ?: return@processTickersWithTransactions
-            val firstMonth = YearMonth.from(referenceDate)
-            val quantityAtMonthEnd = calculateQuantityAtMonthEnd(ticker, purchases, sales, firstMonth)
-
-            quantityAtMonthEnd.forEach { (month, quantity) ->
-                if (quantity > BigDecimal.ZERO) {
-                    val endDate = month.getEffectiveEndDate(clockProvider.today())
-                    val price = tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, endDate)
-
-                    if (price != null) {
-                        val value = quantity.multiply(price)
-                        result.merge(month, value, BigDecimal::add)
-                    }
-                }
-            }
-        }
-
-        processBondsWithOperations { operations ->
-            val bondPortfolioByMonth = calculateBondCumulativeValueByMonth(operations)
-            bondPortfolioByMonth.forEach { (month, value) ->
-                result.merge(month, value, BigDecimal::add)
-            }
-        }
-
-        bondService.getAllNonArchivedBonds().forEach { bond ->
-            val interestHistory = bondInterestCalculationService.getMonthlyInterestHistory(bond)
-            interestHistory.forEach { interest ->
-                interest.referenceMonth.let { month ->
-                    result.merge(month, interest.accumulatedInterest, BigDecimal::add)
-                }
-            }
-        }
-
-        return result
-    }
-
-    private fun calculateTickerAppreciationByMonth(): Map<YearMonth, BigDecimal> {
-        val result = mutableMapOf<YearMonth, BigDecimal>()
-
-        processTickersWithTransactions { ticker, purchases, sales ->
-            val referenceDate = determineTickerReferenceDate(ticker, purchases) ?: return@processTickersWithTransactions
-            val firstMonth = YearMonth.from(referenceDate)
-            val currentMonth = clockProvider.currentMonth()
-
-            var month = firstMonth
-            while (month.isBeforeOrEqual(currentMonth)) {
-                val monthAppreciation =
-                    calculateMonthAppreciationWithIntraMonthTransactions(ticker, purchases, sales, month)
-
-                if (monthAppreciation.isNotZero()) {
-                    result.merge(month, monthAppreciation, BigDecimal::add)
-                }
-
-                month = month.plusMonths(1)
-            }
-        }
-
-        return result
-    }
-
-    private fun calculateMonthAppreciationWithIntraMonthTransactions(
-        ticker: Ticker,
-        purchases: List<TickerPurchase>,
-        sales: List<TickerSale>,
-        month: YearMonth,
-    ): BigDecimal {
-        val transactionDatesInMonth =
-            buildList {
-                add(month.atDay(1))
-                addAll(
-                    purchases
-                        .map { it.walletTransaction!!.date.toLocalDate() }
-                        .filter { YearMonth.from(it) == month },
-                )
-                addAll(
-                    sales
-                        .map { it.walletTransaction!!.date.toLocalDate() }
-                        .filter { YearMonth.from(it) == month },
-                )
-                add(month.getEffectiveEndDate(clockProvider.today()))
-            }
-
-        val sortedDates = transactionDatesInMonth.distinct().sorted()
-
-        return sortedDates
-            .zipWithNext()
-            .mapNotNull { (periodStart, periodEnd) ->
-                val periodQuantity = calculateQuantityAtDate(ticker, purchases, sales, periodEnd)
-
-                if (periodQuantity <= BigDecimal.ZERO) return@mapNotNull null
-
-                val startPrice = tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, periodStart)
-                val endPrice = tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, periodEnd)
-
-                if (startPrice != null && endPrice != null) {
-                    endPrice.subtract(startPrice).multiply(periodQuantity)
-                } else {
-                    null
-                }
-            }.fold(BigDecimal.ZERO, BigDecimal::add)
-    }
-
-    private fun calculateQuantityAtDate(
-        ticker: Ticker,
-        purchases: List<TickerPurchase>,
-        sales: List<TickerSale>,
-        date: LocalDate,
-    ): BigDecimal {
-        val initialQuantity = calculateInitialQuantity(ticker, purchases, sales)
-
-        val purchasesBeforeDate =
-            purchases
-                .filter {
-                    it.walletTransaction!!
-                        .date
-                        .toLocalDate()
-                        .isBeforeOrEqual(date)
-                }.sumOf { it.quantity }
-
-        val salesBeforeDate =
-            sales
-                .filter {
-                    it.walletTransaction!!
-                        .date
-                        .toLocalDate()
-                        .isBeforeOrEqual(date)
-                }.sumOf { it.quantity }
-
-        return initialQuantity.add(purchasesBeforeDate).subtract(salesBeforeDate)
-    }
-
-    private fun calculateQuantityAtMonthEnd(
-        ticker: Ticker,
-        purchases: List<TickerPurchase>,
-        sales: List<TickerSale>,
-        firstMonth: YearMonth,
-    ): Map<YearMonth, BigDecimal> {
-        val quantityAtEnd = mutableMapOf<YearMonth, BigDecimal>()
-        val initialQuantity = calculateInitialQuantity(ticker, purchases, sales)
-        var cumulativeQuantity = initialQuantity
-
-        val allTransactions =
-            (purchases + sales).sortedBy { transaction ->
-                when (transaction) {
-                    is TickerPurchase -> transaction.walletTransaction!!.date
-                    is TickerSale -> transaction.walletTransaction!!.date
-                    else -> LocalDateTime.MIN
-                }
-            }
-
-        allTransactions.forEach { transaction ->
-            when (transaction) {
-                is TickerPurchase -> {
-                    val month = YearMonth.from(transaction.walletTransaction!!.date)
-                    cumulativeQuantity = cumulativeQuantity.add(transaction.quantity)
-                    quantityAtEnd[month] = cumulativeQuantity
-                }
-                is TickerSale -> {
-                    val month = YearMonth.from(transaction.walletTransaction!!.date)
-                    cumulativeQuantity = cumulativeQuantity.subtract(transaction.quantity)
-                    quantityAtEnd[month] = cumulativeQuantity
-                }
-            }
-        }
-
-        val currentMonth = clockProvider.currentMonth()
-        var month = firstMonth
-        var lastQuantity = initialQuantity
-
-        while (month.isBeforeOrEqual(currentMonth)) {
-            quantityAtEnd[month]?.let {
-                lastQuantity = it
-            } ?: run {
-                quantityAtEnd[month] = lastQuantity
-            }
-            month = month.plusMonths(1)
-        }
-
-        return quantityAtEnd
-    }
-
-    private fun determineFirstMonth(
-        allTickers: List<Ticker>,
-        allDividends: List<Dividend>,
-        allBonds: List<Bond>,
-    ): YearMonth {
-        val tickerMonths =
-            allTickers.flatMap { ticker ->
-                tickerService.getAllPurchasesByTicker(ticker.id!!).map {
-                    YearMonth.from(it.walletTransaction!!.date)
-                }
-            }
-
-        val dividendMonths =
-            allDividends.map {
-                YearMonth.from(it.walletTransaction!!.date)
-            }
-
-        val bondMonths =
-            allBonds.flatMap { bond ->
-                bondService.getOperationsByBond(bond).map {
-                    YearMonth.from(it.walletTransaction!!.date)
-                }
-            }
-
-        return (tickerMonths + dividendMonths + bondMonths).minOrNull() ?: clockProvider.currentMonth()
-    }
-
-    private fun calculateBondCumulativeValueByMonth(operations: List<BondOperation>): Map<YearMonth, BigDecimal> {
-        val result = mutableMapOf<YearMonth, BigDecimal>()
-
-        val firstOperationDate =
-            operations
-                .minOfOrNull { it.walletTransaction!!.date.toLocalDate() }
-                ?: return result
-
-        val firstMonth = YearMonth.from(firstOperationDate)
-        val currentMonth = clockProvider.currentMonth()
-
-        var cumulativeValue = BigDecimal.ZERO
-        var month = firstMonth
-
-        while (month.isBeforeOrEqual(currentMonth)) {
-            operations.forEach { bondOperation ->
-                val opMonth = YearMonth.from(bondOperation.walletTransaction!!.date)
-                if (opMonth == month) {
-                    val opValue = bondOperation.unitPrice.multiply(bondOperation.quantity)
-                    cumulativeValue =
-                        when (bondOperation.operationType) {
-                            OperationType.BUY -> cumulativeValue.add(opValue)
-                            OperationType.SELL -> cumulativeValue.subtract(opValue)
-                        }
-                }
-            }
-
-            if (cumulativeValue > BigDecimal.ZERO) {
-                result[month] = cumulativeValue
-            }
-
-            month = month.plusMonths(1)
-        }
-
-        return result
-    }
 
     private fun savePerformanceSnapshots(
         months: List<YearMonth>,
@@ -606,6 +209,110 @@ class InvestmentPerformanceService(
         return snapshotRepository.save(entity)
     }
 
+    private fun computePerformance(): InvestmentPerformanceDTO {
+        val today = clockProvider.today()
+        val currentMonth = clockProvider.currentMonth()
+        val tickers = tickerService.getAllNonArchivedTickers()
+        val purchasesByTicker = tickerService.getAllPurchases().groupBy { it.ticker.id!! }
+        val salesByTicker = tickerService.getAllSales().groupBy { it.ticker.id!! }
+        val dividendsByTicker = tickerService.getAllDividends().groupBy { it.ticker.id!! }
+        val bonds = bondService.getAllNonArchivedBonds()
+        val bondHistories = bonds.map { bondService.getMonthlyInterestHistory(it.id!!) }
+        val bondOperations = bonds.map { bondService.getOperationsByBond(it) }
+        val bondFacts =
+            bondOperations.zip(bondHistories).map { (operations, history) ->
+                InvestmentPerformanceCalculator.BondFacts(
+                    investedOn = { date -> operations.calculateInvestedAmountUntil(date) },
+                    interestHeldAt = { month ->
+                        history
+                            .filter { !it.referenceMonth.isAfter(month) }
+                            .maxByOrNull { it.referenceMonth }
+                            ?.accumulatedInterest ?: BigDecimal.ZERO
+                    },
+                    flows =
+                        operations.map { operation ->
+                            val base = operation.quantity.multiply(operation.unitPrice)
+                            InvestmentPerformanceCalculator.Payout(
+                                operation.walletTransaction!!.date.toLocalDate(),
+                                if (operation.isPurchase()) base else base.add(operation.realizedInterest()).negate(),
+                            )
+                        },
+                )
+            }
+
+        val tickerFacts =
+            tickers
+                .filter { (purchasesByTicker[it.id!!].orEmpty().isNotEmpty()) || it.currentQuantity > BigDecimal.ZERO }
+                .map { ticker ->
+                    val purchases = purchasesByTicker[ticker.id!!].orEmpty()
+                    val sales = salesByTicker[ticker.id!!].orEmpty()
+                    val facts =
+                        InvestmentPerformanceCalculator.TickerFacts(
+                            openingQuantity = calculateInitialQuantity(ticker, purchases, sales),
+                            openingUnitCost = ticker.averageUnitValue,
+                            purchases = purchases.map { it.toTrade() },
+                            sales = sales.map { it.toTrade() },
+                            payouts =
+                                dividendsByTicker[ticker.id!!].orEmpty().map {
+                                    InvestmentPerformanceCalculator.Payout(
+                                        it.walletTransaction!!.date.toLocalDate(),
+                                        it.walletTransaction!!.amount,
+                                    )
+                                },
+                            priceAt = { date -> tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, date) },
+                        )
+                    facts to firstMonthOf(ticker, purchases)
+                }
+
+        val firstMonth =
+            (
+                tickerFacts.map { it.second } +
+                    dividendsByTicker.values.flatten().map { YearMonth.from(it.walletTransaction!!.date) } +
+                    bondOperations.flatten().map { YearMonth.from(it.walletTransaction!!.date) }
+            ).minOrNull() ?: currentMonth
+
+        val months = generateSequence(firstMonth) { it.plusMonths(1) }.takeWhile { !it.isAfter(currentMonth) }.toList()
+
+        val byMonth = months.associateWith { InvestmentPerformanceCalculator.MonthResult() }.toMutableMap()
+
+        tickerFacts.forEach { (facts, _) ->
+            InvestmentPerformanceCalculator.tickerMonths(facts, months, today).forEach { (month, result) ->
+                byMonth[month] = byMonth.getValue(month) + result
+            }
+        }
+
+        bondFacts.forEach { facts ->
+            InvestmentPerformanceCalculator.bondMonths(facts, months, today).forEach { (month, result) ->
+                byMonth[month] = byMonth.getValue(month) + result
+            }
+        }
+
+        var accumulated = BigDecimal.ZERO
+        val accumulatedGains = mutableMapOf<YearMonth, BigDecimal>()
+        months.forEach { month ->
+            accumulated = accumulated.add(byMonth.getValue(month).gain)
+            accumulatedGains[month] = accumulated
+        }
+
+        return InvestmentPerformanceDTO(
+            monthlyInvested = byMonth.mapValues { it.value.invested },
+            portfolioValues = byMonth.mapValues { it.value.value },
+            accumulatedGains = accumulatedGains,
+            monthlyGains = byMonth.mapValues { it.value.gain },
+        )
+    }
+
+    private fun firstMonthOf(
+        ticker: Ticker,
+        purchases: List<TickerPurchase>,
+    ): YearMonth = YearMonth.from(determineTickerReferenceDate(ticker, purchases))
+
+    private fun TickerPurchase.toTrade() =
+        InvestmentPerformanceCalculator.Trade(walletTransaction!!.date.toLocalDate(), quantity, unitPrice)
+
+    private fun TickerSale.toTrade() =
+        InvestmentPerformanceCalculator.Trade(walletTransaction!!.date.toLocalDate(), quantity, unitPrice)
+
     private fun determineTickerReferenceDate(
         ticker: Ticker,
         purchases: List<TickerPurchase>,
@@ -621,31 +328,4 @@ class InvestmentPerformanceService(
         ticker.currentQuantity
             .subtract(purchases.sumOf { it.quantity })
             .add(sales.sumOf { it.quantity })
-
-    private inline fun processTickersWithTransactions(
-        action: (Ticker, List<TickerPurchase>, List<TickerSale>) -> Unit,
-    ) {
-        val allTickers = tickerService.getAllNonArchivedTickers()
-        val purchasesByTicker = tickerService.getAllPurchases().groupBy { it.ticker.id!! }
-        val salesByTicker = tickerService.getAllSales().groupBy { it.ticker.id!! }
-
-        allTickers.forEach { ticker ->
-            val purchases = purchasesByTicker[ticker.id!!] ?: emptyList()
-            val sales = salesByTicker[ticker.id!!] ?: emptyList()
-
-            if (purchases.isEmpty() && ticker.currentQuantity <= BigDecimal.ZERO) {
-                return@forEach
-            }
-
-            action(ticker, purchases, sales)
-        }
-    }
-
-    private inline fun processBondsWithOperations(action: (List<BondOperation>) -> Unit) {
-        bondService.getAllNonArchivedBonds().forEach { bond ->
-            val operations = bondService.getOperationsByBond(bond)
-            if (operations.isEmpty()) return@forEach
-            action(operations)
-        }
-    }
 }

@@ -94,6 +94,28 @@ class FIRECalculatorServiceTest :
             }
         }
 
+        Given("no return, R$ 1.200 saved a month and a FIRE target of R$ 300.000") {
+            val settings =
+                FIRECalculatorSettingsFactory.create(
+                    currentNetWorth = BigDecimal.ZERO,
+                    monthlyContribution = BigDecimal("1200.00"),
+                    annualReturnRate = BigDecimal.ZERO,
+                    monthlyExpense = BigDecimal("1000.00"),
+                    withdrawalRate = BigDecimal("4.00"),
+                    currentAge = 30,
+                )
+
+            When("calculating the projection") {
+                val result = service.calculate(settings)
+
+                Then("it takes 250 months: 20 years and 10 months, reaching FIRE at 30 + 20 years and 10 months") {
+                    result.monthsToFire shouldBe 250
+                    result.ageAtFire shouldBe 50
+                    result.ageMonthsAtFire shouldBe 10
+                }
+            }
+        }
+
         Given("a scenario that does not converge in 50 years") {
             val settings =
                 FIRECalculatorSettingsFactory.create(

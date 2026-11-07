@@ -42,6 +42,15 @@
                                 <Label fx:id="bondInterestTypeLabel" />
                             </children>
                         </VBox>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="%bond.interestHistory.label.netInterest">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font></Label>
+                                <Label fx:id="bondNetInterestLabel" />
+                            </children>
+                        </VBox>
                     </children>
                 </HBox>
             </children>

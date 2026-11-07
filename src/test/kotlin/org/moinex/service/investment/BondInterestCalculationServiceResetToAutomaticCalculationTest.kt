@@ -98,6 +98,9 @@ class BondInterestCalculationServiceResetToAutomaticCalculationTest :
                 every {
                     bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month)
                 } returns calculation
+                every {
+                    bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month.minusMonths(1))
+                } returns null
                 every { bondOperationRepository.findByBondOrderByOperationDateAsc(bond) } returns listOf(operation)
                 every {
                     marketIndicatorService.getIndicatorHistoryBetween(
