@@ -1,6 +1,6 @@
 # Conventions — MOINEX
 
-Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium-high
+Status: human-reviewed (2026-11-07) · Confidence: medium-high
 
 ## Estilo e lint
 - ktlint (plugin 14.2.0, engine 1.4.1, compilador embutido fixado em 2.0.21) + Spotless (plugin aplicado sem bloco de configuração); 4 espaços, linha ≤120, final de arquivo com newline. [src: .editorconfig:1-20] [src: build.gradle.kts:16-17]
@@ -15,7 +15,7 @@ Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium-hi
 
 ## Testes
 - Kotest BehaviorSpec (Given/When/Then), MockK, fábricas em `src/test/kotlin/org/moinex/factory/`, H2 em memória. [src: CLAUDE.md]
-- 117 arquivos de teste em `service/`, `model/`, `ai/`; **nenhum** em `ui/` e Sonar exclui `ui/`, `common/`, `config/`, `model/`, `repository/` da cobertura. [src: find src/test] [src: sonar-project.properties]
+- 204 arquivos de teste Kotlin (2144 testes em 2026-11-07) e 6 de Python (118 testes); **nenhum** em `ui/` e Sonar exclui `ui/`, `common/`, `config/`, `model/`, `repository/` da cobertura. [src: find src/test] [src: sonar-project.properties]
 
 ## i18n
 Traduções em `messages_pt_BR.properties` e `messages_en.properties`; nunca reescrever o arquivo todo, só acrescentar/editar chaves. [src: CLAUDE.md] [user]
@@ -42,3 +42,12 @@ Lint e testes passando no pipeline (build, spotlessCheck/ktlintCheck, test+Jacoc
 ## Atualização 2026-11-02: header de arquivo e TitledValue
 - Todo arquivo de código da app (`.kt` em `src/main`, `.py` de scripts) começa com o header `Filename` / `Created on: <Month D, YYYY>` / `Author`, criado junto com o arquivo (`/* */` em Kotlin, `#` em Python); arquivos migrados de Java usam a data do `.java` original. Os 98 arquivos que não tinham foram corrigidos em f426f361; testes não seguem o padrão. [user] [mem: M-012] [src: CLAUDE.md "File header"]
 - "<Título>: <Valor>" usa `common/ui/TitledValue`; telas antigas migram quando tocadas. [user] [mem: M-010]
+
+## Atualização 2026-11-07
+- Testes Python (`src/test/python/`, unittest) fazem parte do `make test`, do hook de pré-commit e do CI (job `python-tests`). [src: Makefile:47] [src: .github/workflows/pipeline.yml:46]
+- Todo arquivo `.sh` novo precisa de `git update-index --chmod=+x` (`core.fileMode` é false), senão o CI falha com "Permission denied". [src: CLAUDE.md]
+- Escritor único: `TickerMarketDataService` (preço, momento, site e metadata do ticker), `AiChatHistoryService` (tabelas `ai_chat*`); nenhum outro código grava nessas colunas/tabelas. [src: CLAUDE.md "Database"]
+- Atualização manual de um item no Yahoo usa `APIUtils.withoutYahooCooldown { }`; automática e em lote respeita o cooldown. [src: CLAUDE.md]
+- O `ER` em `docs/database-erd.md` nunca é editado à mão: `make erd`. Capturas de validação ficam em `.aidlc/<intent>/construction/screenshots/` (ignoradas pelo git). [src: CLAUDE.md]
+- Antes de iniciar cada intent AI-DLC, perguntar se usa branch ou `main` (M-014). [mem: M-014]
+- Testes que passam por `FxUtils.launchOnFxThread` devem stubar o `FxUtils` (`mockkObject`): sem display o toolkit não inicia e `Platform.runLater` trava para sempre (travou o CI na v2.22.0). [mem: M-013]

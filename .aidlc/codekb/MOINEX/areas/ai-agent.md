@@ -1,43 +1,46 @@
 # Área: agente de IA (chat, tools, revisão)
 
-Status: human-reviewed (2026-11-04)   Confiança: alta (código lido), média (comportamento do LLM)   Commit analisado: edee9038
+Status: human-reviewed (2026-11-07) (reescrita, HEAD aefe5133)   Confiança: alta (código lido), média (comportamento do LLM)
 
 ## Visão geral
-O chat de IA responde perguntas sobre as finanças do usuário e propõe lançamentos e operações de investimento. Nada é gravado sem o usuário revisar e confirmar. [src: config/AiPromptProperties.kt] [src: application.yml:40-81] [user]
+O chat de IA responde perguntas sobre as finanças do usuário e propõe operações (lançamentos, transferências, cartões, metas, wishlist, investimentos, renda fixa). Nada é gravado sem o usuário revisar e confirmar. [src: config/AiPromptProperties.kt] [user]
 
 ```mermaid
 flowchart LR
   UI["AiChatController (UI)"] --> Svc["AiChatService"]
   Svc --> Prov["LlmProvider (Anthropic/OpenAI/Gemini/OpenRouter)"]
-  Svc --> RT["QueryFinanceTool (9 tools de leitura)"]
-  Svc --> PT["ProposeTransactionTool"]
-  Svc --> PI["ProposeInvestmentOperationTool"]
-  Svc -->|"ChatTurnResult.Success(propostas)"| UI
-  UI -->|"botão Revisar (N)"| Rev["TransactionReviewController / InvestmentOperationReviewController (modal)"]
-  Rev -->|"persist"| WS["WalletService / CreditCardService / CategoryService / TickerService / BondService"]
+  Svc --> QF["QueryFinanceTool (9 tools de leitura)"]
+  Svc --> RT["ReadTools (search_transactions, list_records)"]
+  Svc --> FM["FindMatchingTransactionsTool"]
+  Svc --> PC["ProposeChangesTool (propose_changes)"]
+  PC --> Reg["OperationRegistry -> AppOperation por domínio"]
+  Svc -->|"ChatTurnResult.Success(ChangeSet)"| UI
+  UI --> RS["ReviewSession (painel de revisão)"]
+  RS -->|"aprovar"| Reg
+  Reg --> WS["Services (Wallet, CreditCard, Goal, Wishlist, Ticker, Bond...)"]
+  RS --> Aud["ChangeSetAuditLogger"]
 ```
-O diagrama mostra que o loop de tools fica no serviço, e que a gravação acontece no controller de revisão (camada de UI).
+O loop de tools fica em `AiChatService`; as operações aprovadas passam pelos services, e a decisão sobre cada proposta é gravada pelo histórico. Ver `areas/ai-chat-history.md`.
 
 ## Componentes
 | Componente | Responsabilidade | Evidência |
 |---|---|---|
-| `AiChatController` (710 linhas) | Histórico, anexos, indicador "pensando", botões "Revisar (N)" por turno; abre a revisão em janela modal | [src: ui/main/AiChatController.kt] |
-| `AiChatService` | Monta o prompt (texto do `application.yml` por locale + data + contexto de carteiras/categorias/cartões/ativos), roda o loop de tools (`MAX_TOOL_ITERATIONS = 5`), coleta propostas | [src: ai/chat/AiChatService.kt:34-119] |
-| `LlmProvider` + 4 implementações | `chat(messages, tools)` e `testConnection`; HTTP via `java.net.http`, sem streaming | [src: ai/provider/LlmProvider.kt] |
-| `LlmTool` | Interface: `name`, `description`, `jsonSchema`, `execute(argumentsJson): String` | [src: ai/tools/LlmTool.kt] |
-| `QueryFinanceTool` | 9 tools de leitura: patrimônio, gastos por categoria, lançamentos no período, status de pagamento de fatura, receita x despesa, comparar períodos, metas, orçado x realizado, carteira de investimentos | [src: ai/tools/QueryFinanceTool.kt:37-47] |
-| `ProposeTransactionTool` | `propose_transactions`: kinds `wallet`, `credit_card`, `credit_card_payment`; parcelas; `existingTransactionId` (só pendentes de carteira); sugestão de carteira, cartão e categoria; confiança | [src: ai/tools/ProposeTransactionTool.kt] |
-| `ProposeInvestmentOperationTool` | `propose_investment_operations`: compra/venda de ações, dividendo, aplicação/resgate de CDB | [src: model/dto/ai/ExtractedInvestmentOperationDTO.kt:12-17] |
-| Revisão de lançamentos | Diálogo modal com `TableView` editável (abas carteira e cartão); realça duplicata (janela de 3 dias) e baixa confiança (< 0,6); `persist` cria/atualiza lançamento, cria dívida de cartão, paga fatura, cria categoria nova pelo nome | [src: ui/dialog/ai/TransactionReviewController.kt] |
-| Ingestão | CSV e PDF (com senha) viram texto anexado à mensagem | [src: ai/ingest/*] |
+| `AiChatController` | Histórico, anexos, indicador "pensando", painel de revisão por turno | [src: ui/main/AiChatController.kt] |
+| `AiChatService` | Monta o prompt (`PromptComposer`, textos por locale em `resources/ai/prompts`), roda o loop de tools e devolve `ChatTurnResult.Success` com `turnMessages` e o `ChangeSet` | [src: ai/chat/AiChatService.kt] [src: ai/prompt/PromptComposer.kt] |
+| `LlmProvider` + 4 implementações | `chat(messages, tools)` e `testConnection`; HTTP via `java.net.http` (`LlmHttpClient`), sem streaming | [src: ai/provider/] |
+| `LlmTool` | Interface: `name`, `description`, `jsonSchema`, `execute(argumentsJson)` | [src: ai/tools/LlmTool.kt] |
+| `QueryFinanceTool` | 9 tools de leitura: patrimônio, gastos por categoria, lançamentos no período, status de pagamento de fatura, receita x despesa, comparar períodos, metas, orçado x realizado, carteira | [src: ai/tools/QueryFinanceTool.kt] |
+| `ReadTools` | `search_transactions` e `list_records` (paginação, página padrão 20, máx. 50) | [src: ai/tools/ReadTools.kt:39-42] |
+| `FindMatchingTransactionsTool` + `service/matching` | Casamento determinístico de lançamentos do extrato com os existentes (similaridade de descrição), em código e não mais só pelo LLM | [src: ai/tools/FindMatchingTransactionsTool.kt] [src: service/matching/] |
+| `ProposeChangesTool` | `propose_changes`: lista de itens `{operation, ...}`; schema plano; erro de item sem campos devolve um exemplo | [src: ai/tools/ProposeChangesTool.kt] |
+| `ai/operation/**` | `AppOperation`/`BaseOperation`, `OperationRegistry`, `ChangeSet`, `DraftSpec`, `EntityCatalog`, `CategoryResolver`; operações em `transactions/`, `creditcard/`, `investments/` (ticker, investimento, gestão de renda fixa), `planning/` (metas, wishlist) | [src: ai/operation/] |
+| `ReviewSession` | Estado do painel de revisão: itens, decisões, `onItemChanged`, itens `readOnly` | [src: ai/review/ReviewSession.kt] |
+| `ChangeSetAuditLogger` | Registro de auditoria dos conjuntos aplicados | [src: ai/audit/ChangeSetAuditLogger.kt] |
+| Ingestão | CSV e PDF (com senha) viram texto anexado à mensagem | [src: ai/ingest/] |
 
-## Fatos relevantes para a evolução
-1. **A lógica de gravação está na UI**: `persist` dentro do controller de revisão. Qualquer framework de operações precisa extrair isso para uma camada de serviço. [src: TransactionReviewController.kt:503-583]
-2. **Correlação depende do LLM**: o prompt manda checar pendentes com `get_transactions_in_period` e preencher `existingTransactionId`; não há matching em código. `possibleDuplicate` é calculado só na tela de revisão (janela de 3 dias) e é apenas um realce. [src: application.yml:59-65] [src: TransactionReviewController.kt:104-105]
-3. **Contexto pequeno do prompt**: o contexto injetado traz listas (carteiras, categorias, cartões, ativos), não transações. [src: AiChatService.kt:128-135]
-4. **Uma tool de proposta por família**; cada uma com seu DTO, seu controller de revisão e seu botão no chat; o histórico guarda as propostas pendentes por índice. [src: AiChatController.kt:340-440]
-5. **Testes existentes**: `AiChatServiceTest`, codecs dos 4 provedores, `LlmProviderFactoryTest`, `LlmHttpClientTest`, `AiCredentialStoreTest`, renderizadores. Não há testes de prompt/correlação. [src: src/test/kotlin/org/moinex/ai/]
-6. **Diálogos do app gravam ao salvar** e avisam por callback (`setOnTransactionCreatedCallback`); não têm pré-preenchimento genérico. [src: ui/dialog/wallettransaction/create/AddExpenseController.kt:47-84]
+## Fatos relevantes
+1. As ferramentas `propose_transactions` e `propose_investment_operations`, seus DTOs (`ExtractedTransactionDTO`, `ExtractedInvestmentOperationDTO`) e os controllers de revisão específicos foram removidos; a gravação saiu da UI e passou para as operações. [src: git log eb5482a1, 46ae205e]
+2. Testes: `AiChatServiceTest`, codecs dos provedores, `LlmProviderFactoryTest`, `LlmHttpClientTest`, `AiCredentialStoreTest`, renderizadores, testes das operações e das read tools, `AiArchitectureTest` (proíbe `*Service.create/save` em `ai/chat`). Sem testes de qualidade de prompt. [src: src/test/kotlin/org/moinex/ai/]
 
 ## Do usuário
 - Provedor/modelo no dia a dia: **OpenRouter, variando o modelo** [user] → testes e prompts devem ser agnósticos ao modelo; formatos de tool-calling via OpenRouter seguem o estilo OpenAI.

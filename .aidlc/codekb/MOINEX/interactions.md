@@ -1,6 +1,6 @@
 # Interactions — MOINEX
 
-Status: human-reviewed (2026-11-02, HEAD 95b19ba7) · Confidence: medium-high
+Status: human-reviewed (2026-11-07) · Confidence: medium-high
 
 ## 1. Inicialização
 ```mermaid
@@ -73,3 +73,8 @@ Ctrl+S abre `GlobalSearch`; `SearchActionCatalog` lista telas, abas, lançamento
 
 ## 8. Desempenho e detalhe do ativo (2026-11-01, commitado em f426f361)
 `SavingsPerformanceController` pede em segundo plano `PerformanceBenchmarkService.benchmarkSeries/contributions` e `PortfolioAnalyticsService.dividendPanel`; ao abrir a aba atualiza CDI/IPCA/Ibovespa uma vez (`refreshBenchmarks`). `TickerDetailController` chama `PortfolioAnalyticsService.tickerDetail(id, meses)` e mostra o preço (aba Preço) e os proventos do ativo (aba Renda). Respostas antigas são descartadas por um contador de carregamento. [src: ui/main/SavingsPerformanceController.kt:100] [src: ui/dialog/investment/view/TickerDetailController.kt]
+
+## Atualização 2026-11-07
+- Fluxo de preços: `TickerService`/`TickerPriceHistoryService`/`MarketService` → `APIUtils` → `YahooGateway` (limite de 2, cooldown) → script Python → JSON → `TickerMarketDataService` grava preço, momento e metadata. Diagrama completo em `areas/market-data.md`. [src: areas/market-data.md]
+- Fluxo do assistente: usuário → `AiChatService` → provedor LLM ↔ ferramentas de leitura → `propose_changes` → `ChangeSet` → painel de revisão (`ReviewSession`) → aplicação pelos services + auditoria; mensagens e propostas salvas por `AiChatHistoryService`. Ver `areas/ai-agent.md` e `areas/ai-chat-history.md`. [src: areas/]
+- Aviso de release: `ReleaseUpdateScheduler` → `GitHubReleaseClient` → `NotificationService` (notificação com `action_url`). [src: service/release/]

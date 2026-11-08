@@ -1,6 +1,6 @@
 # Área: histórico de conversas com o assistente
 
-Status: draft (2026-11-07)   Confiança: alta (código lido e testado), média (comportamento do modelo)   Commit analisado: b6296cd4 + intent 261106-ai-chat-history (ainda não commitado quando escrito)
+Status: human-reviewed (2026-11-07)   Confiança: alta (código lido e testado), média (comportamento do modelo)   Commit analisado: b6296cd4 + intent 261106-ai-chat-history (commit 2895a4ad); válido em aefe5133
 
 ## Visão geral
 As conversas com o assistente de IA são gravadas no SQLite local, podem ser reabertas, buscadas, renomeadas e apagadas, e as propostas da IA (com o estado de cada uma) voltam ao painel de revisão como se a conversa nunca tivesse sido fechada. [src: service/ai/] [user]

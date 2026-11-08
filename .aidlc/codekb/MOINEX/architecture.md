@@ -1,6 +1,6 @@
 # Architecture — MOINEX
 
-Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: medium-high
+Status: human-reviewed (2026-11-07) · Confidence: medium-high
 
 ## Estilo
 Monólito em camadas, processo único: JavaFX na frente, Spring (injeção + JPA) por baixo, SQLite local. [src: CLAUDE.md]
@@ -16,10 +16,10 @@ flowchart TB
   subgraph SVC["service/ (@Service)"]
     S["wallet · creditcard · goal · wishlist · investment · networth · financialplanning · summary"]
   end
-  AI["ai/ (chat, provedores, ingestão CSV/PDF, ferramentas)"]
+  AI["ai/ (chat, provedores, ingestão CSV/PDF, ferramentas, operações, revisão)"]
   REPO["repository/ (Spring Data JPA)"]
   DB[("SQLite + Flyway")]
-  PY["common/util/APIUtils → scripts Python"]
+  PY["common/util/APIUtils → YahooGateway → scripts Python"]
   Main --> Screens --> S
   Screens --> Theme
   S --> REPO --> DB
@@ -50,3 +50,9 @@ Caption: a UI só fala com services; services falam com repositórios e Python. 
 
 ## Atualização 2026-11-01: infraestrutura de UI (`common/ui/`)
 `SegmentedFilter<T>` (filtro em botões), `TableColumns.centerIdHeaders`, `RowContextMenu.install` + `RowAction` (ações no botão direito da linha), `ScreenActionProvider` (cada tela expõe suas ações ao rodapé "+" e à busca global), `DialogForm` (Enter salva) e `FieldValidation` (validação inline). Busca global: `ui/common/search/{GlobalSearch,SearchActionCatalog,SearchMatcher,ScreenActionEntries,SearchModel}`, atalho Ctrl+S em `MainController`. [src: common/ui/] [src: ui/common/search/] [src: ui/main/MainController.kt:357]
+
+## Atualização 2026-11-07 (v2.21.0 → v2.25.0)
+- **Acesso ao Yahoo:** toda chamada passa por `YahooGateway` (máx. 2 simultâneas; após `rate_limit`, cooldown de 5 min dobrando até 60 min, zerado pela primeira chamada sem rate limit; chamada recusada lança `MoinexException.YahooCooldownException`). Atualização manual de uma coisa só roda em `APIUtils.withoutYahooCooldown { }`; só a atualização automática de abertura e o botão "atualizar todos os preços" respeitam o cooldown. Preço, momento e site de um ticker são gravados só por `TickerMarketDataService`. [src: CLAUDE.md "Python Script Integration"] [src: common/util/YahooGateway.kt] [src: areas/market-data.md]
+- **Assistente de IA:** o modelo não grava nada. `ProposeChangesTool` devolve um `ChangeSet` de `AppOperation`s (registro em `OperationRegistry`, um pacote por domínio), mostrado ao usuário em um painel de revisão (`ReviewSession`); aplicar passa pelos services e é registrado por `ChangeSetAuditLogger`; ferramentas de leitura (`ReadTools`, `FindMatchingTransactionsTool`) ampliam o contexto. As ferramentas antigas `ProposeTransactionTool`/`ProposeInvestmentOperationTool` foram removidas. Conversas e propostas são persistidas (`AiChatHistoryService`, V038). [src: ai/operation/] [src: ai/tools/] [src: areas/ai-agent.md] [src: areas/ai-chat-history.md]
+- **Aviso de release:** `ReleaseUpdateScheduler` consulta o GitHub (`GitHubReleaseClient`) e cria uma `Notification` com `action_url` (V036). [src: service/release/]
+- **Distribuição:** além do Windows, pacotes Linux com JRE e Python embutidos; `EmbeddedPython` localiza o interpretador empacotado. [src: common/util/EmbeddedPython.kt]

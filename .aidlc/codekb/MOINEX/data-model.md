@@ -1,6 +1,6 @@
 # Data model — MOINEX
 
-Status: human-reviewed (2026-11-02, HEAD 95b19ba7); seções "Atualização 2026-11-07" e "Relações e diagrama ER" em draft · Confidence: medium
+Status: human-reviewed (2026-11-07) · Confidence: medium
 
 ## Armazenamento
 - SQLite em `~/.moinex/data/moinex.db` (diretório configurável nas preferências, com fallback para o padrão). [src: app/SpringApp.kt:28-48] [src: CLAUDE.md]
@@ -59,3 +59,5 @@ Dados financeiros pessoais, locais. Credenciais de IA ficam em `AiCredentialStor
 - Preferências novas (fora do banco): `ai.chat.sidebarCollapsed`, `ai.history.maxChats`, `ai.history.maxDays`. [src: service/PreferencesService.kt]
 - O texto dos anexos (extratos) fica em `ai_chat_message.content`: é dado financeiro pessoal no banco local, por decisão do dono. [user]
 
+## Atualização 2026-11-07: migrations V035–V039
+V035 `benchmark_price_history` (série do Ibovespa); V036 `notification.action_url`; V037 `ticker.metadata` (JSON para o que não tem coluna: moeda, momento da sincronização de histórico etc.; preço, momento e site seguem em `current_unit_value`, `last_update` e `domain`, escritos só por `TickerMarketDataService`); V038 `ai_chat`, `ai_chat_message`, `ai_chat_change_set`, `ai_chat_change` (só `AiChatHistoryService` grava); V039 limpa o cache `investment_performance_snapshot` para ser reconstruído com as fórmulas corrigidas. Entidade nova do domínio de investimentos: nenhuma além das de IA; `model/dto` ganhou `BondDetailDTO`, `BondComparisonDTO`, `BondRedemptionEstimateDTO`, `InterestRecalculationRowDTO`, `QuantityIntegrityIssueDTO`, `TickerMetadata`. [src: db/migration/V035–V039] [src: CLAUDE.md "Database"]

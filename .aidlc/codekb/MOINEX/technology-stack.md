@@ -1,6 +1,6 @@
 # Technology stack — MOINEX
 
-Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: high
+Status: human-reviewed (2026-11-07) · Confidence: high; versões conferidas em `gradle/libs.versions.toml` (Boot, JavaFX, Kotest, MockK, Flyway, coroutines, ktlint)
 
 | Item | Versão | Uso |
 |---|---|---|
@@ -11,7 +11,7 @@ Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: high
 | AtlantaFX base | 3.0.0 | tema Dracula/PrimerLight [src: gradle/libs.versions.toml:8] |
 | Ikonli (javafx + material2 pack) | 12.4.0 | ícones vetoriais [src: gradle/libs.versions.toml:9] |
 | SQLite JDBC + Hibernate 7.4.13 (core e community dialects, versão gerida pelo BOM do Boot) | | banco local, `ddl-auto: validate` [src: CLAUDE.md] |
-| Flyway | 11.3.4 | 35 migrations; bean manual em `FlywayConfig` [src: src/main/resources/db/migration] [src: config/FlywayConfig.kt] |
+| Flyway | 11.3.4 | 39 migrations (V001–V039); bean manual em `FlywayConfig` [src: src/main/resources/db/migration] [src: config/FlywayConfig.kt] |
 | kotlinx-coroutines (core, reactor, javafx) | 1.9.0 (javafx) | assíncrono [src: gradle/libs.versions.toml:44] |
 | commonmark (+gfm tables) | | markdown do chat renderizado em WebView [src: build.gradle.kts] |
 | PDFBox, OpenCSV | | importação de extratos [src: ai/ingest/] |
@@ -19,11 +19,13 @@ Status: human-reviewed (2026-11-01, delta pós v2.20.2) · Confidence: high
 | Python 3 + yfinance, requests, pandas, numpy | /usr/bin/python3 no Linux | cotações e indicadores [src: CLAUDE.md] |
 | Testes | Kotest BehaviorSpec 6.1.4, MockK 1.14.11, AssertJ, H2, JUnit5 (Mockito só transitivo via spring-boot-starter-test) | [src: build.gradle.kts] |
 | Qualidade | ktlint (plugin 14.2.0, engine 1.4.1), Spotless 6.25.0 (sem bloco de configuração), JaCoCo 0.8.16, SonarCloud | [src: build.gradle.kts, sonar-project.properties] |
-| Empacote | scripts de instalador Windows (`jpackage`) | [src: build.gradle.kts:15, .github/workflows/build-windows-installer.yml] |
+| Empacote | Windows: instalador (`jpackage`, Python embutido); Linux: `.deb` e `tar.gz` (jpackage, JRE e Python 3.12 embutidos) | [src: .github/workflows/build-windows-installer.yml] [src: .github/workflows/build-linux-package.yml] [src: scripts/linux/build-package.sh] |
 
 Observações:
 - JFoenix foi removido na migração para AtlantaFX (commit b5d123cd). [src: git log]
-- yfinance 1.7.0 fixado em `requirements.txt`; o interpretador no Linux é `/usr/bin/python3`. [src: requirements.txt] [src: CLAUDE.md]
+- yfinance 1.7.0 fixado em `requirements.txt`; com instalação do código-fonte o interpretador no Linux é `/usr/bin/python3`; nos pacotes (Linux e Windows) o Python é embutido (`common/util/EmbeddedPython.kt`). [src: requirements.txt] [src: CLAUDE.md] [src: common/util/EmbeddedPython.kt]
+- Testes Python em `src/test/python/` (unittest, 118 testes em 2026-11-07), rodados por `make test-python` e pelo job `python-tests` do CI (Python 3.12). [src: Makefile:51] [src: .github/workflows/pipeline.yml:46]
+- O número da versão em runtime vem de `common/util/AppVersion.kt`; `model/SemanticVersion.kt` compara versões para o aviso de nova release (`service/release/`, API do GitHub). [src: common/util/AppVersion.kt] [src: service/release/]
 - Lombok, Mockito (declarado), google-java-format, reflections, commons-beanutils e o plugin jlink foram removidos em 2026-10-29 (v2.19.0). [src: git show d50e86e6]
 - ktlint: plugin Gradle 14.2.0 com engine 1.4.1; o `kotlin-compiler-embeddable` da configuração `ktlint` é fixado em 2.0.21, senão o plugin do Kotlin força 2.4.21 e o ktlint falha. [src: build.gradle.kts] [src: gradle/libs.versions.toml]
 - JaCoCo 0.8.16. [src: gradle/libs.versions.toml]

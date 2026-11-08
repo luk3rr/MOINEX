@@ -1,8 +1,15 @@
 # Área: telas de renda fixa e gráficos de comparação
 
-Status: draft (2026-11-07, HEAD 55d07233) · Confidence: alta no código, média nas decisões de interface
+Status: human-reviewed (2026-11-07), HEAD aefe5133 · Confidence: alta no código, média nas decisões de interface
 
-Adicionado no intent `261107-bond-detail-comparison`. Mapeia o que existe hoje para a tabela de títulos, os diálogos por título e os gráficos de benchmark, que a feature de detalhe e comparação vai estender. Nenhum dado pessoal do dono entra aqui (M-011).
+Adicionado no intent `261107-bond-detail-comparison`, concluído no commit aefe5133. As seções "Tela principal", "Diálogos", "Gráficos" e "O que isso significa" abaixo descrevem o estado **anterior** à feature (HEAD 55d07233); a seção "Estado após a feature" resume o que foi construído. Nenhum dado pessoal do dono entra aqui (M-011).
+
+## Estado após a feature (aefe5133)
+- **Tabela enxuta** em `SavingsBondsController` (6 colunas) com abas; duplo clique ou menu abre o **detalhe**. [src: ui/main/SavingsBondsController.kt] [src: .aidlc/261107-bond-detail-comparison/design.md § 2.6]
+- **Detalhe do título:** janela modal `BondDetailController` (`bond_detail.fxml`, `bond-detail.css`), com `BondDetailDTO` e `BondRedemptionEstimateDTO` vindos de `BondService`; o botão Arquivar mora no detalhe (A14). [src: ui/dialog/investment/view/BondDetailController.kt] [src: model/dto/BondDetailDTO.kt]
+- **Comparação:** aba "Comparação" (`ui/main/BondComparisonView.kt`, `bond-comparison.css`) com gráfico de N linhas e barras mensais; dados de `BondComparisonService.comparison/monthly` (`BondComparisonDTO`), posição diária por título em `BondDailySeries`, imposto estimado em `BondTaxEstimator`, CDI como referência. [src: service/investment/BondComparisonService.kt] [src: service/investment/BondDailySeries.kt] [src: service/investment/BondTaxEstimator.kt]
+- Diálogos de histórico de juros e de operações ganharam filtro por título; `common/ui/BondRateText.kt` e `BondYieldText.kt` formatam taxa e rentabilidade; `PerformanceBenchmarkService.loadFixedIncome` passou a reutilizar `BondDailySeries`. [src: git show aefe5133 --stat]
+- Perguntas em aberto resolvidas: cada título entra em 0% na data da primeira compra e todas as linhas terminam no mesmo ponto; o período "Tudo" começa na primeira compra entre os títulos incluídos; arquivados ficam fora, com a opção "Incluir arquivados" desligada por padrão; a comparação abre em 12M. [src: .aidlc/261107-bond-detail-comparison/requirements.md FR-10, FR-11, FR-17, A11] [user]
 
 ## Tela principal de títulos
 
@@ -30,7 +37,7 @@ Adicionado no intent `261107-bond-detail-comparison`. Mapeia o que existe hoje p
 - `PerformanceBenchmarkService.loadFixedIncome` (privado) calcula o valor diário de todos os títulos juntos com `BondAccrualCalculator.dailyValues` e os fluxos de compra e resgate; `PortfolioPerformanceCalculator.portfolioReturn` devolve o retorno acumulado % descontando fluxos; `cumulativeFromDailyRates` dá a linha do CDI. [src: PerformanceBenchmarkService.kt, PortfolioPerformanceCalculator.kt]
 - Dados por título: `BondService.getOperationsByBond`, `getMonthlyInterestHistory`, `estimateNetInterest`, `isAmountOnly`; `BondInterestCalculationService` guarda o histórico mensal. [src: BondService.kt]
 
-## O que isso significa para a feature
+## O que isso significava para a feature (histórico)
 
 1. O gráfico de comparação **precisa de um componente novo ou de uma generalização do `BenchmarkChart`** para N linhas com paleta.
 2. O retorno **por título** exige separar `loadFixedIncome` em uma função por título e chamar `portfolioReturn` com um só `FixedIncomePosition`.
@@ -42,7 +49,6 @@ Adicionado no intent `261107-bond-detail-comparison`. Mapeia o que existe hoje p
 
 HEAD 55d07233: ktlintCheck, spotlessCheck e test com 2114 testes Kotlin, 0 falhas; Python 118 OK (resultado do commit anterior, árvore limpa).
 
-## Perguntas em aberto
+## Perguntas em aberto (resolvidas)
 
-- O gráfico parte do início do período para todos os títulos, ou cada título parte da sua primeira compra?
-- Títulos arquivados entram na comparação?
+Ambas respondidas na seção "Estado após a feature".
