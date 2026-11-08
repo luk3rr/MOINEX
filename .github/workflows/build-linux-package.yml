@@ -1,4 +1,4 @@
-name: Build Linux Package
+name: "Release: Linux package"
 
 on:
   release:
