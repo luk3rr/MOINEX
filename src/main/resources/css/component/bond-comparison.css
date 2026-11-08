@@ -1,0 +1,312 @@
+/* Comparison between bonds: the CDI is dashed, each bond has its own color (bond-line-K, bond-bar-K, bond-legend-K) */
+
+.bond-comparison-chart .chart-series-line {
+    -fx-stroke-width: 2.5px;
+}
+
+.bond-comparison-chart .chart-series-line.bond-cdi {
+    -fx-stroke: theme-accent-text;
+    -fx-stroke-width: 2px;
+    -fx-stroke-dash-array: 6 4;
+}
+
+.bond-comparison-chart .chart-line-symbol {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-0 {
+    -fx-stroke: theme-chart-series-00;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-0 {
+    -fx-bar-fill: theme-chart-series-00;
+}
+
+.bond-legend-0 {
+    -fx-text-fill: theme-chart-series-00;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-1 {
+    -fx-stroke: theme-chart-series-02;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-1 {
+    -fx-bar-fill: theme-chart-series-02;
+}
+
+.bond-legend-1 {
+    -fx-text-fill: theme-chart-series-02;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-2 {
+    -fx-stroke: theme-chart-series-07;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-2 {
+    -fx-bar-fill: theme-chart-series-07;
+}
+
+.bond-legend-2 {
+    -fx-text-fill: theme-chart-series-07;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-3 {
+    -fx-stroke: theme-chart-series-12;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-3 {
+    -fx-bar-fill: theme-chart-series-12;
+}
+
+.bond-legend-3 {
+    -fx-text-fill: theme-chart-series-12;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-4 {
+    -fx-stroke: theme-chart-series-16;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-4 {
+    -fx-bar-fill: theme-chart-series-16;
+}
+
+.bond-legend-4 {
+    -fx-text-fill: theme-chart-series-16;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-5 {
+    -fx-stroke: theme-chart-series-20;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-5 {
+    -fx-bar-fill: theme-chart-series-20;
+}
+
+.bond-legend-5 {
+    -fx-text-fill: theme-chart-series-20;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-6 {
+    -fx-stroke: theme-chart-series-05;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-6 {
+    -fx-bar-fill: theme-chart-series-05;
+}
+
+.bond-legend-6 {
+    -fx-text-fill: theme-chart-series-05;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-7 {
+    -fx-stroke: theme-chart-series-09;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-7 {
+    -fx-bar-fill: theme-chart-series-09;
+}
+
+.bond-legend-7 {
+    -fx-text-fill: theme-chart-series-09;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-8 {
+    -fx-stroke: theme-chart-series-13;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-8 {
+    -fx-bar-fill: theme-chart-series-13;
+}
+
+.bond-legend-8 {
+    -fx-text-fill: theme-chart-series-13;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-9 {
+    -fx-stroke: theme-chart-series-23;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-9 {
+    -fx-bar-fill: theme-chart-series-23;
+}
+
+.bond-legend-9 {
+    -fx-text-fill: theme-chart-series-23;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-10 {
+    -fx-stroke: theme-chart-series-26;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-10 {
+    -fx-bar-fill: theme-chart-series-26;
+}
+
+.bond-legend-10 {
+    -fx-text-fill: theme-chart-series-26;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-11 {
+    -fx-stroke: theme-chart-series-01;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-11 {
+    -fx-bar-fill: theme-chart-series-01;
+}
+
+.bond-legend-11 {
+    -fx-text-fill: theme-chart-series-01;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-12 {
+    -fx-stroke: theme-chart-series-00;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-12 {
+    -fx-bar-fill: theme-chart-series-00;
+}
+
+.bond-legend-12 {
+    -fx-text-fill: theme-chart-series-00;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-13 {
+    -fx-stroke: theme-chart-series-02;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-13 {
+    -fx-bar-fill: theme-chart-series-02;
+}
+
+.bond-legend-13 {
+    -fx-text-fill: theme-chart-series-02;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-14 {
+    -fx-stroke: theme-chart-series-07;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-14 {
+    -fx-bar-fill: theme-chart-series-07;
+}
+
+.bond-legend-14 {
+    -fx-text-fill: theme-chart-series-07;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-15 {
+    -fx-stroke: theme-chart-series-12;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-15 {
+    -fx-bar-fill: theme-chart-series-12;
+}
+
+.bond-legend-15 {
+    -fx-text-fill: theme-chart-series-12;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-16 {
+    -fx-stroke: theme-chart-series-16;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-16 {
+    -fx-bar-fill: theme-chart-series-16;
+}
+
+.bond-legend-16 {
+    -fx-text-fill: theme-chart-series-16;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-17 {
+    -fx-stroke: theme-chart-series-20;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-17 {
+    -fx-bar-fill: theme-chart-series-20;
+}
+
+.bond-legend-17 {
+    -fx-text-fill: theme-chart-series-20;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-18 {
+    -fx-stroke: theme-chart-series-05;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-18 {
+    -fx-bar-fill: theme-chart-series-05;
+}
+
+.bond-legend-18 {
+    -fx-text-fill: theme-chart-series-05;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-19 {
+    -fx-stroke: theme-chart-series-09;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-19 {
+    -fx-bar-fill: theme-chart-series-09;
+}
+
+.bond-legend-19 {
+    -fx-text-fill: theme-chart-series-09;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-20 {
+    -fx-stroke: theme-chart-series-13;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-20 {
+    -fx-bar-fill: theme-chart-series-13;
+}
+
+.bond-legend-20 {
+    -fx-text-fill: theme-chart-series-13;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-21 {
+    -fx-stroke: theme-chart-series-23;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-21 {
+    -fx-bar-fill: theme-chart-series-23;
+}
+
+.bond-legend-21 {
+    -fx-text-fill: theme-chart-series-23;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-22 {
+    -fx-stroke: theme-chart-series-26;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-22 {
+    -fx-bar-fill: theme-chart-series-26;
+}
+
+.bond-legend-22 {
+    -fx-text-fill: theme-chart-series-26;
+}
+
+.bond-comparison-chart .chart-series-line.bond-line-23 {
+    -fx-stroke: theme-chart-series-01;
+}
+
+.bond-monthly-bars .chart-bar.bond-bar-23 {
+    -fx-bar-fill: theme-chart-series-01;
+}
+
+.bond-legend-23 {
+    -fx-text-fill: theme-chart-series-01;
+}
+
+.bond-legend-cdi {
+    -fx-text-fill: theme-accent-text;
+}
+
+.bond-monthly-bars {
+    -fx-background-color: transparent;
+}

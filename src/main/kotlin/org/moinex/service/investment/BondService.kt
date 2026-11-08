@@ -14,7 +14,9 @@ import org.moinex.common.extension.calculateQuantityUntil
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isHeldInReais
 import org.moinex.common.extension.toRounded
+import org.moinex.model.dto.BondDetailDTO
 import org.moinex.model.dto.BondRedemptionEstimateDTO
+import org.moinex.model.dto.MonthBalanceDTO
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.OperationType
@@ -32,13 +34,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
-import java.math.MathContext
 import java.math.RoundingMode
 import java.text.MessageFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
-import java.time.temporal.ChronoUnit
 
 @Service
 class BondService(
@@ -354,6 +354,49 @@ class BondService(
     }
 
     /**
+     * The position of [bond] for its detail window: invested, current value (invested plus the interest held), the
+     * interest of the current month, the estimated net interest as of [today] and the value at the end of each month of
+     * its interest history.
+     */
+    @Transactional(readOnly = true)
+    fun detail(
+        bond: Bond,
+        today: LocalDate = LocalDate.now(),
+    ): BondDetailDTO {
+        val invested = getTotalInvestedValue(bond)
+        val accumulated = getTotalAccumulatedInterestByBondId(bond.id!!)
+
+        return BondDetailDTO(
+            bond = bond,
+            invested = invested,
+            currentValue = invested.add(accumulated),
+            accumulatedInterest = accumulated,
+            monthInterest = getCurrentMonthInterest(bond.id!!),
+            netInterest = estimateNetInterest(bond, today),
+            monthlyBalance =
+                bondInterestCalculationService
+                    .getMonthlyInterestHistory(bond)
+                    .sortedBy { it.referenceMonth }
+                    .map { MonthBalanceDTO(it.referenceMonth, it.finalValue) },
+        )
+    }
+
+    /**
+     * The interest still held in [bond] as a percentage of what is invested in it, with two decimals; null when
+     * nothing is invested.
+     */
+    @Transactional(readOnly = true)
+    fun yieldPercentage(bond: Bond): BigDecimal? {
+        val invested = getTotalInvestedValue(bond)
+
+        if (invested.signum() <= 0) return null
+
+        return getTotalAccumulatedInterestByBondId(bond.id!!)
+            .multiply(BigDecimal(100))
+            .divide(invested, 2, RoundingMode.HALF_UP)
+    }
+
+    /**
      * Whether [bond] is held as an amount in reais: a CDB, LCI or LCA whose units cost one. Bonds of those types saved
      * with another unit price keep showing quantity and price.
      */
@@ -457,33 +500,7 @@ class BondService(
     private fun taxLotsAt(
         operations: List<BondOperation>,
         date: LocalDate,
-    ): List<BondTaxEstimator.Lot> {
-        val lots = mutableListOf<Pair<LocalDate, BigDecimal>>()
-
-        operations
-            .filter { it.localDate <= date }
-            .sortedBy { it.localDate }
-            .forEach { operation ->
-                val value = operation.quantity.multiply(operation.unitPrice)
-
-                if (operation.isPurchase()) {
-                    lots.add(operation.localDate to value)
-                } else {
-                    val total = lots.fold(BigDecimal.ZERO) { acc, lot -> acc.add(lot.second) }
-
-                    if (total.signum() > 0) {
-                        val kept =
-                            BigDecimal.ONE
-                                .subtract(
-                                    value.divide(total, MathContext.DECIMAL64),
-                                ).max(BigDecimal.ZERO)
-                        lots.replaceAll { it.first to it.second.multiply(kept) }
-                    }
-                }
-            }
-
-        return lots.map { BondTaxEstimator.Lot(it.second, ChronoUnit.DAYS.between(it.first, date)) }
-    }
+    ): List<BondTaxEstimator.Lot> = BondTaxEstimator.lotsAt(operations, date)
 
     @Transactional(readOnly = true)
     fun getAllNonArchivedBonds(): List<Bond> = bondRepository.findByArchivedFalseOrderByNameAsc()

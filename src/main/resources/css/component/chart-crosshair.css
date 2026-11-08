@@ -69,3 +69,124 @@
     -fx-fill: theme-warning;
     -fx-text-fill: theme-warning;
 }
+
+.crosshair-bond-0 {
+    -fx-fill: theme-chart-series-00;
+    -fx-text-fill: theme-chart-series-00;
+}
+
+.crosshair-bond-1 {
+    -fx-fill: theme-chart-series-02;
+    -fx-text-fill: theme-chart-series-02;
+}
+
+.crosshair-bond-2 {
+    -fx-fill: theme-chart-series-07;
+    -fx-text-fill: theme-chart-series-07;
+}
+
+.crosshair-bond-3 {
+    -fx-fill: theme-chart-series-12;
+    -fx-text-fill: theme-chart-series-12;
+}
+
+.crosshair-bond-4 {
+    -fx-fill: theme-chart-series-16;
+    -fx-text-fill: theme-chart-series-16;
+}
+
+.crosshair-bond-5 {
+    -fx-fill: theme-chart-series-20;
+    -fx-text-fill: theme-chart-series-20;
+}
+
+.crosshair-bond-6 {
+    -fx-fill: theme-chart-series-05;
+    -fx-text-fill: theme-chart-series-05;
+}
+
+.crosshair-bond-7 {
+    -fx-fill: theme-chart-series-09;
+    -fx-text-fill: theme-chart-series-09;
+}
+
+.crosshair-bond-8 {
+    -fx-fill: theme-chart-series-13;
+    -fx-text-fill: theme-chart-series-13;
+}
+
+.crosshair-bond-9 {
+    -fx-fill: theme-chart-series-23;
+    -fx-text-fill: theme-chart-series-23;
+}
+
+.crosshair-bond-10 {
+    -fx-fill: theme-chart-series-26;
+    -fx-text-fill: theme-chart-series-26;
+}
+
+.crosshair-bond-11 {
+    -fx-fill: theme-chart-series-01;
+    -fx-text-fill: theme-chart-series-01;
+}
+
+.crosshair-bond-12 {
+    -fx-fill: theme-chart-series-00;
+    -fx-text-fill: theme-chart-series-00;
+}
+
+.crosshair-bond-13 {
+    -fx-fill: theme-chart-series-02;
+    -fx-text-fill: theme-chart-series-02;
+}
+
+.crosshair-bond-14 {
+    -fx-fill: theme-chart-series-07;
+    -fx-text-fill: theme-chart-series-07;
+}
+
+.crosshair-bond-15 {
+    -fx-fill: theme-chart-series-12;
+    -fx-text-fill: theme-chart-series-12;
+}
+
+.crosshair-bond-16 {
+    -fx-fill: theme-chart-series-16;
+    -fx-text-fill: theme-chart-series-16;
+}
+
+.crosshair-bond-17 {
+    -fx-fill: theme-chart-series-20;
+    -fx-text-fill: theme-chart-series-20;
+}
+
+.crosshair-bond-18 {
+    -fx-fill: theme-chart-series-05;
+    -fx-text-fill: theme-chart-series-05;
+}
+
+.crosshair-bond-19 {
+    -fx-fill: theme-chart-series-09;
+    -fx-text-fill: theme-chart-series-09;
+}
+
+.crosshair-bond-20 {
+    -fx-fill: theme-chart-series-13;
+    -fx-text-fill: theme-chart-series-13;
+}
+
+.crosshair-bond-21 {
+    -fx-fill: theme-chart-series-23;
+    -fx-text-fill: theme-chart-series-23;
+}
+
+.crosshair-bond-22 {
+    -fx-fill: theme-chart-series-26;
+    -fx-text-fill: theme-chart-series-26;
+}
+
+.crosshair-bond-23 {
+    -fx-fill: theme-chart-series-01;
+    -fx-text-fill: theme-chart-series-01;
+}
+

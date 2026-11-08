@@ -1,0 +1,41 @@
+/* Balance of a bond over the last months, in the detail window */
+
+.bond-balance-chart {
+    -fx-background-color: transparent;
+}
+
+.bond-balance-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.bond-balance-chart .chart-series-line {
+    -fx-stroke: theme-chart-series-00;
+    -fx-stroke-width: 2.5px;
+}
+
+.bond-balance-chart .axis-tick-mark,
+.bond-balance-chart .axis-minor-tick-mark {
+    -fx-stroke: transparent;
+}
+
+.bond-detail-section {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.bond-detail-caption {
+    -fx-font-size: 11px;
+    -fx-opacity: 0.7;
+}
+
+.bond-detail-value {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.bond-detail-card {
+    -fx-padding: 6 10 6 10;
+    -fx-border-color: theme-border;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}

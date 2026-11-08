@@ -16,6 +16,7 @@ import javafx.scene.control.Label
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextInputDialog
+import javafx.scene.layout.VBox
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
@@ -42,6 +43,9 @@ class BondInterestHistoryController(
     private val bondService: BondService,
 ) {
     @FXML
+    private lateinit var headerBox: VBox
+
+    @FXML
     private lateinit var bondNameLabel: Label
 
     @FXML
@@ -63,10 +67,23 @@ class BondInterestHistoryController(
     private lateinit var closeButton: Button
 
     private lateinit var bond: Bond
+    private var year: Int? = null
 
     companion object {
         private val logger = LoggerFactory.getLogger(BondInterestHistoryController::class.java)
         private const val PREVIEW_MAX_LINES = 12
+    }
+
+    /**
+     * Shows the history inside another window: the header and the close button, which that window already has, are
+     * hidden and the table takes the width it is given.
+     */
+    fun setEmbedded() {
+        headerBox.isVisible = false
+        headerBox.isManaged = false
+        closeButton.isVisible = false
+        closeButton.isManaged = false
+        historyTable.minWidth = 0.0
     }
 
     fun setBond(b: Bond) {
@@ -202,8 +219,29 @@ class BondInterestHistoryController(
         )
     }
 
+    /**
+     * The years that have a row of history, newest first.
+     */
+    fun years(): List<Int> =
+        bondInterestCalculationService
+            .getMonthlyInterestHistory(bond)
+            .map { it.referenceMonth.year }
+            .distinct()
+            .sortedDescending()
+
+    /**
+     * Shows only the rows of [selected], or all of them when it is null.
+     */
+    fun showYear(selected: Int?) {
+        year = selected
+        loadHistoryData()
+    }
+
     private fun loadHistoryData() {
-        val history = bondInterestCalculationService.getMonthlyInterestHistory(bond)
+        val history =
+            bondInterestCalculationService
+                .getMonthlyInterestHistory(bond)
+                .filter { year == null || it.referenceMonth.year == year }
         val observableList = FXCollections.observableArrayList(history)
         historyTable.items = observableList
     }

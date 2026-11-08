@@ -80,6 +80,7 @@ object Files {
     // UI investment package - View
     const val BOND_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "bond_transactions.fxml"
     const val BOND_INTEREST_HISTORY_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "bond_interest_history.fxml"
+    const val BOND_DETAIL_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "bond_detail.fxml"
     const val ARCHIVED_TICKERS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "archived_tickers.fxml"
     const val ARCHIVED_BONDS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "archived_bonds.fxml"
     const val INVESTMENT_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "investment_transactions.fxml"
@@ -208,6 +209,7 @@ object Files {
     const val TIMELINE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "timeline-chart.css"
     const val TICKER_PRICE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "ticker-price-chart.css"
     const val BENCHMARK_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "benchmark-chart.css"
+    const val BOND_COMPARISON_STYLE_SHEET: String = CSS_COMPONENT_PATH + "bond-comparison.css"
     const val DIVIDEND_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "dividend-chart.css"
 
     // Notifications

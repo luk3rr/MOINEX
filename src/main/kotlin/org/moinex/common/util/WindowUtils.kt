@@ -154,6 +154,23 @@ object WindowUtils {
         stage.centerOnScreen()
     }
 
+    /**
+     * Loads [fxmlFileName] with its Spring-managed controller to be placed inside another window, and returns the root
+     * node and the controller.
+     */
+    fun <T> loadEmbedded(
+        fxmlFileName: String,
+        springContext: ApplicationContext,
+    ): Pair<Parent, T> {
+        val bundle = springContext.getBean<PreferencesService>().bundle
+        val loader =
+            FXMLLoader(WindowUtils::class.java.getResource(fxmlFileName), bundle).apply {
+                setControllerFactory { springContext.getBean(it) }
+            }
+
+        return loader.load<Parent>() to loader.getController<T>()
+    }
+
     @JvmOverloads
     fun <T> openModalWindow(
         fxmlFileName: String,

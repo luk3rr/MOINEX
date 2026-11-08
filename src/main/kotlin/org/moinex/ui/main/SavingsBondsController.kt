@@ -8,21 +8,30 @@
 
 package org.moinex.ui.main
 
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
+import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
+import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
+import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
+import javafx.scene.layout.Region
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
+import javafx.util.Callback
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.ui.BondTableColumns
-import org.moinex.common.ui.BondTableColumns.asQuantityColumn
-import org.moinex.common.ui.BondTableColumns.asUnitPriceColumn
+import org.moinex.common.ui.BondYieldText
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.ui.ScreenActionProvider
@@ -31,13 +40,14 @@ import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BondType
 import org.moinex.model.investment.Bond
 import org.moinex.service.PreferencesService
+import org.moinex.service.investment.BondComparisonService
 import org.moinex.service.investment.BondService
 import org.moinex.ui.dialog.investment.create.AddBondController
 import org.moinex.ui.dialog.investment.create.AddBondPurchaseController
 import org.moinex.ui.dialog.investment.create.AddBondSaleController
 import org.moinex.ui.dialog.investment.update.EditBondController
 import org.moinex.ui.dialog.investment.view.ArchivedBondsController
-import org.moinex.ui.dialog.investment.view.BondInterestHistoryController
+import org.moinex.ui.dialog.investment.view.BondDetailController
 import org.moinex.ui.dialog.investment.view.BondTransactionsController
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -47,9 +57,13 @@ import java.text.MessageFormat
 @Controller
 class SavingsBondsController(
     private val bondService: BondService,
+    private val bondComparisonService: BondComparisonService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
 ) : ScreenActionProvider {
+    @FXML
+    private lateinit var bondsPortfolioPane: AnchorPane
+
     @FXML
     private lateinit var bondsTotalInvestedLabel: Text
 
@@ -86,9 +100,6 @@ class SavingsBondsController(
     @FXML
     private lateinit var bondsTabBondTypeComboBox: ComboBox<BondType>
 
-    private val currentMonthInterestCache = mutableMapOf<Int, BigDecimal>()
-    private val totalAccumulatedInterestCache = mutableMapOf<Int, BigDecimal>()
-
     @FXML
     override fun screenContext(): String = preferencesService.translate(TranslationKeys.SAVINGS_TAB_BONDS)
 
@@ -106,9 +117,12 @@ class SavingsBondsController(
         )
 
     fun initialize() {
+        addComparisonTab()
+
         RowContextMenu.install(
             bondsTabBondTable,
             listOf(
+                RowAction(preferencesService.translate(TranslationKeys.BOND_DETAIL_MENU)) { handleShowDetail() },
                 RowAction(preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_EDIT)) { handleEditBond() },
                 RowAction(
                     preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_DELETE),
@@ -119,10 +133,17 @@ class SavingsBondsController(
                 RowAction(
                     preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_SELL_BOND),
                 ) { handleSellBond() },
-                RowAction(preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_INTEREST_HISTORY)) {
-                    handleShowInterestHistory()
-                },
             ),
+            createRow = {
+                TableRow<Bond>().apply {
+                    setOnMouseClicked { event ->
+                        if (event.clickCount == 2 && !isEmpty) {
+                            bondsTabBondTable.selectionModel.select(index)
+                            handleShowDetail()
+                        }
+                    }
+                }
+            },
         )
         val searchWidth = bondsFilterGroup.widthProperty()
         bondsTabBondSearchField.prefWidthProperty().bind(searchWidth)
@@ -323,26 +344,46 @@ class SavingsBondsController(
         )
     }
 
-    @FXML
-    fun handleShowInterestHistory() {
-        val selectedBond = bondsTabBondTable.selectionModel.selectedItem
-
-        if (selectedBond == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_HISTORY_MESSAGE),
+    private fun addComparisonTab() {
+        val parent = bondsPortfolioPane.parent as? VBox ?: return
+        val view = BondComparisonView(bondComparisonService, preferencesService) { handleRegisterBond() }
+        val tabs =
+            TabPane(
+                Tab(preferencesService.translate(TranslationKeys.BOND_COMPARISON_TAB_PORTFOLIO)).apply {
+                    isClosable = false
+                },
+                Tab(preferencesService.translate(TranslationKeys.BOND_COMPARISON_TAB_COMPARISON), view.root).apply {
+                    isClosable = false
+                },
             )
-            return
+        val index = parent.children.indexOf(bondsPortfolioPane)
+
+        (parent.children.firstOrNull() as? Region)?.let {
+            it.minHeight = SUMMARY_HEIGHT
+            it.prefHeight = SUMMARY_HEIGHT
+            it.maxHeight = SUMMARY_HEIGHT
         }
+        tabs.minHeight = 0.0
+        tabs.prefHeight = 0.0
+
+        parent.children.remove(bondsPortfolioPane)
+        tabs.tabs[0].content = bondsPortfolioPane
+        parent.children.add(index, tabs)
+        VBox.setVgrow(tabs, Priority.ALWAYS)
+        tabs.selectionModel.selectedIndexProperty().addListener { _, _, selected ->
+            if (selected == 1) view.load()
+        }
+    }
+
+    @FXML
+    fun handleShowDetail() {
+        val selectedBond = bondsTabBondTable.selectionModel.selectedItem ?: return
 
         WindowUtils.openModalWindow(
-            Files.BOND_INTEREST_HISTORY_FXML,
-            MessageFormat.format(
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_INTEREST_HISTORY_TITLE),
-                selectedBond.name,
-            ),
+            Files.BOND_DETAIL_FXML,
+            MessageFormat.format(preferencesService.translate(TranslationKeys.BOND_DETAIL_TITLE), selectedBond.name),
             springContext,
-            { controller: BondInterestHistoryController -> controller.setBond(selectedBond) },
+            { controller: BondDetailController -> controller.setBond(selectedBond) },
             listOf(
                 Runnable {
                     updateBondTableView()
@@ -353,29 +394,13 @@ class SavingsBondsController(
     }
 
     private fun configureBondTableView() {
-        BondTableColumns.hideWhenAllHeldInReais(bondsTabBondTable) { bondService.isAmountOnly(it) }
-
         bondsTabBondTable.columns.addAll(
             createColumn(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME,
             ) { it.name },
             createColumn(
-                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL,
-            ) { it.symbol ?: "" },
-            createColumn(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE,
             ) { UIUtils.translateBondType(it.type) },
-            createColumn(
-                TranslationKeys.BOND_TABLE_QUANTITY_OR_AMOUNT,
-            ) {
-                val quantity = bondService.getCurrentQuantity(it)
-                if (bondService.isAmountOnly(it)) UIUtils.formatCurrency(quantity) else quantity.toString()
-            }.asQuantityColumn(),
-            createColumn(
-                TranslationKeys.BOND_TABLE_UNIT_PRICE,
-            ) {
-                if (bondService.isAmountOnly(it)) "—" else UIUtils.formatCurrency(bondService.getAverageUnitPrice(it))
-            }.asUnitPriceColumn(),
             createColumn(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE,
             ) { UIUtils.formatCurrency(bondService.getTotalInvestedValue(it)) },
@@ -388,28 +413,55 @@ class SavingsBondsController(
                     ),
                 )
             },
+            yieldColumn(),
             createColumn(
                 TranslationKeys.BOND_MATURITY_DATE,
             ) { it.maturityDate?.let { date -> UIUtils.formatDateForDisplay(date) } ?: "-" },
-            createColumn(
-                TranslationKeys.BOND_INTEREST_RATE,
-            ) { it.interestRate?.let { rate -> "$rate%" } ?: "-" },
-            createColumn(
-                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_CURRENT_MONTH_INTEREST,
-            ) {
-                UIUtils.formatCurrency(
-                    currentMonthInterestCache.getOrDefault(it.id, BigDecimal.ZERO),
-                )
-            },
-            createColumn(
-                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TOTAL_ACCUMULATED_INTEREST,
-            ) {
-                UIUtils.formatCurrency(
-                    totalAccumulatedInterestCache.getOrDefault(it.id, BigDecimal.ZERO),
-                )
-            },
         )
     }
+
+    private fun yieldColumn(): TableColumn<Bond, Bond> =
+        TableColumn<Bond, Bond>(
+            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_ACCUMULATED_YIELD),
+        ).apply {
+            setCellValueFactory { SimpleObjectProperty(it.value) }
+            cellFactory =
+                Callback {
+                    object : TableCell<Bond, Bond>() {
+                        override fun updateItem(
+                            item: Bond?,
+                            empty: Boolean,
+                        ) {
+                            super.updateItem(item, empty)
+                            styleClass.removeAll(Styles.POSITIVE_BALANCE_STYLE, Styles.NEGATIVE_BALANCE_STYLE)
+
+                            if (empty || item == null) {
+                                text = null
+                                return
+                            }
+
+                            val accumulated = bondService.getTotalAccumulatedInterestByBondId(item.id!!)
+                            text =
+                                BondYieldText.format(
+                                    accumulated,
+                                    bondService.yieldPercentage(item),
+                                    { UIUtils.formatCurrencySigned(it) },
+                                    preferencesService.locale,
+                                )
+
+                            if (accumulated.signum() != 0) {
+                                styleClass.add(
+                                    if (accumulated.signum() > 0) {
+                                        Styles.POSITIVE_BALANCE_STYLE
+                                    } else {
+                                        Styles.NEGATIVE_BALANCE_STYLE
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+        }
 
     private fun createColumn(
         headerKey: String,
@@ -421,14 +473,6 @@ class SavingsBondsController(
 
     private fun updateBondTableView() {
         val bonds = bondService.getAllNonArchivedBonds()
-
-        currentMonthInterestCache.clear()
-        totalAccumulatedInterestCache.clear()
-
-        bonds.forEach { bond ->
-            currentMonthInterestCache[bond.id!!] = bondService.getCurrentMonthInterest(bond.id!!)
-            totalAccumulatedInterestCache[bond.id!!] = bondService.getTotalAccumulatedInterestByBondId(bond.id!!)
-        }
 
         val filteredBonds =
             bonds
@@ -502,5 +546,6 @@ class SavingsBondsController(
     }
 
     companion object {
+        private const val SUMMARY_HEIGHT = 90.0
     }
 }

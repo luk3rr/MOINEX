@@ -7,14 +7,12 @@
 package org.moinex.service.investment
 
 import org.moinex.common.ClockProvider
-import org.moinex.common.extension.realizedInterest
 import org.moinex.model.dto.BenchmarkSeriesDTO
 import org.moinex.model.dto.ContributionDTO
 import org.moinex.model.dto.DailyPricePointDTO
 import org.moinex.model.dto.PerformancePeriod
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.Ticker
-import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
 import org.moinex.repository.investment.DividendRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
@@ -38,7 +36,7 @@ class PerformanceBenchmarkService(
     private val marketIndicatorService: MarketIndicatorService,
     private val benchmarkService: BenchmarkService,
     private val bondRepository: BondRepository,
-    private val bondOperationRepository: BondOperationRepository,
+    private val bondDailySeries: BondDailySeries,
     private val clockProvider: ClockProvider,
 ) {
     /**
@@ -145,41 +143,8 @@ class PerformanceBenchmarkService(
         }
     }
 
-    /**
-     * The non-archived bonds valued day by day by the same rules that give their monthly interest, with the money put
-     * in and taken out. A bond without rate, type or index history is left out.
-     */
     private fun loadFixedIncome(today: LocalDate): List<PortfolioPerformanceCalculator.FixedIncomePosition> =
-        bondRepository.findByArchivedFalseOrderByNameAsc().mapNotNull { bond ->
-            val type = bond.interestType ?: return@mapNotNull null
-            val rate = bond.interestRate ?: return@mapNotNull null
-            val operations =
-                bondOperationRepository.findByBondOrderByOperationDateAsc(bond).filter { it.walletTransaction != null }
-            val first = operations.firstOrNull { it.isPurchase() }?.localDate ?: return@mapNotNull null
-            val index = bond.interestIndex ?: InterestIndex.CDI
-
-            val points =
-                marketIndicatorService
-                    .getIndicatorHistoryBetween(index, first, today)
-                    .filter { it.referenceDate in first..today }
-                    .map { BondAccrualCalculator.IndexPoint(it.referenceDate, it.rateValue) }
-            if (points.isEmpty()) return@mapNotNull null
-
-            val flows =
-                operations.map {
-                    val base = it.quantity.multiply(it.unitPrice)
-                    BondAccrualCalculator.Flow(
-                        date = it.localDate,
-                        amount = if (it.isPurchase()) base else base.add(it.realizedInterest()).negate(),
-                        rate = it.spread?.takeIf { spread -> spread.signum() > 0 },
-                    )
-                }
-
-            PortfolioPerformanceCalculator.FixedIncomePosition(
-                BondAccrualCalculator.dailyValues(type, index, rate, flows, points).map { it.date to it.value },
-                flows.map { it.date to it.amount },
-            )
-        }
+        bondRepository.findByArchivedFalseOrderByNameAsc().mapNotNull { bondDailySeries.position(it, today) }
 
     private fun rates(
         index: InterestIndex,

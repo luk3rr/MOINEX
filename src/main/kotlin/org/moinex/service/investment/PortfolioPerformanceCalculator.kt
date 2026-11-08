@@ -46,7 +46,8 @@ object PortfolioPerformanceCalculator {
 
     /**
      * A bond or any holding valued directly in money: its value at the close of each day it has one ([values]) and the
-     * money put in (positive) or taken out (negative) on each date ([flows]).
+     * money put in (positive) or taken out (negative) on each date ([flows]). Money put in does not earn on the day it
+     * goes in, so it is not part of the capital at work that day.
      */
     data class FixedIncomePosition(
         val values: List<Pair<LocalDate, BigDecimal>>,
@@ -103,13 +104,7 @@ object PortfolioPerformanceCalculator {
 
             val paid = if (includeDividends) payoutsOn(effective, day, days) else BigDecimal.ZERO
 
-            val base =
-                previousValue
-                    ?.add(
-                        boughtOn(effective, day),
-                    )?.add(
-                        effectiveFixed.fold(BigDecimal.ZERO) { total, fixed -> total.add(fixedBoughtOn(fixed, day)) },
-                    )
+            val base = previousValue?.add(boughtOn(effective, day))
             if (base != null && base.signum() > 0) {
                 val profit = value.subtract(previousValue).subtract(flow).add(paid)
                 val dayReturn = BigDecimal.ONE.add(profit.divide(base, MC), MC)
@@ -295,15 +290,6 @@ object PortfolioPerformanceCalculator {
         fixed: FixedIncomePosition,
         day: LocalDate,
     ): BigDecimal = fixed.flows.filter { it.first == day }.fold(BigDecimal.ZERO) { acc, flow -> acc.add(flow.second) }
-
-    private fun fixedBoughtOn(
-        fixed: FixedIncomePosition,
-        day: LocalDate,
-    ): BigDecimal =
-        fixed.flows
-            .filter {
-                it.first == day && it.second.signum() > 0
-            }.fold(BigDecimal.ZERO) { acc, flow -> acc.add(flow.second) }
 
     private fun boughtOn(
         positions: List<Position>,

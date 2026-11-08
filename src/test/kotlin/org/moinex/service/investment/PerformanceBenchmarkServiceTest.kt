@@ -37,7 +37,7 @@ class PerformanceBenchmarkServiceTest :
                 indicators,
                 benchmarks,
                 mockk<org.moinex.repository.investment.BondRepository>(),
-                mockk<org.moinex.repository.investment.BondOperationRepository>(),
+                mockk<BondDailySeries>(),
                 clock,
             )
         val today = clock.today()

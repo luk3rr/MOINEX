@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
 import javafx.geometry.Pos
+import javafx.scene.control.Button
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
@@ -30,6 +31,7 @@ import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.OperationType
+import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondOperation
 import org.moinex.service.PreferencesService
 import org.moinex.service.investment.BondService
@@ -50,7 +52,12 @@ class BondTransactionsController(
     @FXML
     private lateinit var searchField: TextField
 
+    @FXML
+    private lateinit var closeButton: Button
+
     private var operations: MutableList<BondOperation> = mutableListOf()
+    private var filterBond: Bond? = null
+    private var year: Int? = null
 
     @FXML
     fun initialize() {
@@ -164,19 +171,55 @@ class BondTransactionsController(
         }
     }
 
+    /**
+     * Shows only the operations of [bond], inside another window: the columns of the bond and the close button, which
+     * that window already has, are hidden and the table takes the width it is given.
+     */
+    fun setBond(bond: Bond) {
+        filterBond = bond
+
+        val bondColumns =
+            listOf(
+                preferencesService.translate(TranslationKeys.BOND_TABLE_BOND),
+                preferencesService.translate(TranslationKeys.BOND_TABLE_TYPE),
+            )
+        operationTableView.columns.filter { it.text in bondColumns }.forEach { it.isVisible = false }
+        operationTableView.minWidth = 0.0
+        closeButton.isVisible = false
+        closeButton.isManaged = false
+
+        loadOperationsFromDatabase()
+        updateOperationTableView()
+    }
+
+    /**
+     * The years that have an operation, newest first.
+     */
+    fun years(): List<Int> = operations.map { it.localDate.year }.distinct().sortedDescending()
+
+    /**
+     * Shows only the operations of [selected], or all of them when it is null.
+     */
+    fun showYear(selected: Int?) {
+        year = selected
+        updateOperationTableView()
+    }
+
     private fun loadOperationsFromDatabase() {
-        operations = bondService.getAllOperations().toMutableList()
+        operations =
+            (filterBond?.let { bondService.getOperationsByBond(it) } ?: bondService.getAllOperations()).toMutableList()
     }
 
     private fun updateOperationTableView() {
         val similarTextOrId = searchField.text.lowercase()
+        val inYear = operations.filter { year == null || it.localDate.year == year }
 
         operationTableView.items.clear()
 
         if (similarTextOrId.isEmpty()) {
-            operationTableView.items.setAll(operations)
+            operationTableView.items.setAll(inYear)
         } else {
-            operations
+            inYear
                 .filter { op ->
                     val id = op.id.toString()
                     val bondName = op.bond.name.lowercase()

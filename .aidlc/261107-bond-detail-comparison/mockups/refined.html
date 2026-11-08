@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockups refinados: detalhe do título e comparação</title>
+<style>
+:root{--base:#21222C;--card:#282A36;--pane:#383a52;--hover:#44475A;--text:#F8F8F2;--sec:#BFBFC3;--border:#44475A;--pos:#50FA7B;--neg:#FF5555;--warn:#FFB86C;--acc:#BD93F9;--side:#0a614e;--l0:#16A34A;--l1:#3B82F6;--l2:#EAB308;--l3:#F9A8D4;--cdi:#8BE9FD;--shadow:rgba(0,0,0,.45)}
+:root.light{--base:#F6F8FA;--card:#fff;--pane:#E6E7E8;--hover:#e6e6e6;--text:#1F2328;--sec:#59636e;--border:#D1D9E0;--pos:#1A7F37;--neg:#C62F3E;--warn:#9a6700;--acc:#7c4dcc;--side:#1abc9c;--l0:#16A34A;--l1:#2563EB;--l2:#B45309;--l3:#BE185D;--cdi:#0E7490;--shadow:rgba(0,0,0,.25)}
+*{box-sizing:border-box}body{margin:0;background:#111;color:var(--text);font:13px "Noto Sans",system-ui,sans-serif;padding:16px}
+h1{font-size:16px;margin:0 0 4px;color:#eee}p.n{color:#aaa;margin:0 0 12px;max-width:980px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.bar button{background:#2a2a2a;color:#ddd;border:2px solid #555;border-radius:20px;padding:6px 14px;cursor:pointer}.bar button.on{border-color:var(--acc);color:#fff}
+.app{display:grid;grid-template-columns:56px 1fr;background:var(--base);border:1px solid #333;border-radius:6px;overflow:hidden;max-width:1180px;position:relative;color:var(--text)}
+.side{background:var(--side);display:flex;flex-direction:column;gap:18px;align-items:center;padding:14px 0}.side i{width:22px;height:22px;border-radius:5px;background:#ffffff55;display:block}.side i.on{background:#fff}
+.main{padding:10px;display:flex;flex-direction:column;gap:10px;min-height:560px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.totals{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}.totals b{display:block;font-size:15px;font-weight:400;color:var(--sec)}.totals span{font-size:15px}
+.seg{display:flex;gap:6px;align-items:center}.seg span{padding:4px 14px;border-radius:20px;border:2px solid var(--border);color:var(--sec);cursor:default}.seg span.on{border-color:var(--acc);color:var(--text)}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--text);font-weight:700;border:1px solid var(--border);padding:6px 8px;background:var(--pane)}td{border:1px solid var(--border);padding:7px 8px;color:var(--text)}
+tbody tr:hover{background:var(--hover)}tbody tr.sel{background:var(--hover);outline:2px solid var(--acc);outline-offset:-2px}td.num,th.num{text-align:right}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.menu{position:absolute;background:var(--pane);border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 18px var(--shadow);padding:4px 0;min-width:160px;display:none;z-index:5}.menu div{padding:6px 16px;cursor:pointer}.menu div:hover{background:var(--hover)}.menu hr{border:0;border-top:1px solid var(--border);margin:4px 0}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:6}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:8px;width:860px;max-width:94%;padding:14px;box-shadow:0 10px 30px var(--shadow)}
+.split{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 14px;margin:8px 0}.kv div{color:var(--sec)}.kv b{color:var(--text);font-weight:700}.kv div.p b{font-weight:400}
+.tv b{font-weight:700;color:var(--text)}.tv span{color:var(--text);font-weight:400}
+.btn{border:2px solid var(--acc);border-radius:20px;padding:3px 14px;color:var(--text);font-size:12px;display:inline-block;cursor:default}.btn.warn{border-color:var(--warn)}
+.tag{display:inline-block;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:0 8px;font-size:11px}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--sec);font-size:10px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--sec);font-size:12px;margin-top:6px}.legend label{cursor:default}.legend i{display:inline-block;width:14px;height:3px;margin:0 5px 0 0;vertical-align:middle}
+.empty{color:var(--sec);text-align:center;padding:40px 0}
+.hide{display:none}.note{margin:10px 0 0;color:#aaa;max-width:1180px}
+.tabs2{display:flex;gap:6px;margin:8px 0}.tabs2 span{padding:3px 12px;border:2px solid var(--border);border-radius:20px;color:var(--sec)}.tabs2 span.on{border-color:var(--acc);color:var(--text)}
+.small th,.small td{padding:4px 6px;font-size:12px}
+</style></head><body>
+<h1>Tela de títulos: detalhe e comparação (refinado)</h1>
+<p class="n">Versão refinada com a paleta do app (Dracula e claro) e valores fictícios: rendimento em R$ e %, legenda clicável, aviso de título fora do gráfico, chave bruto/líquido também no mensal e vistas de estados vazios. Em A, clique com o botão direito numa linha para ver o menu e escolha "Detalhes". Em B, clique numa linha para ver o painel. Em C, alterne período, bruto e líquido, e a vista.</p>
+<div class="bar" id="views">
+ <button class="on" data-v="a">A · Janela (clique direito)</button>
+ <button data-v="b">B · Painel ao lado</button>
+ <button data-v="c">C · Comparação: acumulado %</button>
+ <button data-v="d">D · Comparação: mensal em R$</button>
+ <button data-v="e">E · Estados vazios</button>
+ <span style="width:20px"></span><button id="theme">Tema: escuro</button>
+</div>
+
+<div class="app" id="app"><div class="side"><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div><div class="main">
+ <div class="card totals"><div><b>Total Investido</b><span>R$ 14.773,33</span></div><div><b>Valor Atual</b><span>R$ 15.012,40</span></div><div><b>Lucro/Prejuízo</b><span class="pos">R$ 239,07</span></div><div><b>Juros Recebidos</b><span>R$ 239,07</span></div></div>
+
+ <!-- A -->
+ <div class="card view" id="va">
+  <div class="head"><div class="seg"><span class="on">Carteira</span><span>Comparação</span></div><div class="seg"><span>Todos os tipos ▾</span><span>🔍 Buscar por ID ou descrição</span></div></div>
+  <table id="ta"><thead><tr><th>Nome</th><th>Tipo</th><th class="num">Valor Investido</th><th class="num">Valor Atual</th><th class="num">Rendimento acumulado</th><th>Vencimento</th></tr></thead><tbody>
+   <tr data-n="CDB Banco XYZ 120% CDI"><td>CDB Banco XYZ 120% CDI</td><td>CDB</td><td class="num">R$ 4.000,00</td><td class="num">R$ 4.150,20</td><td class="num pos">+ R$ 150,20 (+3,76%)</td><td>21/10/2028</td></tr>
+   <tr data-n="LCI Banco ABC 95% CDI"><td>LCI Banco ABC 95% CDI</td><td>LCI</td><td class="num">R$ 2.000,00</td><td class="num">R$ 2.031,10</td><td class="num pos">+ R$ 31,10 (+1,56%)</td><td>16/10/2029</td></tr>
+   <tr data-n="LCA Banco DEF 90% CDI"><td>LCA Banco DEF 90% CDI</td><td>LCA</td><td class="num">R$ 1.666,66</td><td class="num">R$ 1.690,20</td><td class="num pos">+ R$ 23,54 (+1,41%)</td><td>21/10/2028</td></tr>
+   <tr data-n="Tesouro Selic 2029"><td>Tesouro Selic 2029</td><td>Tesouro Direto</td><td class="num">R$ 2.500,00</td><td class="num">R$ 2.560,00</td><td class="num pos">+ R$ 60,00 (+2,40%)</td><td>16/10/2029</td></tr>
+  </tbody></table>
+  <p class="note" style="margin-top:8px">6 colunas em vez de 13. Identificador, taxa, rendimento do mês e preço unitário passam para o detalhe.</p>
+ </div>
+
+ <!-- B -->
+ <div class="card view hide" id="vb">
+  <div class="head"><div class="seg"><span class="on">Carteira</span><span>Comparação</span></div><div class="seg"><span>Todos os tipos ▾</span><span>🔍 Buscar</span></div></div>
+  <div class="split">
+   <table id="tb"><thead><tr><th>Nome</th><th>Tipo</th><th class="num">Atual</th><th class="num">Rendimento</th></tr></thead><tbody>
+    <tr class="sel" data-i="0"><td>CDB Banco XYZ 120% CDI</td><td>CDB</td><td class="num">R$ 4.150,20</td><td class="num pos">+ 150,20 (+3,76%)</td></tr>
+    <tr data-i="1"><td>LCI Banco ABC 95% CDI</td><td>LCI</td><td class="num">R$ 2.031,10</td><td class="num pos">+ 31,10 (+1,56%)</td></tr>
+    <tr data-i="2"><td>LCA Banco DEF 90% CDI</td><td>LCA</td><td class="num">R$ 1.690,20</td><td class="num pos">+ 23,54 (+1,41%)</td></tr>
+    <tr data-i="3"><td>Tesouro Selic 2029</td><td>Tesouro</td><td class="num">R$ 2.560,00</td><td class="num pos">+ 60,00 (+2,40%)</td></tr>
+   </tbody></table>
+   <div class="card" id="panel" style="background:var(--base)"></div>
+  </div>
+  <p class="note" style="margin-top:8px">A tabela perde largura (4 colunas); o painel mostra o detalhe sem abrir janela, mas divide a área e o histórico fica mais apertado.</p>
+ </div>
+
+ <!-- C -->
+ <div class="card view hide" id="vc">
+  <div class="head"><div class="seg"><span>Carteira</span><span class="on">Comparação</span></div>
+   <div class="seg"><span>3M</span><span>6M</span><span class="on">12M</span><span>Tudo</span><span style="margin-left:10px">Bruto</span><span class="on">Líquido est.</span><span style="margin-left:10px" class="on">Acumulado %</span><span>Mensal R$</span><span>Incluir arquivados</span></div></div>
+  <svg viewBox="0 0 900 300" id="chartC"></svg>
+  <div class="legend" id="lgC"><label data-k="0"><i style="background:var(--l0)"></i>CDB Banco XYZ +14,8%</label><label data-k="1"><i style="background:var(--l1)"></i>LCI Banco ABC +11,2%</label><label data-k="2"><i style="background:var(--l2)"></i>LCA Banco DEF +10,1%</label><label data-k="3"><i style="background:var(--l3)"></i>Tesouro Selic +13,6%</label><label data-k="4"><i style="background:var(--cdi);height:0;border-top:2px dashed var(--cdi)"></i>CDI +14,1%</label></div><div class="legend"><span class="tag">1 título fora do gráfico: sem histórico do índice</span></div>
+  <p class="note" style="margin-top:8px">Todas as linhas partem de 0% no início do período; título comprado depois entra na data da compra. "Líquido est." usa o IR regressivo estimado. Legenda clicável liga e desliga cada linha.</p>
+ </div>
+
+ <!-- E -->
+ <div class="card view hide" id="ve">
+  <div class="head"><div class="seg"><span>Carteira</span><span class="on">Comparação</span></div></div>
+  <div class="split"><div class="card"><b>Sem títulos</b><div class="empty">Cadastre um título para comparar.<br><span class="btn" style="margin-top:10px">Registrar título</span></div></div>
+  <div class="card"><b>Todos fora do gráfico</b><div class="empty">Nenhum título tem histórico do índice ainda.<br>Use Atualizar para baixar o CDI.</div></div></div>
+  <div class="split" style="margin-top:10px"><div class="card"><b>Um só título</b><svg viewBox="0 0 420 120"><polyline fill="none" stroke="var(--l0)" stroke-width="2.5" points="10,100 100,85 200,66 300,48 410,30"/><polyline fill="none" stroke="var(--cdi)" stroke-width="2" stroke-dasharray="6 4" points="10,100 100,88 200,70 300,52 410,34"/></svg><div class="legend"><label><i style="background:var(--l0)"></i>CDB Banco XYZ +14,8%</label><label><i style="background:var(--cdi)"></i>CDI +14,1%</label></div></div>
+  <div class="card"><b>Detalhe sem seleção (painel)</b><div class="empty">Selecione um título na tabela para ver o detalhe.</div></div></div>
+ </div>
+
+ <!-- D -->
+ <div class="card view hide" id="vd">
+  <div class="head"><div class="seg"><span>Carteira</span><span class="on">Comparação</span></div>
+   <div class="seg"><span>3M</span><span>6M</span><span class="on">12M</span><span>Tudo</span><span style="margin-left:10px">Bruto</span><span class="on">Líquido est.</span><span style="margin-left:10px">Acumulado %</span><span class="on">Mensal R$</span><span>Incluir arquivados</span></div></div>
+  <svg viewBox="0 0 900 300" id="chartD"></svg>
+  <div class="legend"><label><i style="background:var(--l0)"></i>CDB Banco XYZ</label><label><i style="background:var(--l1)"></i>LCI Banco ABC</label><label><i style="background:var(--l2)"></i>LCA Banco DEF</label><label><i style="background:var(--l3)"></i>Tesouro Selic</label></div>
+ </div>
+
+ <div class="menu" id="menu"><div>Detalhes</div><hr><div>Comprar</div><div>Resgatar</div><div>Histórico de juros</div><hr><div>Editar</div><div>Apagar</div></div>
+</div>
+<div class="overlay" id="ov"><div class="modal">
+  <div class="head"><div><b style="font-size:15px">CDB Banco XYZ 120% CDI</b> <span style="color:var(--sec)">(CDB-XYZ-001)</span></div><div><span class="btn warn">Arquivar</span> <span class="btn" id="close">Fechar</span></div></div>
+  <div id="detail"></div>
+</div></div>
+</div>
+<p class="note" id="nt"></p>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const detail=(compact)=>`
+<div class="kv tv"><div><b>Tipo: </b><span>CDB</span></div><div><b>Emissor: </b><span>Banco XYZ</span></div><div><b>Vencimento: </b><span>21/10/2028</span></div>
+<div><b>Taxa: </b><span>120% do CDI</span></div><div><b>Valor investido: </b><span>R$ 4.000,00</span></div><div><b>Valor atual: </b><span>R$ 4.150,20</span></div>
+<div><b>Rendimento: </b><span class="pos">+ R$ 150,20</span></div><div><b>Rend. do mês: </b><span class="pos">+ R$ 21,30</span></div><div><b>Juro líquido est.: </b><span>R$ 118,00</span></div></div>
+<svg viewBox="0 0 ${compact?420:800} 90"><polyline fill="none" stroke="var(--l0)" stroke-width="2.5" points="${compact?'6,80 80,70 150,62 220,48 300,34 360,24 414,14':'6,80 120,72 240,62 360,50 480,38 600,28 720,18 794,10'}"/><text x="6" y="88">saldo, 12 meses</text></svg>
+<div class="tabs2"><span class="on">Histórico de juros</span><span>Operações</span></div>
+<table class="small"><thead><tr><th>Mês</th><th class="num">Investido</th><th class="num">Rend. do mês</th><th class="num">Acumulado</th><th class="num">Final</th><th>Status</th></tr></thead><tbody>
+<tr><td>2026-10</td><td class="num">4.000,00</td><td class="num">21,30</td><td class="num">150,20</td><td class="num">4.150,20</td><td>Automático</td></tr>
+<tr><td>2026-09</td><td class="num">4.000,00</td><td class="num">20,10</td><td class="num">128,90</td><td class="num">4.128,90</td><td>Automático</td></tr>
+<tr><td>2026-08</td><td class="num">4.000,00</td><td class="num">19,80</td><td class="num">108,80</td><td class="num">4.108,80</td><td>Ajustado</td></tr></tbody></table>
+<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="btn">Comprar</span><span class="btn">Resgatar</span><span class="btn">Editar</span><span class="btn">Recalcular histórico</span></div>`;
+$('#detail').innerHTML=detail(false);
+const titles=[["CDB Banco XYZ 120% CDI","CDB","Banco XYZ","21/10/2028","120% do CDI","4.000,00","4.150,20","+ R$ 150,20","+ R$ 21,30","118,00"],["LCI Banco ABC 95% CDI","LCI","Banco ABC","16/10/2029","95% do CDI","2.000,00","2.031,10","+ R$ 31,10","+ R$ 9,20","31,10"],["LCA Banco DEF 90% CDI","LCA","Banco DEF","21/10/2028","90% do CDI","1.666,66","1.690,20","+ R$ 23,54","+ R$ 7,90","23,54"],["Tesouro Selic 2029","Tesouro Direto","Tesouro Nacional","16/10/2029","Selic + 0,10%","2.500,00","2.560,00","+ R$ 60,00","+ R$ 17,00","49,50"]];
+function panel(i){const t=titles[i];$('#panel').innerHTML=`<div style="font-weight:700;margin-bottom:6px">${t[0]}</div><div class="kv tv" style="grid-template-columns:1fr 1fr"><div><b>Tipo: </b><span>${t[1]}</span></div><div><b>Emissor: </b><span>${t[2]}</span></div><div><b>Vencimento: </b><span>${t[3]}</span></div><div><b>Taxa: </b><span>${t[4]}</span></div><div><b>Investido: </b><span>R$ ${t[5]}</span></div><div><b>Atual: </b><span>R$ ${t[6]}</span></div><div><b>Rendimento: </b><span class="pos">${t[7]}</span></div><div><b>Do mês: </b><span class="pos">${t[8]}</span></div><div><b>Juro líquido est.: </b><span>R$ ${t[9]}</span></div></div><svg viewBox="0 0 420 70"><polyline fill="none" stroke="var(--l0)" stroke-width="2.5" points="6,60 80,52 150,46 220,36 300,26 360,18 414,10"/><text x="6" y="68">saldo, 12 meses</text></svg><div class="tabs2"><span class="on">Histórico</span><span>Operações</span></div><table class="small"><tbody><tr><td>2026-10</td><td class="num">21,30</td><td class="num">150,20</td></tr><tr><td>2026-09</td><td class="num">20,10</td><td class="num">128,90</td></tr></tbody></table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="btn">Comprar</span><span class="btn">Resgatar</span><span class="btn">Editar</span></div>`}
+panel(0);$$('#tb tbody tr').forEach(r=>r.onclick=()=>{$$('#tb tbody tr').forEach(x=>x.classList.remove('sel'));r.classList.add('sel');panel(+r.dataset.i)});
+// charts
+const cols=['var(--l0)','var(--l1)','var(--l2)','var(--l3)'];
+const pts=(f,n=12)=>Array.from({length:n+1},(_,i)=>[60+i*(820/n),250-f(i/n)*12.857]).map(p=>p.join(',')).join(' ');
+let c=`<g stroke="var(--border)" stroke-width=".6">${[0,1,2,3,4].map(i=>`<line x1="60" x2="880" y1="${250-i*45}" y2="${250-i*45}"/>`).join('')}</g>`;
+c+=[0,3.5,7,10.5,14].map((v,i)=>`<text x="10" y="${254-i*45}">${v}%</text>`).join('')+['nov','jan','mar','mai','jul','set','nov'].map((m,i)=>`<text x="${60+i*136}" y="275">${m}</text>`).join('');
+const fs=[x=>x*14.8+Math.sin(x*9)*.25,x=>x*11.2+Math.sin(x*7)*.2,x=>x*10.1+Math.sin(x*8)*.15,x=>x*13.6+Math.sin(x*5)*.5];
+// scale so max is ~14.8 -> y 250-14.8*13*0.75
+fs.forEach((f,i)=>{c+=`<polyline data-k="${i}" fill="none" stroke="${cols[i]}" stroke-width="2.5" points="${pts(x=>f(x))}"/>`});
+c+=`<polyline data-k="4" fill="none" stroke="var(--cdi)" stroke-width="2" stroke-dasharray="6 4" points="${pts(x=>x*14.1)}"/>`;
+$('#chartC').innerHTML=c;$$('#lgC label').forEach(l=>{l.style.cursor='pointer';l.onclick=()=>{const k=l.dataset.k,off=l.classList.toggle('off');l.style.opacity=off?.4:1;document.querySelectorAll('#chartC polyline[data-k="'+k+'"]').forEach(p=>p.style.display=off?'none':'')}});
+let d=`<g stroke="var(--border)" stroke-width=".6">${[0,1,2,3].map(i=>`<line x1="60" x2="880" y1="${250-i*60}" y2="${250-i*60}"/>`).join('')}</g>`+[0,20,40,60].map((v,i)=>`<text x="6" y="${254-i*60}">R$ ${v}</text>`).join('');
+const m=['nov','dez','jan','fev','mar','abr','mai','jun','jul','ago','set','out'];
+m.forEach((mm,i)=>{const x0=70+i*68;const v=[18+i*.6,8+i*.3,7+i*.25,6+i*.2];v.forEach((val,k)=>{d+=`<rect x="${x0+k*14}" y="${250-val*3}" width="12" height="${val*3}" fill="${cols[k]}"/>`});d+=`<text x="${x0+8}" y="272">${mm}</text>`});
+$('#chartD').innerHTML=d;
+// views
+const notes={e:'Estados: sem títulos, todos fora do gráfico, um só título e o painel sem seleção.',a:'Opção A: o detalhe abre numa janela, como o histórico de juros e as operações. Segue o padrão do app e deixa a tabela larga; custa um clique extra e esconde a tabela atrás do modal.',b:'Opção B: padrão novo no app (nenhuma tela divide a área com um painel de linha). Dá o detalhe sem abrir janela, mas a tabela fica com 4 colunas e o histórico de juros do painel é curto.',c:'Comparação em rendimento acumulado, com o CDI como referência. A legenda liga e desliga cada linha (clique); o título fora do gráfico é avisado.',d:'Comparação em rendimento mensal em reais, barras agrupadas por mês.'};
+function show(v){$$('.view').forEach(x=>x.classList.add('hide'));$('#v'+v).classList.remove('hide');$$('#views button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('#nt').textContent=notes[v];$('#menu').style.display='none'}
+$$('#views button[data-v]').forEach(b=>b.onclick=()=>show(b.dataset.v));show('a');
+$('#theme').onclick=()=>{document.documentElement.classList.toggle('light');$('#theme').textContent='Tema: '+(document.documentElement.classList.contains('light')?'claro':'escuro')};
+$$('#ta tbody tr').forEach(r=>r.oncontextmenu=e=>{e.preventDefault();const a=$('#app').getBoundingClientRect(),mn=$('#menu');mn.style.left=(e.clientX-a.left)+'px';mn.style.top=(e.clientY-a.top)+'px';mn.style.display='block'});
+$('#menu div').onclick=()=>{$('#menu').style.display='none';$('#ov').style.display='flex'};
+$('#close').onclick=()=>$('#ov').style.display='none';
+document.addEventListener('click',e=>{if(!e.target.closest('#menu'))$('#menu').style.display='none'});
+const h=location.hash.slice(1);if(h){const [v,m]=h.split('-');show(v);if(m==='modal')$('#ov').style.display='flex';if(m==='light'){document.documentElement.classList.add('light');$('#theme').textContent='Tema: claro'}}
+</script></body></html>

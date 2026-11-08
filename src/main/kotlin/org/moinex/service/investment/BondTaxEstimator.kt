@@ -7,9 +7,12 @@
 package org.moinex.service.investment
 
 import org.moinex.model.enums.BondType
+import org.moinex.model.investment.BondOperation
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /**
  * Estimate of the income tax on the interest of a bond, by the regressive table. It is an estimate for the user to
@@ -48,6 +51,50 @@ object BondTaxEstimator {
             ageDays <= THIRD_BRACKET_DAYS -> THIRD_RATE
             else -> LAST_RATE
         }
+
+    /**
+     * Share of the interest that the tax takes, as a fraction; zero when there is no interest or no estimate.
+     */
+    fun effectiveRate(
+        type: BondType,
+        lots: List<Lot>,
+        interest: BigDecimal,
+    ): BigDecimal {
+        if (interest.signum() <= 0) return BigDecimal.ZERO
+
+        return estimate(type, lots, interest).tax.divide(interest, MC)
+    }
+
+    /**
+     * The money kept in the bond on [date], one lot per purchase: a sale takes the same share out of every lot, and
+     * each lot is as old as its purchase.
+     */
+    fun lotsAt(
+        operations: List<BondOperation>,
+        date: LocalDate,
+    ): List<Lot> {
+        val lots = mutableListOf<Pair<LocalDate, BigDecimal>>()
+
+        operations
+            .filter { it.localDate <= date }
+            .sortedBy { it.localDate }
+            .forEach { operation ->
+                val value = operation.quantity.multiply(operation.unitPrice)
+
+                if (operation.isPurchase()) {
+                    lots.add(operation.localDate to value)
+                } else {
+                    val total = lots.fold(BigDecimal.ZERO) { acc, lot -> acc.add(lot.second) }
+
+                    if (total.signum() > 0) {
+                        val kept = BigDecimal.ONE.subtract(value.divide(total, MC)).max(BigDecimal.ZERO)
+                        lots.replaceAll { it.first to it.second.multiply(kept) }
+                    }
+                }
+            }
+
+        return lots.map { Lot(it.second, ChronoUnit.DAYS.between(it.first, date)) }
+    }
 
     fun estimate(
         type: BondType,
