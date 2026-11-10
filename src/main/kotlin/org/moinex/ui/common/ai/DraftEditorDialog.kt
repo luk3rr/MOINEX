@@ -11,6 +11,7 @@ import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonType
+import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Dialog
@@ -62,6 +63,14 @@ class DraftEditorDialog(
         fun read(): Any?
 
         fun isFilled(): Boolean
+
+        fun onChange(listener: () -> Unit)
+
+        fun write(value: Any?) {}
+
+        fun lock(locked: Boolean) {
+            node().isDisable = locked
+        }
     }
 
     private class TextEditor(
@@ -75,6 +84,10 @@ class DraftEditorDialog(
         override fun read(): Any? = input.text.trim()
 
         override fun isFilled() = input.text.isNotBlank()
+
+        override fun onChange(listener: () -> Unit) {
+            input.textProperty().addListener { _, _, _ -> listener() }
+        }
     }
 
     private class DecimalEditor(
@@ -92,6 +105,14 @@ class DraftEditorDialog(
                 .toBigDecimalOrNull()
 
         override fun isFilled() = read() != null
+
+        override fun onChange(listener: () -> Unit) {
+            input.textProperty().addListener { _, _, _ -> listener() }
+        }
+
+        override fun write(value: Any?) {
+            input.text = (value as? BigDecimal)?.toPlainString().orEmpty()
+        }
     }
 
     private class IntegerEditor(
@@ -105,6 +126,10 @@ class DraftEditorDialog(
         override fun read(): Any? = input.text.trim().toIntOrNull()
 
         override fun isFilled() = read() != null
+
+        override fun onChange(listener: () -> Unit) {
+            input.textProperty().addListener { _, _, _ -> listener() }
+        }
     }
 
     private class DateEditor(
@@ -118,6 +143,27 @@ class DraftEditorDialog(
         override fun read(): Any? = input.value
 
         override fun isFilled() = input.value != null
+
+        override fun onChange(listener: () -> Unit) {
+            input.valueProperty().addListener { _, _, _ -> listener() }
+        }
+    }
+
+    private class BooleanEditor(
+        override val field: DraftField,
+        initial: Any?,
+    ) : Editor {
+        private val input = CheckBox().apply { isSelected = initial as? Boolean ?: false }
+
+        override fun node(): Node = input
+
+        override fun read(): Any? = input.isSelected
+
+        override fun isFilled() = true
+
+        override fun onChange(listener: () -> Unit) {
+            input.selectedProperty().addListener { _, _, _ -> listener() }
+        }
     }
 
     private class ChoiceEditor(
@@ -142,6 +188,10 @@ class DraftEditorDialog(
         override fun read(): Any? = input.value?.value
 
         override fun isFilled() = input.value != null
+
+        override fun onChange(listener: () -> Unit) {
+            input.valueProperty().addListener { _, _, _ -> listener() }
+        }
     }
 
     /**
@@ -152,14 +202,17 @@ class DraftEditorDialog(
         title: String,
         spec: List<DraftField>,
         initial: DraftValues,
-    ): DraftValues? = build(title, spec, initial).showAndWait().orElse(null)
+        suggest: (DraftValues) -> Map<String, Any?> = { emptyMap() },
+    ): DraftValues? = build(title, spec, initial, suggest).showAndWait().orElse(null)
 
     internal fun build(
         title: String,
         spec: List<DraftField>,
         initial: DraftValues,
+        suggest: (DraftValues) -> Map<String, Any?> = { emptyMap() },
     ): Dialog<DraftValues?> {
         val editors = spec.map { buildEditor(it, initial.fields[it.key]) }
+        wireAutoCalculate(editors, initial, suggest)
         val grid =
             GridPane().apply {
                 hgap = GAP
@@ -250,6 +303,47 @@ class DraftEditorDialog(
         return dialog
     }
 
+    /**
+     * While the box of the `autoCalculate` field is on, the fields the operation suggests are filled in from what the
+     * form holds and cannot be typed, and they follow every change of the other fields, as in the app's own forms.
+     */
+    private fun wireAutoCalculate(
+        editors: List<Editor>,
+        initial: DraftValues,
+        suggest: (DraftValues) -> Map<String, Any?>,
+    ) {
+        val toggle = editors.firstOrNull { it.field.key == AUTO_CALCULATE_KEY } ?: return
+        val byKey = editors.associateBy { it.field.key }
+        var suggested = emptySet<String>()
+        var refreshing = false
+
+        fun refresh() {
+            val current =
+                DraftValues(
+                    initial.operationName,
+                    initial.fields + editors.associate { it.field.key to it.read() },
+                )
+            val values = if (toggle.read() == true) suggest(current) else emptyMap()
+
+            refreshing = true
+            try {
+                suggested.filter { it !in values }.forEach { byKey[it]?.lock(false) }
+                values.forEach { (key, value) ->
+                    byKey[key]?.apply {
+                        write(value)
+                        lock(true)
+                    }
+                }
+                suggested = values.keys
+            } finally {
+                refreshing = false
+            }
+        }
+
+        editors.forEach { editor -> editor.onChange { if (!refreshing) refresh() } }
+        refresh()
+    }
+
     private fun buildEditor(
         field: DraftField,
         initial: Any?,
@@ -259,6 +353,7 @@ class DraftEditorDialog(
             DraftFieldType.DECIMAL -> DecimalEditor(field, initial)
             DraftFieldType.INTEGER -> IntegerEditor(field, initial)
             DraftFieldType.DATE -> DateEditor(field, initial)
+            DraftFieldType.BOOLEAN -> BooleanEditor(field, initial)
             DraftFieldType.CHOICE ->
                 ChoiceEditor(field, choiceSource.choices(field.choices ?: DraftChoices.CATEGORIES), initial)
         }
@@ -266,7 +361,8 @@ class DraftEditorDialog(
     companion object {
         private const val GAP = 10.0
         private const val CONTENT_WIDTH = 520.0
-        private const val LABEL_WIDTH = 150.0
+        private const val LABEL_WIDTH = 200.0
         private const val BUTTON_MIN_WIDTH = 80.0
+        private const val AUTO_CALCULATE_KEY = "autoCalculate"
     }
 }

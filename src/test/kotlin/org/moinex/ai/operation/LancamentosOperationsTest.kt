@@ -156,7 +156,9 @@ class LancamentosOperationsTest :
             When("the amount is missing") {
                 val payload =
                     operation.fromModelArguments(
-                        JSONObject("""{"date":"2026-11-01","amount":0,"fromWalletName":"nubank"}"""),
+                        JSONObject(
+                            """{"date":"2026-11-01","amount":0,"fromWalletName":"nubank","description":"Move"}""",
+                        ),
                         catalog,
                     )
 

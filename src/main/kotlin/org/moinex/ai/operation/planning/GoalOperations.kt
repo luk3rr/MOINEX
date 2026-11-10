@@ -9,6 +9,7 @@ package org.moinex.ai.operation.planning
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.DraftField
 import org.moinex.ai.operation.DraftFieldType
 import org.moinex.ai.operation.DraftValues
@@ -17,6 +18,8 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardDay
+import org.moinex.ai.operation.cardMoney
 import org.moinex.common.constant.Constants
 import org.moinex.model.goal.Goal
 import org.moinex.service.goal.GoalService
@@ -73,6 +76,9 @@ abstract class GoalManagementOperation(
                 ValidationResult.error("initial balance cannot exceed the target")
             else -> ValidationResult.OK
         }
+
+    override fun card(payload: GoalPayload) =
+        CardInfo(payload.name, listOf(cardMoney(payload.targetBalance), cardDay(payload.targetDate)))
 
     override fun summary(payload: GoalPayload) =
         "${payload.name}, ${payload.targetBalance.toPlainString()}, ${payload.targetDate}"

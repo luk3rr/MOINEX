@@ -49,6 +49,12 @@ interface AppOperation<P : Any> {
     /** A short line that identifies the payload to the user. */
     fun summary(payload: P): String
 
+    /** The main line and the facts of the review card; null keeps the single [summary] line. */
+    fun card(payload: P): CardInfo? = null
+
+    /** What kind of thing the payload is (an expense, an income...), shown as a tag on the card; null when none. */
+    fun tag(payload: P): OperationTag? = null
+
     /** What to look for among stored records to know whether the payload is already recorded; null when never. */
     fun matchQuery(payload: P): MatchQuery? = null
 
@@ -67,11 +73,20 @@ interface AppOperation<P : Any> {
     /** The fields the fallback editor shows for this operation. */
     fun draftSpec(): List<DraftField> = emptyList()
 
+    /** The fields the editor shows for [payload], when they depend on what it holds. */
+    fun draftSpecFor(payload: P): List<DraftField> = draftSpec()
+
     fun toDraft(payload: P): DraftValues? = null
 
     fun fromDraft(draft: DraftValues): P? = null
 
     fun preview(payload: P): Preview? = null
+
+    /**
+     * Values the editor fills in by itself, by field key, from what the draft holds now, while the user keeps the
+     * draft's automatic calculation on; empty when the draft has none.
+     */
+    fun suggest(draft: DraftValues): Map<String, Any?> = emptyMap()
 
     /** Writes through the domain services. A failure is returned, not thrown, so one bad item never stops a batch. */
     fun apply(payload: P): ApplyResult

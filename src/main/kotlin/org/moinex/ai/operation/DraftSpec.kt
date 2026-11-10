@@ -12,6 +12,7 @@ enum class DraftFieldType {
     DATE,
     INTEGER,
     CHOICE,
+    BOOLEAN,
 }
 
 /** Which list a [DraftFieldType.CHOICE] field picks from. */

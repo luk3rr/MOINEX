@@ -30,6 +30,9 @@ abstract class BaseOperation<P : Any> : AppOperation<P> {
             }
     }
 
+    protected fun missingDescription(description: String): List<String> =
+        if (description.isBlank()) listOf(DESCRIPTION_MISSING) else emptyList()
+
     protected fun JSONObject.requireDate(key: String): LocalDate = LocalDate.parse(getString(key))
 
     protected fun JSONObject.optIntOrNull(key: String): Int? = if (isNull(key) || !has(key)) null else getInt(key)
@@ -43,6 +46,8 @@ abstract class BaseOperation<P : Any> : AppOperation<P> {
     ): JSONObject = JSONObject().put("type", type).apply { description?.let { put("description", it) } }
 
     protected fun Any?.asInt(): Int? = (this as? Number)?.toInt()
+
+    protected fun Any?.asBoolean(): Boolean = this as? Boolean ?: false
 
     protected fun Any?.asDecimal(): BigDecimal? =
         when (this) {
@@ -59,3 +64,7 @@ abstract class BaseOperation<P : Any> : AppOperation<P> {
             else -> null
         }
 }
+
+const val DESCRIPTION_MISSING: String =
+    "description is required: a short label for the record, such as the payee or merchant, or what the " +
+        "operation is about (e.g. \"Resgate CDB Banco Inter\")"

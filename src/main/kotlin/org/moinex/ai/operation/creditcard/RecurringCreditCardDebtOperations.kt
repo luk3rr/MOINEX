@@ -10,6 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.CategoryResolver
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
@@ -20,7 +21,10 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardMoney
+import org.moinex.ai.operation.cardTranslated
 import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.model.creditcard.RecurringCreditCardDebt
 import org.moinex.model.enums.CreditCardRecurringFrequency
@@ -86,6 +90,16 @@ abstract class RecurringCardDebtOperation(
     override fun categoryNeeded(payload: RecurringCardDebtPayload) =
         payload.categoryName.takeIf { it.isNotBlank() && !it.equals(payload.keptCategory, ignoreCase = true) }
 
+    override fun card(payload: RecurringCardDebtPayload) =
+        CardInfo(
+            payload.description,
+            listOf(
+                cardMoney(payload.amount),
+                cardTranslated("creditCard.recurring.frequency.${payload.frequency.name.lowercase()}"),
+                cardTranslated(TranslationKeys.AIPANEL_FACT_DAY_OF_MONTH, payload.dayOfMonth),
+            ),
+        )
+
     override fun summary(payload: RecurringCardDebtPayload) =
         "${payload.description}, ${payload.amount.toPlainString()}, ${payload.frequency.name.lowercase()}, " +
             "day ${payload.dayOfMonth}"
@@ -143,7 +157,7 @@ class CreateRecurringCardDebtOperation(
     override val name = "create_recurring_card_debt"
     override val risk = OperationRisk.LOW
 
-    override fun modelRequired() = listOf("creditCardName", "categoryName", "amount", "date")
+    override fun modelRequired() = listOf("creditCardName", "categoryName", "amount", "date", "description")
 
     override fun modelDescription() =
         "create_recurring_card_debt: a charge that repeats on a credit card (creditCardName, categoryName, amount, " +
@@ -171,7 +185,8 @@ class CreateRecurringCardDebtOperation(
     }
 
     override fun missingFromModel(payload: RecurringCardDebtPayload) =
-        if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+        (if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()) +
+            missingDescription(payload.description)
 
     override fun execute(payload: RecurringCardDebtPayload): ApplyResult.Success {
         val card = creditCardService.getAllNonArchivedCreditCardsOrderedByName().first { it.id == payload.cardId }

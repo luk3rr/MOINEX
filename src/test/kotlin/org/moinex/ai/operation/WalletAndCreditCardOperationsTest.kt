@@ -90,11 +90,19 @@ class WalletAndCreditCardOperationsTest :
         }
 
         Given("a wallet proposal that the user reviews") {
-            Then("the summary says whether it will be created as an expense or as an income") {
-                walletOperation.summary(payload) shouldBe
-                    "${TranslationKeys.TRANSACTION_TYPE_EXPENSE}: Market, 150.30, 2026-10-10"
-                walletOperation.summary(payload.copy(movementType = WalletTransactionType.INCOME)) shouldBe
-                    "${TranslationKeys.TRANSACTION_TYPE_INCOME}: Market, 150.30, 2026-10-10"
+            Then("the card puts the description on the main line and the amount and date as facts") {
+                val card = walletOperation.card(payload)
+                card.title shouldBe "Market"
+                card.facts.take(2) shouldBe
+                    listOf(cardMoney(BigDecimal("150.30")), cardDay(LocalDate.of(2026, 10, 10)))
+            }
+
+            Then("the summary leaves the type out and a tag says expense or income") {
+                walletOperation.summary(payload) shouldBe "Market, 150.30, 2026-10-10"
+                walletOperation.tag(payload) shouldBe
+                    OperationTag(TranslationKeys.TRANSACTION_TYPE_EXPENSE, TagTone.NEGATIVE)
+                walletOperation.tag(payload.copy(movementType = WalletTransactionType.INCOME)) shouldBe
+                    OperationTag(TranslationKeys.TRANSACTION_TYPE_INCOME, TagTone.POSITIVE)
             }
         }
 
@@ -169,7 +177,7 @@ class WalletAndCreditCardOperationsTest :
 
         Given("a wallet payload edited in the fallback editor") {
             Then("the draft carries every editable field and rebuilds the same payload") {
-                val draft = walletOperation.toDraft(payload)!!
+                val draft = walletOperation.toDraft(payload)
                 draft.fields["walletId"] shouldBe 1
                 walletOperation.fromDraft(draft) shouldBe payload
             }

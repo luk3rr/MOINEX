@@ -558,7 +558,7 @@ class AiChatController(
                 preferencesService.translate(TranslationKeys.AIPANEL_DRAFT_TITLE),
                 reviewSession.draftSpecOf(item),
                 initial,
-            ) ?: return
+            ) { reviewSession.suggestOf(item, it) } ?: return
         reviewSession.applyDraft(item, edited)
     }
 

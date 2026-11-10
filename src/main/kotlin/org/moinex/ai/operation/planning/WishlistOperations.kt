@@ -10,6 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.CategoryResolver
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
@@ -20,6 +21,7 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardMoney
 import org.moinex.model.enums.WishlistItemPriority
 import org.moinex.model.wishlist.WishlistItem
 import org.moinex.service.wishlist.WishlistService
@@ -71,6 +73,8 @@ abstract class WishlistOperation(
 
     override fun categoryNeeded(payload: WishlistItemPayload) =
         payload.categoryName.takeIf { it.isNotBlank() && !it.equals(payload.keptCategory, ignoreCase = true) }
+
+    override fun card(payload: WishlistItemPayload) = CardInfo(payload.title, listOf(cardMoney(payload.estimatedPrice)))
 
     override fun summary(payload: WishlistItemPayload) =
         "${payload.title}, ${payload.estimatedPrice.toPlainString()}, ${payload.priority.name.lowercase()}"

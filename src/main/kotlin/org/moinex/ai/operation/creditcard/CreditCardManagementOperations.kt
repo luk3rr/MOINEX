@@ -9,6 +9,7 @@ package org.moinex.ai.operation.creditcard
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
 import org.moinex.ai.operation.DraftFieldType
@@ -18,6 +19,9 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardDay
+import org.moinex.ai.operation.cardMoney
+import org.moinex.ai.operation.cardText
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardCredit
 import org.moinex.model.enums.CreditCardCreditType
@@ -104,6 +108,16 @@ abstract class CreditCardManagementOperation(
         creditCardService.getAllCreditCardOperatorsOrderedByName().firstOrNull {
             it.name.equals(payload.operatorName, ignoreCase = true)
         }
+
+    override fun card(payload: CreditCardPayload) =
+        CardInfo(
+            payload.name,
+            listOf(
+                cardText(payload.operatorName),
+                cardMoney(payload.maxDebt),
+                cardText("${payload.closingDay}/${payload.dueDay}"),
+            ),
+        )
 
     override fun summary(payload: CreditCardPayload) =
         "${payload.name}, ${payload.operatorName}, ${payload.maxDebt.toPlainString()}, " +
@@ -335,7 +349,7 @@ class AddCreditCardCreditOperation(
     override val domain = OperationDomain.CREDIT_CARD
     override val risk = OperationRisk.LOW
 
-    override fun modelRequired() = listOf("creditCardName", "date", "amount")
+    override fun modelRequired() = listOf("creditCardName", "date", "amount", "description")
 
     override fun modelDescription() =
         "add_credit_card_credit: a credit on a card (creditType cashback, refund or reward) that raises the " +
@@ -369,7 +383,14 @@ class AddCreditCardCreditOperation(
         }
 
     override fun missingFromModel(payload: CreditCardCreditPayload) =
-        if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+        (if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()) +
+            missingDescription(payload.description)
+
+    override fun card(payload: CreditCardCreditPayload) =
+        CardInfo(
+            payload.description.ifBlank { payload.type.name.lowercase() },
+            listOf(cardMoney(payload.amount), cardDay(payload.date)),
+        )
 
     override fun summary(payload: CreditCardCreditPayload) =
         "${payload.type.name.lowercase()}, ${payload.amount.toPlainString()}, ${payload.date}"

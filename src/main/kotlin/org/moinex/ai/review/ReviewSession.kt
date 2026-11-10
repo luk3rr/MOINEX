@@ -16,11 +16,13 @@ import org.moinex.ai.audit.ChangeSetAuditLogger
 import org.moinex.ai.history.RawPayload
 import org.moinex.ai.operation.AppOperation
 import org.moinex.ai.operation.ApplyResult
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.ChangeBadge
 import org.moinex.ai.operation.ChangeSet
 import org.moinex.ai.operation.ChangeState
 import org.moinex.ai.operation.DraftValues
 import org.moinex.ai.operation.OperationRegistry
+import org.moinex.ai.operation.OperationTag
 import org.moinex.ai.operation.ProposedChange
 import org.moinex.ai.operation.ValidationResult
 import org.moinex.common.constant.TranslationKeys
@@ -171,6 +173,18 @@ class ReviewSession(
             operationOf(item).validate(item.payloadProperty.get())
         }
 
+    fun suggestOf(
+        item: ReviewItem,
+        draft: DraftValues,
+    ): Map<String, Any?> =
+        if (item.payloadProperty.get() is RawPayload) emptyMap() else operationOf(item).suggest(draft)
+
+    fun cardOf(item: ReviewItem): CardInfo? =
+        if (item.payloadProperty.get() is RawPayload) null else operationOf(item).card(item.payloadProperty.get())
+
+    fun tagOf(item: ReviewItem): OperationTag? =
+        if (item.payloadProperty.get() is RawPayload) null else operationOf(item).tag(item.payloadProperty.get())
+
     fun previewOf(item: ReviewItem) =
         if (item.payloadProperty.get() is RawPayload) null else operationOf(item).preview(item.payloadProperty.get())
 
@@ -178,7 +192,13 @@ class ReviewSession(
         if (item.payloadProperty.get() is RawPayload) null else operationOf(item).toDraft(item.payloadProperty.get())
 
     fun draftSpecOf(item: ReviewItem) =
-        if (item.payloadProperty.get() is RawPayload) emptyList() else operationOf(item).draftSpec()
+        if (item.payloadProperty.get() is RawPayload) {
+            emptyList()
+        } else {
+            operationOf(
+                item,
+            ).draftSpecFor(item.payloadProperty.get())
+        }
 
     /**
      * Applies the given open items, each after the items it depends on, one failing never stopping the rest.

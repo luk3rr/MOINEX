@@ -10,6 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.CategoryResolver
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
@@ -20,6 +21,9 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardDay
+import org.moinex.ai.operation.cardMoney
+import org.moinex.ai.operation.cardTranslated
 import org.moinex.common.constant.Constants
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.model.enums.WalletTransactionType
@@ -87,6 +91,16 @@ abstract class RecurringTransactionOperation(
 
     override fun categoryNeeded(payload: RecurringTransactionPayload) =
         payload.categoryName.takeIf { it.isNotBlank() && !it.equals(payload.keptCategory, ignoreCase = true) }
+
+    override fun card(payload: RecurringTransactionPayload) =
+        CardInfo(
+            payload.description,
+            listOf(
+                cardMoney(payload.amount),
+                cardTranslated("recurringtransaction.frequency.${payload.frequency.name.lowercase()}"),
+                cardDay(payload.startDate),
+            ),
+        )
 
     override fun summary(payload: RecurringTransactionPayload) =
         "${payload.description}, ${payload.amount.toPlainString()}, ${payload.frequency.name.lowercase()}, " +
@@ -165,7 +179,8 @@ class CreateRecurringTransactionOperation(
     override val name = "create_recurring_transaction"
     override val risk = OperationRisk.LOW
 
-    override fun modelRequired() = listOf("date", "amount", "walletName", "categoryName", "movementType", "frequency")
+    override fun modelRequired() =
+        listOf("date", "amount", "walletName", "categoryName", "movementType", "frequency", "description")
 
     override fun modelDescription() =
         "create_recurring_transaction: an income or expense that repeats (date is the first occurrence, frequency, " +
@@ -192,7 +207,8 @@ class CreateRecurringTransactionOperation(
     }
 
     override fun missingFromModel(payload: RecurringTransactionPayload) =
-        if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+        (if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()) +
+            missingDescription(payload.description)
 
     override fun execute(payload: RecurringTransactionPayload): ApplyResult.Success {
         val id =

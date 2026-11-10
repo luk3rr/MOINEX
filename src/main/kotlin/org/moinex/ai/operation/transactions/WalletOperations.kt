@@ -9,6 +9,7 @@ package org.moinex.ai.operation.transactions
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
 import org.moinex.ai.operation.DraftFieldType
@@ -18,6 +19,8 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardMoney
+import org.moinex.ai.operation.cardText
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.service.wallet.WalletService
 import org.springframework.stereotype.Component
@@ -84,6 +87,9 @@ class CreateWalletOperation(
             ) -> ValidationResult.error("wallet '${payload.name}' already exists")
             else -> ValidationResult.OK
         }
+
+    override fun card(payload: CreateWalletPayload) =
+        CardInfo(payload.name, listOf(cardText(payload.typeName), cardMoney(payload.initialBalance)))
 
     override fun summary(payload: CreateWalletPayload) =
         "${payload.name}, ${payload.typeName}, ${payload.initialBalance.toPlainString()}"

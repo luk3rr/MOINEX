@@ -23,11 +23,16 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
+import org.moinex.ai.operation.CardFact
+import org.moinex.ai.operation.CardValue
 import org.moinex.ai.operation.ChangeBadge
 import org.moinex.ai.operation.ChangeState
+import org.moinex.ai.operation.OperationTag
+import org.moinex.ai.operation.TagTone
 import org.moinex.ai.review.ReviewItem
 import org.moinex.ai.review.ReviewSession
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.moinex.service.matching.Match
 import org.moinex.service.matching.MatchStatus
@@ -191,7 +196,12 @@ class ReviewPanel(
             }
         val operationLabel =
             Label(translate("aioperation.${item.change.operationName}")).apply { styleClass.add(STYLE_CARD_TITLE) }
-        val header = HBox(8.0, check, operationLabel, spacer(), badgeLabel(item)).apply { alignment = Pos.CENTER_LEFT }
+        val header =
+            HBox(8.0, check, operationLabel, spacer()).apply {
+                alignment = Pos.CENTER_LEFT
+                session.tagOf(item)?.let { children.add(tagLabel(it)) }
+                children.add(badgeLabel(item))
+            }
 
         val summary =
             Label(session.summaryOf(item)).apply {
@@ -200,7 +210,19 @@ class ReviewPanel(
                 styleClass.add(STYLE_CARD_SUMMARY)
             }
 
-        val card = VBox(6.0, header, summary)
+        val info = session.cardOf(item)
+        val main =
+            if (info == null) {
+                summary
+            } else {
+                Label(info.title).apply {
+                    isWrapText = true
+                    minHeight = Region.USE_PREF_SIZE
+                    styleClass.add(STYLE_CARD_SUMMARY)
+                }
+            }
+        val card = VBox(6.0, header, main)
+        info?.facts?.takeIf { it.isNotEmpty() }?.let { card.children.add(wrapped(factsLine(it), STYLE_MUTED)) }
         card.styleClass.add(STYLE_CARD)
         if (item.selectedProperty.get() && open) card.styleClass.add(STYLE_CARD_SELECTED)
 
@@ -214,7 +236,10 @@ class ReviewPanel(
         if (open) buildCandidates(item)?.let { card.children.add(it) }
 
         if (open) {
-            session.previewOf(item)?.lines?.forEach { card.children.add(wrapped(it, STYLE_MUTED)) }
+            session.previewOf(item)?.let { preview ->
+                preview.lines.forEach { card.children.add(wrapped(it, STYLE_MUTED)) }
+                preview.rows.forEach { card.children.add(wrapped(factsLine(it), STYLE_MUTED)) }
+            }
         }
 
         if (open) {
@@ -330,6 +355,31 @@ class ReviewPanel(
         return Label(text + edited).apply { styleClass.addAll(STYLE_BADGE, style) }
     }
 
+    private fun factsLine(facts: List<CardFact>): String = facts.joinToString(" · ") { factText(it) }
+
+    private fun factText(fact: CardFact): String {
+        val text =
+            when (val value = fact.value) {
+                is CardValue.Text -> value.text
+                is CardValue.Money -> UIUtils.formatCurrency(value.amount)
+                is CardValue.Day -> UIUtils.formatDateForDisplay(value.date)
+                is CardValue.Translated -> MessageFormat.format(translate(value.key), *value.args.toTypedArray())
+            }
+        return fact.label?.let { "$it: $text" } ?: text
+    }
+
+    private fun tagLabel(tag: OperationTag): Label =
+        Label(tag.label).apply {
+            styleClass.addAll(
+                STYLE_BADGE,
+                when (tag.tone) {
+                    TagTone.POSITIVE -> STYLE_TAG_POSITIVE
+                    TagTone.NEGATIVE -> STYLE_TAG_NEGATIVE
+                    TagTone.NEUTRAL -> STYLE_BADGE_REJECTED
+                },
+            )
+        }
+
     private fun originalBadge(item: ReviewItem): Pair<String, String> =
         when (item.change.badge) {
             ChangeBadge.NEW -> translate(TranslationKeys.AIPANEL_BADGE_NEW) to STYLE_BADGE_NEW
@@ -379,6 +429,8 @@ class ReviewPanel(
         private const val STYLE_BUTTON_EDIT = "ai-review-button-edit"
         private const val STYLE_BADGE = "ai-review-badge"
         private const val STYLE_BADGE_NEW = "ai-review-badge-new"
+        private const val STYLE_TAG_POSITIVE = "ai-review-tag-positive"
+        private const val STYLE_TAG_NEGATIVE = "ai-review-tag-negative"
         private const val STYLE_BADGE_MATCH = "ai-review-badge-match"
         private const val STYLE_BADGE_WARNING = "ai-review-badge-warning"
         private const val STYLE_BADGE_APPROVED = "ai-review-badge-approved"

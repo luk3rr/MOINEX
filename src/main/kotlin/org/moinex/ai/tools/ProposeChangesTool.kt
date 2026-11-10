@@ -104,8 +104,20 @@ class ProposeChangesTool(
                             "Date of the operation. For a card purchase, the date it was made, not the date it " +
                                 "was posted to the statement nor the invoice due date.",
                         ),
-                ).put("description", JSONObject().put("type", "string"))
-                .put(
+                ).put(
+                    "description",
+                    JSONObject()
+                        .put("type", "string")
+                        .put(
+                            "description",
+                            "REQUIRED for every operation that records a transaction, transfer, credit or " +
+                                "investment: a short label shown in the app and kept on the record, such as the " +
+                                "payee or merchant (\"Pix para Mariana\", \"Mercado\") or what the operation is " +
+                                "about (\"Aplicação CDB Banco Inter\", \"Resgate CDB Banco Inter\", " +
+                                "\"Dividendos PETR4\"). Never leave it empty or omit it, even when the user " +
+                                "gave only an amount.",
+                        ),
+                ).put(
                     "amount",
                     JSONObject()
                         .put("type", "number")

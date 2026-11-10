@@ -179,6 +179,16 @@
   -fx-border-color: theme-positive;
 }
 
+.ai-review-tag-positive {
+  -fx-text-fill: theme-text-primary;
+  -fx-border-color: theme-positive;
+}
+
+.ai-review-tag-negative {
+  -fx-text-fill: theme-text-primary;
+  -fx-border-color: theme-negative;
+}
+
 .ai-review-badge-match {
   -fx-text-fill: theme-accent-text;
   -fx-border-color: theme-accent;

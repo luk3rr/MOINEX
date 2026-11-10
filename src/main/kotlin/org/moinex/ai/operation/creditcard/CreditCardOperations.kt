@@ -9,6 +9,7 @@ package org.moinex.ai.operation.creditcard
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.CategoryResolver
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
@@ -18,6 +19,9 @@ import org.moinex.ai.operation.EntityCatalog
 import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardDay
+import org.moinex.ai.operation.cardMoney
+import org.moinex.ai.operation.cardText
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.model.creditcard.CreditCard
@@ -67,7 +71,7 @@ class CreateCreditCardDebtOperation(
     override val domain = OperationDomain.CREDIT_CARD
     override val risk = OperationRisk.LOW
 
-    override fun modelRequired() = listOf("date", "amount", "creditCardName", "categoryName")
+    override fun modelRequired() = listOf("date", "amount", "creditCardName", "categoryName", "description")
 
     override fun modelDescription() =
         "create_credit_card_debt: a purchase on a credit card (use creditCardName); amount is always the value of " +
@@ -126,12 +130,24 @@ class CreateCreditCardDebtOperation(
         }
 
     override fun missingFromModel(payload: CreditCardDebtPayload) =
-        if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+        (if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()) +
+            missingDescription(payload.description)
 
     override fun categoryNeeded(payload: CreditCardDebtPayload) = payload.categoryName.takeIf { it.isNotBlank() }
 
     override fun summary(payload: CreditCardDebtPayload) =
         "${payload.description}, ${installmentValue(payload).toPlainString()}, ${payload.date}"
+
+    override fun card(payload: CreditCardDebtPayload) =
+        CardInfo(
+            payload.description.ifBlank { payload.categoryName },
+            listOfNotNull(
+                cardMoney(installmentValue(payload)),
+                payload.installments.takeIf { it > 1 }?.let { cardText("${it}x") },
+                cardDay(payload.date),
+                payload.categoryName.takeIf { it.isNotBlank() && payload.description.isNotBlank() }?.let(::cardText),
+            ),
+        )
 
     private fun installmentValue(payload: CreditCardDebtPayload): BigDecimal =
         payload.amount.divide(payload.installments.toBigDecimal(), 2, RoundingMode.HALF_UP)
@@ -259,6 +275,9 @@ class PayCreditCardInvoiceOperation(
 
     override fun missingFromModel(payload: CreditCardInvoicePaymentPayload) =
         if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+
+    override fun card(payload: CreditCardInvoicePaymentPayload) =
+        CardInfo(payload.invoiceMonth.toString(), listOf(cardMoney(payload.amount)))
 
     override fun summary(payload: CreditCardInvoicePaymentPayload) =
         "${payload.invoiceMonth}, ${payload.amount.toPlainString()}"

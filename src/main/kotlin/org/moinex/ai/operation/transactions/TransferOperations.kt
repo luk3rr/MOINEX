@@ -9,6 +9,7 @@ package org.moinex.ai.operation.transactions
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.CategoryResolver
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
@@ -19,6 +20,8 @@ import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
 import org.moinex.ai.operation.Preview
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardDay
+import org.moinex.ai.operation.cardMoney
 import org.moinex.model.Category
 import org.moinex.model.wallettransaction.Transfer
 import org.moinex.service.wallet.WalletService
@@ -88,6 +91,16 @@ abstract class TransferOperation(
     override fun categoryNeeded(payload: TransferPayload) =
         payload.categoryName.takeIf { it.isNotBlank() && !it.equals(payload.keptCategory, ignoreCase = true) }
 
+    override fun card(payload: TransferPayload): CardInfo {
+        val sender = payload.senderWalletId?.let { runCatching { walletService.getWalletById(it).name }.getOrNull() }
+        val receiver =
+            payload.receiverWalletId?.let { runCatching { walletService.getWalletById(it).name }.getOrNull() }
+        return CardInfo(
+            "${sender ?: "?"} → ${receiver ?: "?"}",
+            listOf(cardMoney(payload.amount), cardDay(payload.date)),
+        )
+    }
+
     override fun summary(payload: TransferPayload): String {
         val sender = payload.senderWalletId?.let { runCatching { walletService.getWalletById(it).name }.getOrNull() }
         val receiver =
@@ -150,7 +163,7 @@ class CreateTransferOperation(
     override val name = "create_transfer"
     override val risk = OperationRisk.LOW
 
-    override fun modelRequired() = listOf("date", "amount", "fromWalletName", "toWalletName")
+    override fun modelRequired() = listOf("date", "amount", "fromWalletName", "toWalletName", "description")
 
     override fun modelDescription() =
         "create_transfer: money moved between two of the user's own wallets (fromWalletName, toWalletName, " +
@@ -170,7 +183,8 @@ class CreateTransferOperation(
     )
 
     override fun missingFromModel(payload: TransferPayload) =
-        if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+        (if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()) +
+            missingDescription(payload.description)
 
     override fun execute(payload: TransferPayload): ApplyResult.Success {
         val id = walletService.createTransfer(toTransfer(payload))

@@ -9,6 +9,7 @@ package org.moinex.ai.operation.transactions
 import org.json.JSONObject
 import org.moinex.ai.operation.ApplyResult
 import org.moinex.ai.operation.BaseOperation
+import org.moinex.ai.operation.CardInfo
 import org.moinex.ai.operation.CategoryResolver
 import org.moinex.ai.operation.DraftChoices
 import org.moinex.ai.operation.DraftField
@@ -17,7 +18,12 @@ import org.moinex.ai.operation.DraftValues
 import org.moinex.ai.operation.EntityCatalog
 import org.moinex.ai.operation.OperationDomain
 import org.moinex.ai.operation.OperationRisk
+import org.moinex.ai.operation.OperationTag
+import org.moinex.ai.operation.TagTone
 import org.moinex.ai.operation.ValidationResult
+import org.moinex.ai.operation.cardDay
+import org.moinex.ai.operation.cardMoney
+import org.moinex.ai.operation.cardText
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
@@ -43,6 +49,16 @@ data class WalletTransactionPayload(
     val existingTransactionId: Int? = null,
 )
 
+internal fun movementTag(
+    preferencesService: PreferencesService,
+    type: WalletTransactionType,
+): OperationTag =
+    if (type == WalletTransactionType.INCOME) {
+        OperationTag(preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOME), TagTone.POSITIVE)
+    } else {
+        OperationTag(preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_EXPENSE), TagTone.NEGATIVE)
+    }
+
 @Component
 class CreateWalletTransactionOperation(
     private val walletService: WalletService,
@@ -53,7 +69,7 @@ class CreateWalletTransactionOperation(
     override val domain = OperationDomain.TRANSACTIONS
     override val risk = OperationRisk.LOW
 
-    override fun modelRequired() = listOf("date", "amount", "walletName", "categoryName", "movementType")
+    override fun modelRequired() = listOf("date", "amount", "walletName", "categoryName", "movementType", "description")
 
     companion object {
         const val NAME = "create_wallet_transaction"
@@ -111,23 +127,25 @@ class CreateWalletTransactionOperation(
         }
 
     override fun missingFromModel(payload: WalletTransactionPayload) =
-        if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()
+        (if (payload.amount.signum() <= 0) listOf("amount must be greater than 0") else emptyList()) +
+            missingDescription(payload.description)
 
     override fun categoryNeeded(payload: WalletTransactionPayload) = payload.categoryName.takeIf { it.isNotBlank() }
 
     override fun summary(payload: WalletTransactionPayload) =
-        "${movementLabel(
-            payload.movementType,
-        )}: ${payload.description}, ${payload.amount.toPlainString()}, ${payload.date}"
+        "${payload.description}, ${payload.amount.toPlainString()}, ${payload.date}"
 
-    private fun movementLabel(type: WalletTransactionType) =
-        preferencesService.translate(
-            if (type == WalletTransactionType.INCOME) {
-                TranslationKeys.TRANSACTION_TYPE_INCOME
-            } else {
-                TranslationKeys.TRANSACTION_TYPE_EXPENSE
-            },
+    override fun card(payload: WalletTransactionPayload) =
+        CardInfo(
+            payload.description.ifBlank { payload.categoryName },
+            listOfNotNull(
+                cardMoney(payload.amount),
+                cardDay(payload.date),
+                payload.categoryName.takeIf { it.isNotBlank() && payload.description.isNotBlank() }?.let(::cardText),
+            ),
         )
+
+    override fun tag(payload: WalletTransactionPayload) = movementTag(preferencesService, payload.movementType)
 
     override fun matchQuery(payload: WalletTransactionPayload) =
         MatchQuery(
