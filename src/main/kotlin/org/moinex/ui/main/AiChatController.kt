@@ -309,10 +309,10 @@ class AiChatController(
                     }
                 val elapsedMillis = (System.nanoTime() - requestStartNanos) / NANOS_PER_MILLI
                 val finishOutcome =
-                    if (result is ChatTurnResult.Success) {
-                        conversationState.finishTurn(result, elapsedMillis)
-                    } else {
-                        PersistOutcome.Saved
+                    when (result) {
+                        is ChatTurnResult.Success -> conversationState.finishTurn(result, elapsedMillis)
+                        is ChatTurnResult.Error -> conversationState.failTurn(errorText(result))
+                        is ChatTurnResult.NoProviderConfigured -> PersistOutcome.Saved
                     }
                 val failure =
                     listOf(
@@ -483,12 +483,13 @@ class AiChatController(
                 appendNotice(preferencesService.translate(TranslationKeys.AI_CHAT_NO_PROVIDER_CONFIGURED))
             is ChatTurnResult.Error -> {
                 logger.warn("AI chat turn failed: {}", result.message)
-                appendNotice(
-                    MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_ERROR), result.message),
-                )
+                appendNotice(errorText(result))
             }
         }
     }
+
+    private fun errorText(result: ChatTurnResult.Error): String =
+        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_ERROR), result.message)
 
     private fun ignoredLinesText(ignored: List<IgnoredLine>): String =
         MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_IGNORED_HEADER), ignored.size) +

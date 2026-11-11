@@ -94,6 +94,13 @@ class ChatConversationState(
         return persist(result.changeSet)
     }
 
+    /** Stores [message] as the assistant's answer of a turn that failed, so the conversation shows it when reopened. */
+    @Synchronized
+    fun failTurn(message: String): PersistOutcome {
+        messages += ChatMessage(role = ChatRole.ASSISTANT, content = message)
+        return persist(null)
+    }
+
     private fun createChat(): Int {
         val id = historyService.createChat()
         chatId = id

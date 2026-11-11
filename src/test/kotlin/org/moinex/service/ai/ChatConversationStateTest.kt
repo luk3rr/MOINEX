@@ -96,6 +96,17 @@ class ChatConversationStateTest :
                 }
             }
 
+            When("a turn fails") {
+                state.startTurn(user)
+                state.failTurn("Erro ao consultar o assistente: limite")
+
+                Then("the error is stored as the assistant's answer, so it shows when the chat is reopened") {
+                    stored.captured.map { it.role } shouldBe listOf(ChatRole.ASSISTANT)
+                    stored.captured.single().content shouldBe "Erro ao consultar o assistente: limite"
+                    state.messages().map { it.role } shouldBe listOf(ChatRole.USER, ChatRole.ASSISTANT)
+                }
+            }
+
             When("the conversation is created") {
                 state.startTurn(user)
 

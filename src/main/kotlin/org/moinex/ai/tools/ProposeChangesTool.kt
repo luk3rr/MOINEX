@@ -46,6 +46,7 @@ class ProposeChangesTool(
         const val LOW_CONFIDENCE_THRESHOLD = 0.6
         private const val DEFAULT_CONFIDENCE = 1.0
         private const val CREATE_CATEGORY = "create_category"
+        private const val RECEIVED_ITEM_LOG_LIMIT = 500
         private val logger = LoggerFactory.getLogger(ProposeChangesTool::class.java)
     }
 
@@ -340,11 +341,12 @@ class ProposeChangesTool(
             } catch (e: JSONException) {
                 val received = arguments.keySet().sorted()
                 logger.info(
-                    "Item {} of propose_changes ({}) arrived with fields {}: {}",
+                    "Item {} of propose_changes ({}) arrived with fields {}: {}. Received item: {}",
                     index,
                     operationName,
                     received,
                     e.message,
+                    arguments.toString().take(RECEIVED_ITEM_LOG_LIMIT),
                 )
                 error(
                     "$operationName could not be read (${e.message}). The item arrived with only these fields: " +
