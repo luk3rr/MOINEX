@@ -125,7 +125,7 @@ class RecurringCreditCardDebtServiceProjectionTest :
 
         Given("an active recurring with an endDate within the projection window") {
             val now = YearMonth.now()
-            val endDate = now.plusMonths(3).atDay(1)
+            val endDate = now.plusMonths(3).atDay(1).minusDays(1)
             val recurring =
                 RecurringCreditCardDebtFactory.create(
                     id = 1,

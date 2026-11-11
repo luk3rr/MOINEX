@@ -18,7 +18,7 @@ object RecurringCreditCardDebtFactory {
         category: Category = CategoryFactory.create(id = 1),
         amount: BigDecimal = BigDecimal("50.00"),
         description: String? = "Test Recurring",
-        dayOfMonth: Int = 10,
+        dayOfMonth: Int = 1,
         frequency: CreditCardRecurringFrequency = CreditCardRecurringFrequency.MONTHLY,
         status: RecurringTransactionStatus = RecurringTransactionStatus.ACTIVE,
         startDate: LocalDate = LocalDate.now().withDayOfMonth(1),

@@ -1167,7 +1167,9 @@ class CreditCardController(
                             is CreditCardDebtRowDTO.Materialized -> UIUtils.formatDateForDisplay(row.payment.date)
                             is CreditCardDebtRowDTO.Projected ->
                                 UIUtils.formatDateForDisplay(
-                                    row.occurrence.invoiceMonth.atDay(row.occurrence.recurringDebt.dayOfMonth),
+                                    row.occurrence.invoiceMonth.atDay(
+                                        row.occurrence.recurringDebt.creditCard.billingDueDay,
+                                    ),
                                 )
                         }
                     SimpleStringProperty(date)
@@ -1183,7 +1185,8 @@ class CreditCardController(
                         when (val row = param.value) {
                             is CreditCardDebtRowDTO.Materialized ->
                                 UIUtils.formatDateForDisplay(row.payment.creditCardDebt.date)
-                            is CreditCardDebtRowDTO.Projected -> "-"
+                            is CreditCardDebtRowDTO.Projected ->
+                                UIUtils.formatDateForDisplay(row.occurrence.occurrenceDate)
                         }
                     SimpleStringProperty(date)
                 }

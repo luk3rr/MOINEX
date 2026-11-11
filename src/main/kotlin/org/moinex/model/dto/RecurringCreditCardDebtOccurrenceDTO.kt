@@ -8,10 +8,13 @@ package org.moinex.model.dto
 
 import org.moinex.model.creditcard.RecurringCreditCardDebt
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
 
 data class RecurringCreditCardDebtOccurrenceDTO(
     val recurringDebt: RecurringCreditCardDebt,
     val invoiceMonth: YearMonth,
     val amount: BigDecimal,
-)
+) {
+    val occurrenceDate: LocalDate get() = recurringDebt.occurrenceDateFor(invoiceMonth)
+}

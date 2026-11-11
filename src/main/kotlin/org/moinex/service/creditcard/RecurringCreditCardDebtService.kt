@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Month
 import java.time.Year
 import java.time.YearMonth
@@ -48,6 +50,8 @@ class RecurringCreditCardDebtService(
         check(creditCardRepository.existsById(recurring.creditCard.id!!)) {
             "${recurring.creditCard} does not exist"
         }
+
+        recurring.nextInvoiceMonth = firstInvoiceMonth(recurring)
 
         val newRecurringTransaction = recurringCreditCardDebtRepository.save(recurring)
 
@@ -133,7 +137,7 @@ class RecurringCreditCardDebtService(
             )
 
         activeRecurringTransactions.forEach { recurring ->
-            materializeDebtsUpTo(recurring, clockProvider.currentMonth())
+            materializeDebtsUpTo(recurring, clockProvider.today())
         }
     }
 
@@ -152,7 +156,7 @@ class RecurringCreditCardDebtService(
             var current = startMonth
 
             while (current.isBeforeOrEqual(endMonth)) {
-                val occurrenceDate = current.atDay(recurringTransactionFromDatabase.dayOfMonth)
+                val occurrenceDate = recurringTransactionFromDatabase.occurrenceDateFor(current)
 
                 if (occurrenceDate.isAfter(recurringTransactionFromDatabase.endDate)) break
 
@@ -252,12 +256,12 @@ class RecurringCreditCardDebtService(
             "Can only materialize the next scheduled month (${recurring.nextInvoiceMonth}), not $targetMonth"
         }
 
-        val occurrenceDate = targetMonth.atDay(recurring.dayOfMonth)
+        val occurrenceDate = recurring.occurrenceDateFor(targetMonth)
         check(!occurrenceDate.isAfter(recurring.endDate)) {
             "Target date $occurrenceDate exceeds end date ${recurring.endDate} for $recurring"
         }
 
-        if (isAlreadyMaterialized(recurring, targetMonth)) {
+        if (isAlreadyMaterialized(recurring, occurrenceDate)) {
             logger.info("$recurring already materialized for $targetMonth — skipping")
             return
         }
@@ -268,7 +272,7 @@ class RecurringCreditCardDebtService(
                 category = recurring.category,
                 amount = recurring.amount,
                 description = recurring.description,
-                date = clockProvider.now(),
+                date = purchaseDateTime(occurrenceDate),
                 installments = 1,
                 recurringSource = recurring,
             )
@@ -281,12 +285,14 @@ class RecurringCreditCardDebtService(
 
     private fun materializeDebtsUpTo(
         recurring: RecurringCreditCardDebt,
-        upTo: YearMonth,
+        today: LocalDate,
     ) {
         var current = recurring.nextInvoiceMonth
 
-        while (current.isBeforeOrEqual(upTo)) {
-            val occurrenceDate = current.atDay(recurring.dayOfMonth)
+        while (true) {
+            val occurrenceDate = recurring.occurrenceDateFor(current)
+
+            if (occurrenceDate.isAfter(today)) break
 
             if (occurrenceDate.isAfter(recurring.endDate)) {
                 recurring.status = RecurringTransactionStatus.INACTIVE
@@ -294,7 +300,7 @@ class RecurringCreditCardDebtService(
                 break
             }
 
-            if (isAlreadyMaterialized(recurring, current)) {
+            if (isAlreadyMaterialized(recurring, occurrenceDate)) {
                 logger.info("$recurring already materialized for $current — skipping")
                 current = current.plus(1, recurring.frequency.chronoUnit)
                 continue
@@ -306,7 +312,7 @@ class RecurringCreditCardDebtService(
                     category = recurring.category,
                     amount = recurring.amount,
                     description = recurring.description,
-                    date = clockProvider.now(),
+                    date = occurrenceDate.atStartOfDay(),
                     installments = 1,
                     recurringSource = recurring,
                 )
@@ -324,10 +330,28 @@ class RecurringCreditCardDebtService(
         recurring.nextInvoiceMonth = current
     }
 
+    private fun firstInvoiceMonth(recurring: RecurringCreditCardDebt): YearMonth {
+        var occurrenceDate = YearMonth.from(recurring.startDate).atDay(recurring.dayOfMonth)
+
+        if (occurrenceDate.isBefore(recurring.startDate)) {
+            occurrenceDate = occurrenceDate.plus(1, recurring.frequency.chronoUnit)
+        }
+
+        return creditCardService.invoiceMonthForPurchaseDate(recurring.creditCard, occurrenceDate)
+    }
+
+    private fun purchaseDateTime(occurrenceDate: LocalDate): LocalDateTime =
+        if (occurrenceDate.isAfter(clockProvider.today())) {
+            clockProvider.now()
+        } else {
+            occurrenceDate.atStartOfDay()
+        }
+
     private fun isAlreadyMaterialized(
         recurring: RecurringCreditCardDebt,
-        month: YearMonth,
+        occurrenceDate: LocalDate,
     ): Boolean {
+        val month = YearMonth.from(occurrenceDate)
         val monthStart = month.atDay(1).atStartOfDay()
         val monthEnd = month.atEndOfMonth().atEndOfDay()
 

@@ -2,6 +2,7 @@ package org.moinex.service.creditcard
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -40,10 +41,19 @@ class RecurringCreditCardDebtServiceCreateTest :
 
         Given("a valid recurring debt with an existing credit card") {
             val creditCard = CreditCardFactory.create(id = 1)
-            val recurring = RecurringCreditCardDebtFactory.create(id = null, creditCard = creditCard)
+            val recurring =
+                RecurringCreditCardDebtFactory.create(
+                    id = null,
+                    creditCard = creditCard,
+                    dayOfMonth = 8,
+                    startDate = java.time.LocalDate.of(2026, 11, 8),
+                )
 
             When("creating the recurring debt") {
                 every { creditCardRepository.existsById(1) } returns true
+                every {
+                    creditCardService.invoiceMonthForPurchaseDate(creditCard, java.time.LocalDate.of(2026, 11, 8))
+                } returns java.time.YearMonth.of(2026, 12)
                 every { recurringCreditCardDebtRepository.save(recurring) } returns
                     recurring.also { it.id = 1 }
 
@@ -51,6 +61,10 @@ class RecurringCreditCardDebtServiceCreateTest :
 
                 Then("should persist the recurring debt") {
                     verify { recurringCreditCardDebtRepository.save(recurring) }
+                }
+
+                Then("should start at the invoice month the first occurrence date falls into") {
+                    recurring.nextInvoiceMonth shouldBe java.time.YearMonth.of(2026, 12)
                 }
 
                 Then("should return the generated id") {

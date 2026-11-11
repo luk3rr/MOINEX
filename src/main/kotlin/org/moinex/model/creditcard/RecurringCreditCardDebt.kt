@@ -79,6 +79,12 @@ class RecurringCreditCardDebt(
         }
     }
 
+    fun occurrenceDateFor(invoiceMonth: YearMonth): LocalDate {
+        val purchaseMonth =
+            if (dayOfMonth > creditCard.closingDay) invoiceMonth.minusMonths(1) else invoiceMonth
+        return purchaseMonth.atDay(dayOfMonth)
+    }
+
     fun isActive(): Boolean = status == RecurringTransactionStatus.ACTIVE
 
     fun isInactive(): Boolean = status == RecurringTransactionStatus.INACTIVE
