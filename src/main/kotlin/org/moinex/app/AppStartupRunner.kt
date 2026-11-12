@@ -11,6 +11,7 @@ package org.moinex.app
 import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.service.ai.AiChatHistoryService
@@ -28,6 +29,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
+import java.time.Duration
+import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.milliseconds
 
 @Component
 class AppStartupRunner(
@@ -43,6 +47,11 @@ class AppStartupRunner(
     private val releaseUpdateScheduler: ReleaseUpdateScheduler,
     private val aiChatHistoryService: AiChatHistoryService,
 ) : ApplicationRunner {
+    private companion object {
+        const val MAX_COOLDOWN_RETRIES = 3
+        val COOLDOWN_RETRY_MARGIN: Duration = Duration.ofSeconds(5)
+    }
+
     private val logger = LoggerFactory.getLogger(AppStartupRunner::class.java)
 
     @Volatile
@@ -86,7 +95,36 @@ class AppStartupRunner(
             logger.info("Startup pipeline beginning")
             startupPipeline()
             logger.info("Startup pipeline completed successfully")
+
+            retryYahooStepsAfterCooldown()
         }
+    }
+
+    /**
+     * When Yahoo limited the requests during startup, waits for the end of the cooldown announced to the user and
+     * repeats only the steps that depend on Yahoo, up to [MAX_COOLDOWN_RETRIES] times. Those steps skip what is
+     * still fresh, so each retry asks only for what is missing. The performance snapshots are rebuilt once at the
+     * end, since they are derived from the prices.
+     */
+    private suspend fun retryYahooStepsAfterCooldown() {
+        var retries = 0
+
+        while (retries < MAX_COOLDOWN_RETRIES) {
+            val until = APIUtils.yahooGateway.cooldownUntil() ?: break
+            val wait = Duration.between(LocalDateTime.now(), until).plus(COOLDOWN_RETRY_MARGIN)
+
+            logger.info("Yahoo cooldown during startup: retrying the Yahoo steps at {}", until)
+            delay(wait.toMillis().coerceAtLeast(0).milliseconds)
+
+            if (isShuttingDown || APIUtils.isShuttingDown()) return
+
+            updateMarketQuotesAndCommodities()
+            updateTickerPrices()
+            updatePriceHistory()
+            retries++
+        }
+
+        if (retries > 0) recalculateSnapshots()
     }
 
     private suspend fun startupPipeline() =
@@ -105,12 +143,7 @@ class AppStartupRunner(
                     }
                 }
 
-            val quotesAndCommoditiesStep =
-                async {
-                    runStep("Updating market quotes and commodities") {
-                        marketService.updateMarketQuotesAndCommoditiesIfStale()
-                    }
-                }
+            val quotesAndCommoditiesStep = async { updateMarketQuotesAndCommodities() }
 
             marketIndicatorStep.await()
             brazilianMarketIndicatorsStep.await()
@@ -123,30 +156,38 @@ class AppStartupRunner(
                     }
                 }
 
-            val nonArchivedTickerPricesStep =
-                async {
-                    runStep("Updating ticker prices") {
-                        tickerService.updateAllNonArchivedTickersPrices()
-                    }
-                }
+            val nonArchivedTickerPricesStep = async { updateTickerPrices() }
 
             nonArchivedTickerPricesStep.await()
 
-            val tickerPriceHistoryStep =
-                async {
-                    runStep("Initializing price history") {
-                        tickerPriceHistoryService.initializePriceHistory()
-                        tickerPriceHistoryService.syncDailyPriceHistory()
-                        performanceBenchmarkService.refreshBenchmarks()
-                    }
-                }
+            val tickerPriceHistoryStep = async { updatePriceHistory() }
 
             bondInterestCalculationStep.await()
             tickerPriceHistoryStep.await()
 
-            runStep("Recalculating investment performance snapshots") {
-                investmentPerformanceService.recalculateAllSnapshots()
-            }
+            recalculateSnapshots()
+        }
+
+    private suspend fun updateMarketQuotesAndCommodities() =
+        runStep("Updating market quotes and commodities") {
+            marketService.updateMarketQuotesAndCommoditiesIfStale()
+        }
+
+    private suspend fun updateTickerPrices() =
+        runStep("Updating ticker prices") {
+            tickerService.updateAllNonArchivedTickersPrices()
+        }
+
+    private suspend fun updatePriceHistory() =
+        runStep("Initializing price history") {
+            tickerPriceHistoryService.initializePriceHistory()
+            tickerPriceHistoryService.syncDailyPriceHistory()
+            performanceBenchmarkService.refreshBenchmarks()
+        }
+
+    private suspend fun recalculateSnapshots() =
+        runStep("Recalculating investment performance snapshots") {
+            investmentPerformanceService.recalculateAllSnapshots()
         }
 
     private suspend fun <T> runStep(
