@@ -21,3 +21,4 @@
 | areas/ai-chat-history.md | human-reviewed (2026-11-07) | alta no código, média no comportamento do modelo | adicionado no intent 261106-ai-chat-history |
 | areas/financial-calculations.md | human-reviewed (2026-11-07) | alta no código, média nas suspeitas | adicionado no intent 261107-financial-calculations-review; HEAD 6c94ec03 |
 | areas/bond-screens.md | human-reviewed (2026-11-07) | alta no código | adicionado no intent 261107-bond-detail-comparison; HEAD 55d07233 |
+| areas/data-exchange.md | draft | alta no código, média nos casos de borda | adicionado no intent 261112-import-export-data; HEAD 8c32f394 + alterações não commitadas |

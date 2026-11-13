@@ -234,6 +234,7 @@ class WalletService(
     fun createWalletTransaction(
         transaction: WalletTransaction,
         publishNotification: Boolean = false,
+        enforceBalanceRules: Boolean = true,
     ): Int {
         val walletFromDatabase = walletRepository.findByIdOrThrow(transaction.wallet.id!!)
 
@@ -241,8 +242,10 @@ class WalletService(
 
         if (transaction.status == WalletTransactionStatus.CONFIRMED) {
             when (transaction.type) {
-                WalletTransactionType.INCOME -> incrementWalletBalance(walletFromDatabase, transaction.amount)
-                WalletTransactionType.EXPENSE -> decrementWalletBalance(walletFromDatabase, transaction.amount)
+                WalletTransactionType.INCOME ->
+                    incrementWalletBalance(walletFromDatabase, transaction.amount, enforceBalanceRules)
+                WalletTransactionType.EXPENSE ->
+                    decrementWalletBalance(walletFromDatabase, transaction.amount, enforceBalanceRules)
             }
         }
 
@@ -333,7 +336,10 @@ class WalletService(
     }
 
     @Transactional
-    fun createTransfer(transfer: Transfer): Int {
+    fun createTransfer(
+        transfer: Transfer,
+        enforceBalanceRules: Boolean = true,
+    ): Int {
         val senderWallet = walletRepository.findByIdOrThrow(transfer.senderWallet.id!!)
         val receiverWallet = walletRepository.findByIdOrThrow(transfer.receiverWallet.id!!)
 
@@ -341,14 +347,14 @@ class WalletService(
             "You cannot transfer money from a master wallet to its virtual wallet."
         }
 
-        check(senderWallet.balance >= transfer.amount) {
+        check(!enforceBalanceRules || senderWallet.balance >= transfer.amount) {
             "Sender wallet does not have enough balance to transfer"
         }
 
         val newTransfer = transfersRepository.save(transfer)
 
-        decrementWalletBalance(senderWallet, transfer.amount)
-        incrementWalletBalance(receiverWallet, transfer.amount)
+        decrementWalletBalance(senderWallet, transfer.amount, enforceBalanceRules)
+        incrementWalletBalance(receiverWallet, transfer.amount, enforceBalanceRules)
 
         logger.info("$newTransfer was created")
 
@@ -573,21 +579,24 @@ class WalletService(
     private fun incrementWalletBalance(
         walletFromDatabase: Wallet,
         amount: BigDecimal,
+        enforceBalanceRules: Boolean = true,
     ) {
-        updateWalletBalance(walletFromDatabase, amount, true)
+        updateWalletBalance(walletFromDatabase, amount, true, enforceBalanceRules)
     }
 
     private fun decrementWalletBalance(
         walletFromDatabase: Wallet,
         amount: BigDecimal,
+        enforceBalanceRules: Boolean = true,
     ) {
-        updateWalletBalance(walletFromDatabase, amount, false)
+        updateWalletBalance(walletFromDatabase, amount, false, enforceBalanceRules)
     }
 
     private fun updateWalletBalance(
         walletToUpdate: Wallet,
         amount: BigDecimal,
         isIncrement: Boolean,
+        enforceBalanceRules: Boolean = true,
     ) {
         if (amount.isZero()) return
 
@@ -599,7 +608,7 @@ class WalletService(
 
         when {
             walletToUpdate.isVirtual() -> {
-                check(walletToUpdate.balance.add(adjustedAmount) >= BigDecimal.ZERO) {
+                check(!enforceBalanceRules || walletToUpdate.balance.add(adjustedAmount) >= BigDecimal.ZERO) {
                     "Virtual wallets cannot have negative balances"
                 }
 
@@ -613,7 +622,7 @@ class WalletService(
                     amount,
                 )
             }
-            walletToUpdate.isMaster() && !isIncrement -> {
+            walletToUpdate.isMaster() && !isIncrement && enforceBalanceRules -> {
                 val unallocatedBalance = getUnallocatedBalance(walletToUpdate)
 
                 check(unallocatedBalance >= amount) {

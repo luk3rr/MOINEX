@@ -46,6 +46,19 @@
                   </VBox>
                   <VBox styleClass="card" spacing="10.0">
                       <children>
+                      <Label text="%dataexchange.settings.title" style="-fx-font-weight: bold;" />
+                      <Label text="%dataexchange.settings.hint" wrapText="true" maxWidth="520.0" style="-fx-text-fill: theme-text-secondary;" />
+                      <HBox spacing="10.0" alignment="CENTER_LEFT">
+                         <children>
+                            <Button text="%dataexchange.settings.export" onAction="#handleExportData" />
+                            <Button text="%dataexchange.settings.import" onAction="#handleImportData" />
+                            <Button text="%dataexchange.settings.template" onAction="#handleDownloadTemplate" />
+                         </children>
+                      </HBox>
+                      </children>
+                  </VBox>
+                  <VBox styleClass="card" spacing="10.0">
+                      <children>
                       <Label text="%settings.integrity.title" style="-fx-font-weight: bold;" />
                       <Label text="%settings.integrity.hint" wrapText="true" maxWidth="520.0" style="-fx-text-fill: theme-text-secondary;" />
                       <Button text="%settings.integrity.check" onAction="#handleCheckIntegrity" />

@@ -192,8 +192,9 @@ class CreditCardService(
         debt: CreditCardDebt,
         invoiceMonth: YearMonth,
         publishNotification: Boolean = false,
+        enforceCreditLimit: Boolean = true,
     ): Int {
-        check(debt.amount <= getAvailableCredit(debt.creditCard.id!!)) {
+        check(!enforceCreditLimit || debt.amount <= getAvailableCredit(debt.creditCard.id!!)) {
             "${debt.creditCard} does not have enough credit"
         }
 

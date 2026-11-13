@@ -25,7 +25,23 @@ class NotificationService(
 ) {
     private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
+    private val silenced = ThreadLocal.withInitial { false }
+
     private val uiListeners = mutableListOf<(Notification) -> Unit>()
+
+    /**
+     * Runs [block] without creating or showing notifications on the calling thread.
+     */
+    fun <T> withoutNotifications(block: () -> T): T {
+        val previous = silenced.get()
+        silenced.set(true)
+        try {
+            return block()
+        } finally {
+            silenced.set(previous)
+        }
+    }
+
     private val pendingToasts = mutableListOf<Notification>()
 
     fun registerUiListener(listener: (Notification) -> Unit) {
@@ -45,6 +61,8 @@ class NotificationService(
         relatedEntityId: Int? = null,
         actionUrl: String? = null,
     ) {
+        if (silenced.get()) return
+
         val notification =
             Notification(
                 type = type,

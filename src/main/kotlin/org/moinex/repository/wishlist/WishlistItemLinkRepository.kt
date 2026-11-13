@@ -8,11 +8,15 @@ package org.moinex.repository.wishlist
 
 import org.moinex.model.wishlist.WishlistItemLink
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
 interface WishlistItemLinkRepository : JpaRepository<WishlistItemLink, Int> {
     fun findAllByWishlistItemId(wishlistItemId: Int): List<WishlistItemLink>
+
+    @Query("SELECT l FROM WishlistItemLink l JOIN FETCH l.wishlistItem")
+    fun findAllWithExistingItem(): List<WishlistItemLink>
 
     fun deleteAllByWishlistItemId(wishlistItemId: Int)
 }

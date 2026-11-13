@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockups: importar e exportar dados</title>
+<style>
+:root{--base:#21222C;--card:#282A36;--pane:#383a52;--hover:#44475A;--text:#F8F8F2;--sec:#BFBFC3;--border:#44475A;--pos:#50FA7B;--neg:#FF5555;--warn:#FFB86C;--acc:#BD93F9;--side:#0a614e;--shadow:rgba(0,0,0,.45)}
+:root.light{--base:#F6F8FA;--card:#fff;--pane:#E6E7E8;--hover:#e6e6e6;--text:#1F2328;--sec:#59636e;--border:#D1D9E0;--pos:#1A7F37;--neg:#C62F3E;--warn:#9a6700;--acc:#7c4dcc;--side:#1abc9c;--shadow:rgba(0,0,0,.25)}
+*{box-sizing:border-box}body{margin:0;background:#111;color:var(--text);font:13px "Noto Sans",system-ui,sans-serif;padding:16px}
+h1{font-size:16px;margin:0 0 4px;color:#eee}p.n{color:#aaa;margin:0 0 12px;max-width:980px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.bar button{background:#2a2a2a;color:#ddd;border:2px solid #555;border-radius:20px;padding:6px 14px;cursor:pointer}.bar button.on{border-color:var(--acc);color:#fff}
+.app{display:grid;grid-template-columns:56px 1fr;background:var(--base);border:1px solid #333;border-radius:6px;overflow:hidden;max-width:1180px;position:relative;color:var(--text);min-height:600px}
+.side{background:var(--side);display:flex;flex-direction:column;gap:18px;align-items:center;padding:14px 0}.side i{width:22px;height:22px;border-radius:5px;background:#ffffff55;display:block}.side i.on{background:#fff}
+.main{padding:12px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px 14px}
+.card h3{margin:0 0 8px;font-size:14px}.hint{color:var(--sec);margin:0 0 8px;max-width:560px}
+.btn{border:2px solid var(--acc);border-radius:20px;padding:4px 16px;color:var(--text);display:inline-block;cursor:pointer;background:transparent;font:inherit}.btn.dis{border-color:var(--border);color:var(--sec);cursor:default;opacity:.6}.btn.sec{border-color:var(--border)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:6}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:8px;width:760px;max-width:94%;padding:16px;box-shadow:0 10px 30px var(--shadow)}
+.modal h2{margin:0 0 10px;font-size:15px}
+.seg{display:flex;gap:6px}.seg span{padding:3px 14px;border-radius:20px;border:2px solid var(--border);color:var(--sec)}.seg span.on{border-color:var(--acc);color:var(--text)}
+.grp{border:1px solid var(--border);border-radius:6px;margin:6px 0}.grp .gh{background:var(--pane);padding:6px 10px;font-weight:700;display:flex;justify-content:space-between}.grp .gb{padding:4px 10px 6px;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+.cb:before{content:"\2611  ";color:var(--acc)}.cb.off:before{content:"\2610  ";color:var(--sec)}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-weight:700;border:1px solid var(--border);padding:5px 8px;background:var(--pane)}td{border:1px solid var(--border);padding:5px 8px}
+td.num,th.num{text-align:right}.pos{color:var(--pos)}.neg{color:var(--neg)}.warn{color:var(--warn)}
+.steps{display:flex;gap:6px;margin-bottom:10px;color:var(--sec)}.steps b{color:var(--text)}
+.prog{height:8px;border-radius:4px;background:var(--hover);overflow:hidden;margin:8px 0}.prog i{display:block;height:100%;width:62%;background:var(--acc)}
+.split{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+.banner{border:1px solid var(--warn);border-radius:6px;padding:6px 10px;margin:8px 0;color:var(--warn)}.banner.err{border-color:var(--neg);color:var(--neg)}.banner.ok{border-color:var(--pos);color:var(--pos)}
+.hide{display:none}.note{margin:10px 0 0;color:#aaa;max-width:1180px}.tv b{font-weight:700}.sel{background:var(--hover)}
+.drop{border:2px dashed var(--border);border-radius:8px;padding:26px;text-align:center;color:var(--sec)}
+</style></head><body>
+<h1>Importar e exportar dados (CSV/XLSX)</h1>
+<p class="n">Valores fictícios, paleta real do app. Seção "Dados" nas Configurações abre dois diálogos: Exportar e Importar (assistente em 3 passos: arquivo, pré-visualização, resultado). Para a pré-visualização há duas opções de layout (D1 e D2) para você escolher. Botão "Tema" alterna escuro e claro.</p>
+<div class="bar" id="views">
+ <button class="on" data-v="a">A · Configurações: seção Dados</button>
+ <button data-v="b">B · Exportar</button>
+ <button data-v="c">C · Importar: arquivo</button>
+ <button data-v="d1">D1 · Pré-visualização: tabela + painel de problemas</button>
+ <button data-v="d2">D2 · Pré-visualização: lista de entidades | detalhe</button>
+ <button data-v="e">E · Progresso</button>
+ <button data-v="f">F · Resultado</button>
+ <button data-v="g">G · Estados de erro</button>
+ <span style="width:20px"></span><button id="theme">Tema: escuro</button>
+</div>
+
+<div class="app" id="app"><div class="side"><i></i><i></i><i></i><i></i><i></i><i class="on"></i></div><div class="main">
+ <div class="card"><h3>Configurações</h3>
+  <div class="row"><span class="tv"><b>Idioma:</b> Português</span><span class="tv"><b>Tema:</b> Escuro</span></div></div>
+ <div class="card"><h3>Banco de dados</h3><div class="row"><span class="tv"><b>Local:</b> definido nas preferências</span></div></div>
+ <div class="card"><h3>Dados</h3>
+  <p class="hint">Exporte seus dados para planilhas (CSV ou XLSX) e importe arquivos no mesmo layout. Tudo acontece neste computador.</p>
+  <div class="row"><span class="btn">Exportar dados…</span><span class="btn">Importar dados…</span><span class="btn sec">Baixar modelo vazio</span></div>
+ </div>
+ <div class="card"><h3>Atualizações</h3><div class="hint">…</div></div>
+
+ <div class="overlay view hide" id="vb"><div class="modal">
+  <h2>Exportar dados</h2>
+  <div class="row" style="margin-bottom:6px"><span class="tv"><b>Formato:</b></span><div class="seg"><span class="on">XLSX (uma aba por tabela)</span><span>CSV (.zip)</span></div></div>
+  <div class="grp"><div class="gh"><span class="cb">Carteiras</span><span class="hint" style="margin:0">4 entidades · 1.284 linhas</span></div><div class="gb"><span class="cb">Carteiras e tipos (7)</span><span class="cb">Categorias (32)</span><span class="cb">Transações (1.102)</span><span class="cb">Transferências (41)</span><span class="cb">Recorrências (12)</span><span></span></div></div>
+  <div class="grp"><div class="gh"><span class="cb">Cartões de crédito</span><span class="hint" style="margin:0">5 entidades · 386 linhas</span></div><div class="gb"><span class="cb">Cartões e operadoras (5)</span><span class="cb">Dívidas e parcelas (298)</span><span class="cb">Pagamentos (62)</span><span class="cb">Créditos (9)</span><span class="cb">Recorrências (12)</span></div></div>
+  <div class="grp"><div class="gh"><span class="cb off">Investimentos</span><span class="hint" style="margin:0">8 entidades · 241 linhas</span></div><div class="gb"><span class="cb off">Ativos (18)</span><span class="cb off">Compras e vendas (96)</span><span class="cb off">Dividendos (88)</span><span class="cb off">Títulos e operações (30)</span><span class="cb off">Metas de alocação (9)</span></div></div>
+  <div class="grp"><div class="gh"><span class="cb off">Planejamento</span><span class="hint" style="margin:0">4 entidades · 37 linhas</span></div><div class="gb"><span class="cb off">Planos e grupos (14)</span><span class="cb off">Metas (8)</span><span class="cb off">Wishlist (15)</span></div></div>
+  <p class="hint">Fora do arquivo: preços, indicadores, análises, notificações e conversas e chaves da IA.</p>
+  <div class="row" style="justify-content:space-between"><span class="tv"><b>Selecionado:</b> 2 grupos, 1.670 linhas</span><div class="row"><span class="btn sec">Cancelar</span><span class="btn">Exportar…</span></div></div>
+ </div></div>
+
+ <div class="overlay view hide" id="vc"><div class="modal">
+  <h2>Importar dados</h2>
+  <div class="steps"><b>1 Arquivo</b> › 2 Pré-visualização › 3 Resultado</div>
+  <div class="drop">Escolha um arquivo <b>.xlsx</b> ou <b>.zip</b> de CSVs exportado pelo MOINEX<br><br><span class="btn">Escolher arquivo…</span></div>
+  <p class="hint">Só são adicionados registros novos; os que já existem são ignorados. Nada é gravado antes da sua confirmação.</p>
+  <div class="row" style="justify-content:flex-end"><span class="btn sec">Cancelar</span></div>
+ </div></div>
+
+ <div class="overlay view hide" id="vd1"><div class="modal" style="width:900px">
+  <h2>Importar dados</h2>
+  <div class="steps">1 Arquivo › <b>2 Pré-visualização</b> › 3 Resultado</div>
+  <div class="tv"><b>Arquivo:</b> moinex-export.xlsx · layout v1</div>
+  <table style="margin-top:8px"><thead><tr><th>Entidade</th><th class="num">No arquivo</th><th class="num">Novas</th><th class="num">Duplicadas</th><th class="num">Avisos</th><th class="num">Erros</th></tr></thead><tbody>
+   <tr><td>Carteiras</td><td class="num">7</td><td class="num pos">2</td><td class="num">5</td><td class="num">0</td><td class="num">0</td></tr>
+   <tr><td>Categorias</td><td class="num">32</td><td class="num pos">0</td><td class="num">32</td><td class="num">0</td><td class="num">0</td></tr>
+   <tr class="sel"><td>Transações</td><td class="num">1.102</td><td class="num pos">214</td><td class="num">886</td><td class="num warn">1</td><td class="num neg">2</td></tr>
+   <tr><td>Transferências</td><td class="num">41</td><td class="num pos">3</td><td class="num">38</td><td class="num">0</td><td class="num">0</td></tr>
+  </tbody></table>
+  <div class="banner err">2 erros bloqueiam a importação. Corrija o arquivo e escolha-o de novo.</div>
+  <table class="small"><thead><tr><th>Entidade</th><th class="num">Linha</th><th>Coluna</th><th>Problema</th></tr></thead><tbody>
+   <tr><td>Transações</td><td class="num">57</td><td>wallet</td><td class="neg">Carteira "Reserva" não existe no arquivo nem no banco</td></tr>
+   <tr><td>Transações</td><td class="num">203</td><td>amount</td><td class="neg">Valor "12,5x" não é um número</td></tr>
+   <tr><td>Transações</td><td class="num">88</td><td>date</td><td class="warn">Data futura (2027-03-01), transação ficará pendente</td></tr>
+  </tbody></table>
+  <div class="row" style="justify-content:space-between;margin-top:10px"><span class="hint" style="margin:0">Linhas idênticas dentro do arquivo contam como distintas.</span><div class="row"><span class="btn sec">Voltar</span><span class="btn dis">Importar 219 registros</span></div></div>
+ </div></div>
+
+ <div class="overlay view hide" id="vd2"><div class="modal" style="width:900px">
+  <h2>Importar dados</h2>
+  <div class="steps">1 Arquivo › <b>2 Pré-visualização</b> › 3 Resultado</div>
+  <div class="split">
+   <table><thead><tr><th>Entidade</th><th class="num">Novas</th><th class="num">Dup.</th><th></th></tr></thead><tbody>
+    <tr><td>Carteiras</td><td class="num pos">2</td><td class="num">5</td><td class="pos">✔</td></tr>
+    <tr><td>Categorias</td><td class="num">0</td><td class="num">32</td><td class="pos">✔</td></tr>
+    <tr class="sel"><td>Transações</td><td class="num pos">214</td><td class="num">886</td><td class="neg">2 erros</td></tr>
+    <tr><td>Transferências</td><td class="num pos">3</td><td class="num">38</td><td class="pos">✔</td></tr>
+   </tbody></table>
+   <div><div class="tv"><b>Transações:</b> 1.102 no arquivo</div>
+   <div class="seg" style="margin:6px 0"><span class="on">Problemas (3)</span><span>Novas (214)</span><span>Duplicadas (886)</span></div>
+   <table class="small"><thead><tr><th class="num">Linha</th><th>Coluna</th><th>Problema</th></tr></thead><tbody>
+    <tr><td class="num">57</td><td>wallet</td><td class="neg">Carteira "Reserva" não existe</td></tr>
+    <tr><td class="num">203</td><td>amount</td><td class="neg">Valor "12,5x" inválido</td></tr>
+    <tr><td class="num">88</td><td>date</td><td class="warn">Data futura: ficará pendente</td></tr>
+   </tbody></table></div>
+  </div>
+  <div class="banner err">2 erros bloqueiam a importação.</div>
+  <div class="row" style="justify-content:flex-end"><span class="btn sec">Voltar</span><span class="btn dis">Importar 219 registros</span></div>
+ </div></div>
+
+ <div class="overlay view hide" id="ve"><div class="modal">
+  <h2>Exportando…</h2>
+  <div class="tv"><b>Entidade atual:</b> Transações (684 de 1.102)</div>
+  <div class="prog"><i></i></div>
+  <div class="row" style="justify-content:flex-end"><span class="btn sec">Cancelar</span></div>
+  <p class="hint">Na importação, o botão Cancelar fica ativo até a confirmação; durante a gravação ela não pode ser interrompida.</p>
+ </div></div>
+
+ <div class="overlay view hide" id="vf"><div class="modal">
+  <h2>Importação concluída</h2>
+  <div class="steps">1 Arquivo › 2 Pré-visualização › <b>3 Resultado</b></div>
+  <div class="banner ok">219 registros adicionados, 924 duplicados ignorados.</div>
+  <table><thead><tr><th>Entidade</th><th class="num">Adicionadas</th><th class="num">Ignoradas</th></tr></thead><tbody>
+   <tr><td>Carteiras</td><td class="num">2</td><td class="num">5</td></tr><tr><td>Transações</td><td class="num">214</td><td class="num">886</td></tr><tr><td>Transferências</td><td class="num">3</td><td class="num">38</td></tr></tbody></table>
+  <div class="row" style="justify-content:flex-end;margin-top:10px"><span class="btn">Fechar</span></div>
+ </div></div>
+
+ <div class="overlay view hide" id="vg"><div class="modal">
+  <h2>Estados de erro (todos no passo 1)</h2>
+  <div class="banner err">Este arquivo não é uma exportação do MOINEX (aba "Transactions" não encontrada).</div>
+  <div class="banner err">Layout v2 desconhecido. Atualize o MOINEX para importar este arquivo.</div>
+  <div class="banner err">Arquivo maior que o limite de 50 MB.</div>
+  <div class="banner">Banco sem dados no grupo "Investimentos": ele aparece desmarcado e vazio no diálogo Exportar.</div>
+  <div class="row" style="justify-content:flex-end"><span class="btn sec">Escolher outro arquivo</span></div>
+ </div></div>
+</div></div>
+<p class="note">Decisão pedida: D1 ou D2 para a pré-visualização. D1 mostra tudo numa janela só (resumo em cima, erros embaixo); D2 separa a lista de entidades do detalhe (melhor com muitos erros ou muitas entidades).</p>
+<script>
+const v=document.querySelectorAll('.view');
+document.querySelectorAll('#views button[data-v]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#views button').forEach(x=>x.classList.remove('on'));b.classList.add('on');v.forEach(e=>e.classList.add('hide'));const t=document.getElementById('v'+b.dataset.v);if(t)t.classList.remove('hide')});
+document.getElementById('theme').onclick=function(){const l=document.documentElement.classList.toggle('light');this.textContent='Tema: '+(l?'claro':'escuro')};
+</script></body></html>

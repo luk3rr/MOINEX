@@ -31,6 +31,7 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.dataexchange.ui.DataExchangeDialogs
 import org.moinex.model.dto.QuantityIssueKind
 import org.moinex.model.enums.LlmProviderType
 import org.moinex.service.PreferencesService
@@ -55,6 +56,7 @@ class SettingsController(
     private val aiCredentialStore: AiCredentialStore,
     private val llmProviderFactory: LlmProviderFactory,
     private val quantityIntegrityService: QuantityIntegrityService,
+    private val dataExchangeDialogs: DataExchangeDialogs,
 ) {
     @FXML
     private lateinit var languageComboBox: ComboBox<Locale>
@@ -404,6 +406,21 @@ class SettingsController(
             message,
             preferencesService.bundle,
         )
+    }
+
+    @FXML
+    fun handleExportData() {
+        dataExchangeDialogs.openExport(dbPathField.scene?.window)
+    }
+
+    @FXML
+    fun handleDownloadTemplate() {
+        dataExchangeDialogs.saveTemplate(dbPathField.scene?.window)
+    }
+
+    @FXML
+    fun handleImportData() {
+        dataExchangeDialogs.openImport(dbPathField.scene?.window)
     }
 
     @FXML

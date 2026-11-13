@@ -56,6 +56,8 @@ dependencies {
 
 	// Utilities
 	implementation(libs.com.opencsv.opencsv)
+	implementation(libs.org.dhatim.fastexcel)
+	implementation(libs.org.dhatim.fastexcel.reader)
 	implementation(libs.org.apache.commons.commons.lang3)
 	implementation(libs.net.objecthunter.exp4j)
 	implementation(libs.org.json.json)
