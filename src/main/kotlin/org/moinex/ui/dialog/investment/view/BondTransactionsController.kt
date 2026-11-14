@@ -17,7 +17,6 @@ import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
@@ -28,6 +27,7 @@ import org.moinex.common.ui.BondTableColumns.asQuantityColumn
 import org.moinex.common.ui.BondTableColumns.asUnitPriceColumn
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.OperationType
@@ -81,7 +81,7 @@ class BondTransactionsController(
 
     @FXML
     private fun handleCancel() {
-        (searchField.scene.window as Stage).close()
+        searchField.closeDialog()
     }
 
     @FXML
@@ -156,6 +156,7 @@ class BondTransactionsController(
                 preferencesService.translate(TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_OPERATION_TITLE),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             runCatching {

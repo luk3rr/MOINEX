@@ -10,10 +10,10 @@ package org.moinex.ui.dialog.wallettransaction.create
 
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.wallettransaction.RecurringTransaction
@@ -85,7 +85,7 @@ class AddRecurringTransactionController(
                 ),
             )
 
-            (descriptionField.scene.window as Stage).close()
+            descriptionField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

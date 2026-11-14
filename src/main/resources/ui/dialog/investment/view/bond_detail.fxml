@@ -31,8 +31,8 @@
                </children>
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
-            <Button minWidth="100.0" onAction="#handleBuy" text="%savings.bonds.button.buyBond" />
-            <Button minWidth="100.0" onAction="#handleSell" text="%savings.bonds.button.sellBond" />
+            <Button styleClass="accent" minWidth="100.0" onAction="#handleBuy" text="%savings.bonds.button.buyBond" />
+            <Button styleClass="accent" minWidth="100.0" onAction="#handleSell" text="%savings.bonds.button.sellBond" />
             <Button minWidth="100.0" onAction="#handleEdit" text="%savings.bonds.button.edit" />
          </children>
       </HBox>

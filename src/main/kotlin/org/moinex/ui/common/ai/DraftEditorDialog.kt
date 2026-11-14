@@ -10,11 +10,9 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Button
-import javafx.scene.control.ButtonType
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
-import javafx.scene.control.Dialog
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.layout.ColumnConstraints
@@ -32,6 +30,9 @@ import org.moinex.ai.operation.DraftFieldType
 import org.moinex.ai.operation.DraftValues
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogCard
+import org.moinex.common.ui.closeDialog
+import org.moinex.common.util.WindowUtils
 import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -203,14 +204,36 @@ class DraftEditorDialog(
         spec: List<DraftField>,
         initial: DraftValues,
         suggest: (DraftValues) -> Map<String, Any?> = { emptyMap() },
-    ): DraftValues? = build(title, spec, initial, suggest).showAndWait().orElse(null)
+    ): DraftValues? {
+        val host = checkNotNull(WindowUtils.dialogHost) { "The main window is not ready to show dialogs" }
+        var result: DraftValues? = null
+        lateinit var card: DialogCard
 
-    internal fun build(
-        title: String,
+        val content =
+            buildContent(spec, initial, suggest) {
+                result = it
+                card.closeDialog()
+            }
+        card =
+            DialogCard(
+                title,
+                content,
+                closeTooltip = preferencesService.translate(TranslationKeys.DIALOG_BUTTON_CLOSE),
+                width = CONTENT_WIDTH + GAP * 4,
+                sizeKey = "ai-draft",
+                sizeStore = WindowUtils.dialogSizes,
+            )
+        card.stylesheets.add(DraftEditorDialog::class.java.getResource(Files.AI_CHAT_STYLE_SHEET)!!.toExternalForm())
+        host.show(card)
+        return result
+    }
+
+    private fun buildContent(
         spec: List<DraftField>,
         initial: DraftValues,
-        suggest: (DraftValues) -> Map<String, Any?> = { emptyMap() },
-    ): Dialog<DraftValues?> {
+        suggest: (DraftValues) -> Map<String, Any?>,
+        onResult: (DraftValues?) -> Unit,
+    ): Node {
         val editors = spec.map { buildEditor(it, initial.fields[it.key]) }
         wireAutoCalculate(editors, initial, suggest)
         val grid =
@@ -257,14 +280,10 @@ class DraftEditorDialog(
                 isManaged = false
                 styleClass.add("ai-review-error")
             }
-        val dialog = Dialog<DraftValues?>()
         val cancelButton =
             Button(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_CANCEL)).apply {
                 minWidth = BUTTON_MIN_WIDTH
-                setOnAction {
-                    dialog.result = null
-                    dialog.close()
-                }
+                setOnAction { onResult(null) }
             }
         val saveButton =
             Button(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_SAVE)).apply {
@@ -274,33 +293,18 @@ class DraftEditorDialog(
                         error.isVisible = true
                         error.isManaged = true
                     } else {
-                        dialog.result =
+                        onResult(
                             DraftValues(
                                 initial.operationName,
                                 initial.fields + editors.associate { it.field.key to it.read() },
-                            )
-                        dialog.close()
+                            ),
+                        )
                     }
                 }
             }
         val buttons = HBox(GAP, cancelButton, saveButton).apply { alignment = Pos.CENTER }
 
-        dialog.apply {
-            this.title = title
-            dialogPane.stylesheets.add(
-                DraftEditorDialog::class.java.getResource(Files.AI_CHAT_STYLE_SHEET)!!.toExternalForm(),
-            )
-            dialogPane.prefWidth = CONTENT_WIDTH + GAP * 4
-            dialogPane.content = VBox(GAP * 1.5, banner, grid, error, buttons).apply { padding = Insets(GAP) }
-            setResultConverter { dialog.result }
-            dialogPane.buttonTypes.add(ButtonType.CANCEL)
-            dialogPane.lookupButton(ButtonType.CANCEL).apply {
-                isVisible = false
-                isManaged = false
-            }
-        }
-
-        return dialog
+        return VBox(GAP * 1.5, banner, grid, error, buttons).apply { padding = Insets(GAP) }
     }
 
     /**

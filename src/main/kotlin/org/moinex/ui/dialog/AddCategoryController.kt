@@ -10,8 +10,8 @@ package org.moinex.ui.dialog
 
 import javafx.fxml.FXML
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.service.CategoryService
@@ -38,7 +38,7 @@ class AddCategoryController(
         runCatching {
             categoryService.createCategory(Category(name = name, isArchived = false))
 
-            (categoryNameField.scene.window as Stage).close()
+            categoryNameField.closeDialog()
         }.onFailure { e ->
             WindowUtils.showErrorDialog(
                 preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_ERROR_ADDING_CATEGORY_TITLE),
@@ -49,6 +49,6 @@ class AddCategoryController(
 
     @FXML
     private fun handleCancel() {
-        (categoryNameField.scene.window as Stage).close()
+        categoryNameField.closeDialog()
     }
 }

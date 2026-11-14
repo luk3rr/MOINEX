@@ -384,6 +384,7 @@ class TransactionController(
                 ),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             walletService.deleteWalletTransaction(selectedTransaction.id!!)

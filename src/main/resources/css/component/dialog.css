@@ -1,0 +1,65 @@
+/*
+ * Filename: dialog.css
+ * Created on: November 13, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * Standard dialog card shown as an overlay over the main window. Colors come only from the theme tokens.
+ */
+
+.dialog-scrim {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+}
+
+.dialog-scrim-stacked {
+    -fx-background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dialog-card {
+    -fx-background-color: theme-bg-card;
+    -fx-border-color: theme-border;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 24, 0.1, 0, 6);
+}
+
+.dialog-header {
+    -fx-padding: 12px 16px;
+    -fx-border-color: transparent transparent theme-border transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.dialog-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: theme-text-title;
+}
+
+.dialog-close {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 0;
+    -fx-padding: 2px 6px;
+    -fx-cursor: hand;
+}
+
+.dialog-close:hover {
+    -fx-background-color: theme-bg-hover;
+}
+
+.dialog-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.dialog-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.dialog-footer {
+    -fx-padding: 12px 16px;
+    -fx-spacing: 8px;
+    -fx-border-color: theme-border transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}

@@ -9,9 +9,9 @@
 package org.moinex.ui.dialog.creditcard
 
 import javafx.fxml.FXML
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.service.PreferencesService
@@ -96,7 +96,7 @@ class EditCreditCardController(
                 creditCardService.updateCreditCard(creditCard!!)
             }
 
-            (nameField.scene.window as Stage).close()
+            nameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

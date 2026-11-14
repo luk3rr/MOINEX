@@ -9,8 +9,8 @@ package org.moinex.ui.dialog.wishlist
 import javafx.fxml.FXML
 import javafx.scene.control.RadioButton
 import javafx.scene.control.ToggleGroup
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.model.wishlist.WishlistItem
 import org.moinex.service.PreferencesService
 import org.springframework.stereotype.Controller
@@ -67,7 +67,6 @@ class MarkAsPurchasedController(
     }
 
     private fun closeDialog() {
-        val stage = creditCardRadioButton.scene.window as Stage
-        stage.close()
+        creditCardRadioButton.closeDialog()
     }
 }

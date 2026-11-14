@@ -16,6 +16,7 @@ import javafx.scene.control.TextField
 import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -163,7 +164,7 @@ abstract class BaseBudgetGroupController(
 
     @FXML
     protected fun handleCancel() {
-        groupNameField.scene.window.hide()
+        groupNameField.closeDialog()
     }
 
     @FXML

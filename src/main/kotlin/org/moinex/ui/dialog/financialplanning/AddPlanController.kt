@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BudgetGroupTransactionFilter
 import org.moinex.model.financialplanning.BudgetGroup
@@ -118,7 +119,7 @@ class AddPlanController(
                 )
             financialPlanningService.createPlan(plan)
 
-            planNameField.scene.window.hide()
+            planNameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

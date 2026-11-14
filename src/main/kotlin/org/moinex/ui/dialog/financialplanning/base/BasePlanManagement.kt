@@ -26,6 +26,7 @@ import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isNotEqual
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -97,7 +98,7 @@ abstract class BasePlanManagement(
 
     @FXML
     protected open fun handleCancel() {
-        planNameField.scene.window.hide()
+        planNameField.closeDialog()
     }
 
     @FXML

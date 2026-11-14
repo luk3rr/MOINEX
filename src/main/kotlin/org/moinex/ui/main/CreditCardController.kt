@@ -566,6 +566,7 @@ class CreditCardController(
                 ),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             creditCardService.deleteDebt(debt.id!!)

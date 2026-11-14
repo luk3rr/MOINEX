@@ -17,12 +17,12 @@ import javafx.scene.control.TableView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.SegmentedFilter
 import org.moinex.common.ui.TitledValue
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.TickerDetailDTO
@@ -139,7 +139,7 @@ class TickerDetailController(
 
     @FXML
     fun handleClose() {
-        (nameLabel.scene.window as Stage).close()
+        nameLabel.closeDialog()
     }
 
     private fun load() {

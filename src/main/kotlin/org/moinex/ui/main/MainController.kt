@@ -39,6 +39,7 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.DialogHost
 import org.moinex.common.ui.Icons
 import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.AppVersion
@@ -49,6 +50,7 @@ import org.moinex.service.ThemeService
 import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
 import org.moinex.ui.common.NotificationToastOverlay
+import org.moinex.ui.common.ToastHub
 import org.moinex.ui.common.search.GlobalSearch
 import org.moinex.ui.common.search.SearchAction
 import org.moinex.ui.common.search.SearchActionCatalog
@@ -131,6 +133,8 @@ class MainController(
     private lateinit var notificationPanel: VBox
     private lateinit var notificationCenterController: NotificationCenterController
     private lateinit var toastOverlay: NotificationToastOverlay
+
+    lateinit var dialogHost: DialogHost
     private lateinit var globalSearch: GlobalSearch
 
     @FXML
@@ -227,12 +231,21 @@ class MainController(
         setupGlobalSearch()
         setupScreenActionsButton()
 
+        dialogHost = DialogHost(rootPane)
+        WindowUtils.dialogHost = dialogHost
+
         // Toast overlay must be added last to stay on top of everything (highest Z-order)
         toastOverlay =
             NotificationToastOverlay(
                 rootPane,
                 preferencesService.translate(TranslationKeys.NOTIFICATION_ACTION_OPEN_PAGE),
             )
+
+        dialogHost.keepOnTop(toastOverlay.node)
+
+        val toastHub = ToastHub(toastOverlay)
+        toastOverlay.hub = toastHub
+        WindowUtils.toastHub = toastHub
 
         notificationService.registerUiListener { notification ->
             toastOverlay.show(notification)

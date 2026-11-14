@@ -12,11 +12,11 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Wallet
@@ -93,7 +93,7 @@ class ChangeWalletBalanceController(
             wt.balance = newBalance
             walletService.updateWalletBalance(wt)
 
-            (balanceField.scene.window as Stage).close()
+            balanceField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {
@@ -121,8 +121,7 @@ class ChangeWalletBalanceController(
 
     @FXML
     private fun handleCancel() {
-        val stage = walletComboBox.scene.window as Stage
-        stage.close()
+        walletComboBox.closeDialog()
     }
 
     private fun loadWalletsFromDatabase() {

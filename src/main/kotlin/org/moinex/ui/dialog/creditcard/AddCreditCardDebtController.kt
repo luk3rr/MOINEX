@@ -9,9 +9,9 @@
 package org.moinex.ui.dialog.creditcard
 
 import javafx.fxml.FXML
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCardDebt
@@ -101,7 +101,7 @@ class AddCreditCardDebtController(
 
             onDebtCreatedCallback?.invoke(debtId)
 
-            (crcComboBox.scene.window as Stage).close()
+            crcComboBox.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

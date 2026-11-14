@@ -15,7 +15,6 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.ai.operation.DraftValues
 import org.moinex.ai.operation.transactions.CreateWalletTransactionOperation
 import org.moinex.common.constant.Constants
@@ -25,6 +24,7 @@ import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
 import org.moinex.common.ui.DialogForm
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -152,8 +152,7 @@ abstract class BaseWalletTransactionManagement(
 
     @FXML
     protected fun handleCancel() {
-        val stage = descriptionField.scene.window as Stage
-        stage.close()
+        descriptionField.closeDialog()
     }
 
     @FXML
@@ -335,7 +334,7 @@ abstract class BaseWalletTransactionManagement(
                 ),
             ),
         )
-        (descriptionField.scene.window as Stage).close()
+        descriptionField.closeDialog()
         return true
     }
 

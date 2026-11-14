@@ -137,7 +137,7 @@
         <HBox alignment="CENTER" spacing="10.0">
             <children>
                 <Button minWidth="80.0" onAction="#handleCancel" text="%dialog.button.cancel" />
-                <Button minWidth="80.0" onAction="#handleSave" text="%dialog.button.save" />
+                <Button styleClass="accent" minWidth="80.0" onAction="#handleSave" text="%dialog.button.save" />
             </children>
         </HBox>
     </children>

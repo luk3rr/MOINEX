@@ -16,11 +16,11 @@ import javafx.scene.control.TabPane
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionStatus
@@ -173,7 +173,7 @@ class InvestmentTransactionsController(
 
     @FXML
     private fun handleCancel() {
-        (searchField.scene.window as Stage).close()
+        searchField.closeDialog()
     }
 
     private fun loadPurchasesFromDatabase() {
@@ -784,6 +784,7 @@ class InvestmentTransactionsController(
                 preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_PURCHASE_TITLE),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             tickerService.deleteTickerPurchase(purchase.id!!)
@@ -807,6 +808,7 @@ class InvestmentTransactionsController(
                 preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_SALE_TITLE),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             tickerService.deleteTickerSale(sale.id!!)
@@ -830,6 +832,7 @@ class InvestmentTransactionsController(
                 preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_DIVIDEND_TITLE),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             tickerService.deleteDividend(dividend.id!!)
@@ -891,6 +894,7 @@ class InvestmentTransactionsController(
                 preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_EXCHANGE_TITLE),
                 message,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             tickerService.deleteCryptoExchange(cryptoExchange.id!!)

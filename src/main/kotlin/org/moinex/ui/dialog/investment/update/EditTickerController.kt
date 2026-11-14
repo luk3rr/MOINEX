@@ -11,10 +11,10 @@ package org.moinex.ui.dialog.investment.update
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.CheckBox
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Ticker
 import org.moinex.service.PreferencesService
@@ -112,7 +112,7 @@ class EditTickerController(
 
             tickerService.updateTicker(ticker)
 
-            (nameField.scene.window as Stage).close()
+            nameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

@@ -68,8 +68,8 @@
             <children>
                 
                 
-                <Button fx:id="recalculateButton" minWidth="110.0" onAction="#handleRecalculateHistory" text="%bond.interestHistory.button.recalculateHistory" />
                 <Button fx:id="closeButton" minWidth="110.0" onAction="#handleClose" text="%bond.interestHistory.button.close" />
+                <Button fx:id="recalculateButton" minWidth="110.0" onAction="#handleRecalculateHistory" text="%bond.interestHistory.button.recalculateHistory" />
             </children>
         </HBox>
     </children>

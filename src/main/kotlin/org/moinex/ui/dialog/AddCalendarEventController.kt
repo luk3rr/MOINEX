@@ -13,10 +13,10 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.DialogForm
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.CalendarEvent
@@ -55,7 +55,7 @@ class AddCalendarEventController(
 
     @FXML
     private fun handleCancel() {
-        (titleField.scene.window as Stage).close()
+        titleField.closeDialog()
     }
 
     @FXML
@@ -79,7 +79,7 @@ class AddCalendarEventController(
                 CalendarEvent(date = eventDate, title = eventTitle, description = description, eventType = eventType),
             )
 
-            (titleField.scene.window as Stage).close()
+            titleField.closeDialog()
         }.onFailure { e ->
             WindowUtils.showErrorDialog(
                 preferencesService.translate(TranslationKeys.CALENDAR_DIALOG_ERROR_CREATING_EVENT_TITLE),

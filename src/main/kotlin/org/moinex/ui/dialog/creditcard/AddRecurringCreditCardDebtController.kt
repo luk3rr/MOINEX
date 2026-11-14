@@ -10,11 +10,11 @@ import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -128,7 +128,7 @@ class AddRecurringCreditCardDebtController(
 
             recurringCreditCardDebtService.createRecurring(recurring)
 
-            (crcComboBox.scene.window as Stage).close()
+            crcComboBox.closeDialog()
         }.onFailure { e ->
             WindowUtils.showErrorDialog(
                 preferencesService.translate(TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_ERROR_TITLE),
@@ -139,7 +139,7 @@ class AddRecurringCreditCardDebtController(
 
     @FXML
     private fun handleCancel() {
-        (crcComboBox.scene.window as Stage).close()
+        crcComboBox.closeDialog()
     }
 
     @FXML

@@ -25,17 +25,22 @@ import org.moinex.common.constant.Styles
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Notification
+import org.moinex.model.enums.NotificationType
 
 class NotificationToastOverlay(
     rootPane: AnchorPane,
     private val openPageLabel: String,
-) {
+) : ToastSurface {
+    var hub: ToastHub? = null
+
     private val stack =
         VBox(8.0).apply {
             alignment = Pos.BOTTOM_RIGHT
             isPickOnBounds = false
             maxWidth = TOAST_WIDTH + MAX_WIDTH_OFFSET
         }
+
+    val node: VBox get() = stack
 
     private val queue: ArrayDeque<Notification> = ArrayDeque()
     private val activeToasts = mutableListOf<HBox>()
@@ -67,27 +72,42 @@ class NotificationToastOverlay(
         animateOut(card) {
             stack.children.remove(card)
             activeToasts.remove(card)
+            (card.properties[TOAST_ID_KEY] as? Int)?.let { id ->
+                toastCards.remove(id)
+                toastCounts.remove(id)
+                toastTimers.remove(id)?.stop()
+                hub?.dismissed(id)
+            }
             if (queue.isNotEmpty()) show(queue.removeFirst())
         }
     }
 
-    private fun buildCard(n: Notification): HBox {
+    private fun buildCard(n: Notification): HBox =
+        buildCard(n.type, n.title, n.message, n.actionUrl, dismissOnClick = true)
+
+    private fun buildCard(
+        type: NotificationType,
+        titleText: String,
+        messageText: String,
+        actionUrl: String?,
+        dismissOnClick: Boolean,
+    ): HBox {
         val accentBar =
             Region().apply {
-                styleClass.addAll(Styles.NOTIFICATION_TOAST_ACCENT, UIUtils.getNotificationAccentClass(n.type))
+                styleClass.addAll(Styles.NOTIFICATION_TOAST_ACCENT, UIUtils.getNotificationAccentClass(type))
                 minHeight = 0.0
                 maxHeight = Double.MAX_VALUE
             }
 
         val title =
-            Label(n.title).apply {
+            Label(titleText).apply {
                 styleClass.add(Styles.NOTIFICATION_TOAST_TITLE)
                 isWrapText = true
                 maxWidth = TOAST_WIDTH - TOAST_TITLE_AND_MESSAGE_WIDTH_OFFSET
             }
 
         val message =
-            Label(n.message).apply {
+            Label(messageText).apply {
                 styleClass.add(Styles.NOTIFICATION_TOAST_MESSAGE)
                 isWrapText = true
                 maxWidth = TOAST_WIDTH - TOAST_TITLE_AND_MESSAGE_WIDTH_OFFSET
@@ -112,7 +132,7 @@ class NotificationToastOverlay(
                 alignment = Pos.CENTER_LEFT
             }
 
-        n.actionUrl?.let { url ->
+        actionUrl?.let { url ->
             val openButton =
                 Button(openPageLabel).apply {
                     setOnAction {
@@ -124,7 +144,7 @@ class NotificationToastOverlay(
         }
 
         closeButton.setOnAction { dismiss(card) }
-        card.setOnMouseClicked { dismiss(card) }
+        if (dismissOnClick) card.setOnMouseClicked { dismiss(card) }
 
         return card
     }
@@ -177,7 +197,67 @@ class NotificationToastOverlay(
         seq.play()
     }
 
+    private val toastCards = mutableMapOf<Int, HBox>()
+    private val toastCounts = mutableMapOf<Int, Label>()
+    private val toastTimers = mutableMapOf<Int, PauseTransition>()
+
+    override fun addToast(
+        id: Int,
+        spec: ToastSpec,
+    ) {
+        val card = buildCard(spec.type, spec.title, spec.message, null, dismissOnClick = !spec.sticky)
+        val countLabel =
+            Label().apply {
+                styleClass.add(Styles.NOTIFICATION_TOAST_COUNT)
+                isVisible = false
+                isManaged = false
+            }
+        (card.children[1] as VBox).children.add(0, countLabel)
+        toastCards[id] = card
+        toastCounts[id] = countLabel
+
+        card.properties[TOAST_ID_KEY] = id
+        if (spec.sticky) card.properties[STICKY_KEY] = true
+        stack.children.add(0, card)
+        activeToasts.add(card)
+        animateIn(card) {
+            if (!spec.sticky) scheduleToastDismiss(id, card)
+        }
+    }
+
+    override fun updateToastCount(
+        id: Int,
+        count: Int,
+    ) {
+        toastCounts[id]?.apply {
+            text = "×$count"
+            isVisible = true
+            isManaged = true
+        }
+        val card = toastCards[id] ?: return
+        toastTimers.remove(id)?.stop()
+        if (!card.properties.containsKey(STICKY_KEY)) scheduleToastDismiss(id, card)
+    }
+
+    override fun removeToast(id: Int) {
+        val card = toastCards[id] ?: return
+        dismiss(card)
+    }
+
+    private fun scheduleToastDismiss(
+        id: Int,
+        card: HBox,
+    ) {
+        val pause = PauseTransition(Duration.millis(TRANSIENT_MS))
+        pause.setOnFinished { dismiss(card) }
+        toastTimers[id] = pause
+        pause.play()
+    }
+
     companion object {
+        private const val TOAST_ID_KEY = "moinex.toast.id"
+        private const val STICKY_KEY = "moinex.toast.sticky"
+        private const val TRANSIENT_MS = 4000.0
         private const val MAX_VISIBLE = 4
         private const val TOAST_WIDTH = 320.0
         private const val TOAST_TITLE_AND_MESSAGE_WIDTH_OFFSET = 60

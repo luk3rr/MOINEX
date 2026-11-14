@@ -215,4 +215,5 @@ object Files {
     // Notifications
     const val NOTIFICATION_CENTER_FXML: String = UI_MAIN_PATH + "notification_center.fxml"
     const val NOTIFICATION_CSS: String = CSS_COMPONENT_PATH + "notification.css"
+    const val DIALOG_CSS: String = CSS_COMPONENT_PATH + "dialog.css"
 }

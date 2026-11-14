@@ -14,12 +14,12 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -121,7 +121,7 @@ abstract class BaseDividendManagement(
 
     @FXML
     protected open fun handleCancel() {
-        (descriptionField.scene.window as Stage).close()
+        descriptionField.closeDialog()
     }
 
     @FXML

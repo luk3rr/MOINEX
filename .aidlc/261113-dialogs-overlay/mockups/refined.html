@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dialogs overlay - mockup refinado v2 (botões)</title>
+<style>
+:root{--bg-base:#21222C;--bg-card:#282A36;--bg-pane:#383a52;--bg-input:#282A36;--bg-hover:#44475A;--txt:#F8F8F2;--txt2:#BFBFC3;--border:#44475A;--accent:#BD93F9;--accent-text:#BD93F9;--pos:#50FA7B;--neg:#FF5555;--warn:#FFB86C;--sidebar:#0a614e;--toast-bg:#1F2328;--toast-title:#F8F8F2;--toast-msg:#BFBFC3;--btn-on-accent:#282A36}
+[data-theme=light]{--bg-base:#F6F8FA;--bg-card:#fff;--bg-pane:#E6E7E8;--bg-input:#fff;--bg-hover:#e6e6e6;--txt:#1F2328;--txt2:#59636E;--border:#D1D9E0;--accent-text:#6D4FC2;--pos:#1A7F37;--neg:#C62F3E;--warn:#9A6700;--btn-on-accent:#1F2328}
+*{box-sizing:border-box}body{margin:0;font:13px/1.4 system-ui,sans-serif;background:var(--bg-base);color:var(--txt);padding:16px}
+h1{font-size:18px;margin:0 0 4px}h2{font-size:14px;margin:28px 0 4px;color:var(--accent-text)}p.note{color:var(--txt2);margin:0 0 10px;max-width:880px}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+button{font:inherit;cursor:pointer}
+.tg{border:1px solid var(--border);background:var(--bg-card);color:var(--txt);border-radius:20px;padding:4px 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:16px}
+/* app frame */
+.app{position:relative;height:420px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-base);display:flex}
+.side{width:54px;background:var(--sidebar);flex:none}
+.main{flex:1;padding:14px;overflow:hidden}
+.main .row{height:14px;border-radius:4px;background:var(--bg-pane);margin:8px 0;opacity:.7}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.scrim.l2{background:rgba(0,0,0,.25)}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.35);width:100%;max-width:420px;max-height:100%;display:flex;flex-direction:column}
+.card.wide{max-width:560px}.card.small{max-width:340px}
+.hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.hd h3{margin:0;font-size:14px;flex:1}
+.x{border:0;background:transparent;color:var(--txt2);font-size:16px;border-radius:6px;padding:2px 8px}.x:hover{background:var(--bg-hover);color:var(--txt)}
+.bd{padding:16px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.ft{display:flex;justify-content:center;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+label{font-weight:700;font-size:12px;display:block;margin-bottom:3px}
+.in{border:1px solid var(--border);background:var(--bg-input);border-radius:6px;padding:6px 8px;color:var(--txt2)}
+.btn{border-radius:20px;border:2px solid var(--border);background:transparent;color:var(--txt);padding:5px 18px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--btn-on-accent);font-weight:700}
+.fg{display:flex;gap:8px}
+.ft.c{justify-content:center}.ft.c .fg{gap:8px}.ft.e{justify-content:flex-end}
+.sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.sw .box{border:1px solid var(--border);border-radius:8px;background:var(--bg-card);padding:10px}.sw .box b{display:block;margin-bottom:8px;font-size:12px}.sw .ft{border:0;padding:6px 0 0}
+.badge{display:inline-block;font-size:10px;border:1px solid var(--border);border-radius:10px;padding:0 6px;margin-left:6px;color:var(--txt2)}
+.btn.dan{background:var(--neg);border-color:var(--neg);color:#fff;font-weight:700}
+/* variant B: sem barra de cabecalho */
+.card.b .hd{border:0;padding:16px 16px 0}.card.b .hd h3{font-size:16px}.card.b .ft{border:0}
+.msg{color:var(--txt2)}
+.card.small .ft{justify-content:center!important}
+.ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;font-weight:700}
+.ico.dan{background:rgba(255,85,85,.15);color:var(--neg)}.ico.q{background:rgba(189,147,249,.18);color:var(--accent-text)}
+.conf{display:flex;gap:12px;align-items:flex-start}
+/* toasts */
+.toasts{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;width:300px}
+.toast{background:var(--toast-bg);border-radius:8px;display:flex;box-shadow:0 4px 12px rgba(0,0,0,.35);overflow:hidden}
+.toast i{width:4px;flex:none}.toast .t{padding:10px 12px;flex:1}.toast b{color:var(--toast-title);font-size:12px;display:block}.toast span{color:var(--toast-msg);font-size:11px}
+.toast .c{border:0;background:transparent;color:var(--toast-msg);padding:0 10px}
+.k-warn i{background:var(--warn)}.k-ok i{background:var(--pos)}.k-err i{background:var(--neg)}.k-info i{background:var(--accent)}
+.tag{font-size:10px;color:var(--toast-msg);margin-left:6px}
+.cap{font-size:12px;color:var(--txt2);margin:6px 0 0}
+ul.l{margin:6px 0 0 18px;color:var(--txt2)}
+.list .r{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}.list .r:last-child{border:0}
+</style></head><body data-theme="dark">
+<h1>Dialogs em overlay: mockup refinado (2.5) · v2 padrão de botões</h1>
+<p class="note">Paleta real do app (tokens dark/Dracula e light). Overlay no mesmo estilo da busca: scrim rgba(0,0,0,.45), cartão raio 12, sombra. Botões pílula (M-001). Alterne o tema.</p>
+<div class="bar"><button class="tg" onclick="document.body.dataset.theme='dark'">Escuro</button><button class="tg" onclick="document.body.dataset.theme='light'">Claro</button></div>
+
+<h2>1. Formulário: duas opções de cabeçalho</h2>
+<p class="note"><b>A</b>: barra de cabeçalho com divisor e rodapé com divisor (separa título, corpo e ações; boa para formulários longos que rolam). <b>B</b>: sem divisores, título maior (mais leve, igual ao ar da busca). Recomendação: <b>A</b>, porque cabeçalho e rodapé ficam fixos e visíveis quando o corpo rola (FR-13).</p>
+<div class="grid">
+<div><div class="app"><div class="side"></div><div class="main"><div class="row" style="width:60%"></div><div class="row"></div><div class="row" style="width:80%"></div><div class="row"></div></div>
+<div class="scrim"><div class="card"><div class="hd"><h3>Adicionar despesa</h3><button class="x">✕</button></div>
+<div class="bd"><div><label>Descrição</label><div class="in">Mercado</div></div><div><label>Valor</label><div class="in">R$ 245,90</div></div><div><label>Carteira</label><div class="in">Conta corrente ▾</div></div><div><label>Data</label><div class="in">13/11/2026</div></div></div>
+<div class="ft"><div class="fg"><button class="btn">Cancelar</button></div><div class="fg"><button class="btn pri">Salvar</button></div></div></div></div></div><p class="cap">Opção A (recomendada)</p></div>
+<div><div class="app"><div class="side"></div><div class="main"><div class="row" style="width:60%"></div><div class="row"></div><div class="row" style="width:80%"></div><div class="row"></div></div>
+<div class="scrim"><div class="card b"><div class="hd"><h3>Adicionar despesa</h3><button class="x">✕</button></div>
+<div class="bd"><div><label>Descrição</label><div class="in">Mercado</div></div><div><label>Valor</label><div class="in">R$ 245,90</div></div><div><label>Carteira</label><div class="in">Conta corrente ▾</div></div><div><label>Data</label><div class="in">13/11/2026</div></div></div>
+<div class="ft"><div class="fg"><button class="btn">Cancelar</button></div><div class="fg"><button class="btn pri">Salvar</button></div></div></div></div></div><p class="cap">Opção B</p></div>
+</div>
+
+<h2>2. Confirmação (normal e destrutiva)</h2>
+<p class="note">Cartão pequeno com ícone, mensagem, secundário à esquerda e primário à direita. Destrutiva usa o botão de perigo; o foco inicial fica em "Não". ESC cancela (retorna false).</p>
+<div class="grid">
+<div><div class="app"><div class="side"></div><div class="main"><div class="row"></div><div class="row" style="width:70%"></div></div>
+<div class="scrim"><div class="card small"><div class="hd"><h3>Confirmação</h3></div><div class="bd"><div class="conf"><div class="ico q">?</div><div class="msg">Marcar este item da lista de desejos como comprado?</div></div></div><div class="ft"><div class="fg"><button class="btn">Não</button></div><div class="fg"><button class="btn pri">Sim</button></div></div></div></div></div><p class="cap">Confirmação normal</p></div>
+<div><div class="app"><div class="side"></div><div class="main"><div class="row"></div><div class="row" style="width:70%"></div></div>
+<div class="scrim"><div class="card small"><div class="hd"><h3>Excluir transação</h3></div><div class="bd"><div class="conf"><div class="ico dan">!</div><div class="msg">Esta transação será removida e o saldo da carteira será recalculado. Não dá para desfazer.</div></div></div><div class="ft"><div class="fg"><button class="btn">Cancelar</button></div><div class="fg"><button class="btn dan">Excluir</button></div></div></div></div></div><p class="cap">Confirmação destrutiva</p></div>
+</div>
+
+<h2>3. Pilha: edição sobre lista, confirmação sobre a edição</h2>
+<p class="note">Cada nível ganha o seu scrim (o de baixo fica mais escuro). ESC fecha só o topo; o formulário de baixo mantém os valores.</p>
+<div class="app"><div class="side"></div><div class="main"><div class="row"></div><div class="row" style="width:75%"></div></div>
+<div class="scrim"><div class="card wide"><div class="hd"><h3>Transações recorrentes</h3><button class="x">✕</button></div><div class="bd list"><div class="r"><span>Aluguel</span><span>R$ 1.800,00</span></div><div class="r"><span>Internet</span><span>R$ 99,90</span></div></div><div class="ft"><div class="fg"><button class="btn">Fechar</button></div><div class="fg"><button class="btn">Editar</button><button class="btn dan">Excluir</button></div></div></div></div>
+<div class="scrim l2"><div class="card"><div class="hd"><h3>Editar recorrência</h3><button class="x">✕</button></div><div class="bd"><div><label>Descrição</label><div class="in">Internet</div></div><div><label>Valor</label><div class="in">R$ 99,90</div></div></div><div class="ft"><div class="fg"><button class="btn">Cancelar</button></div><div class="fg"><button class="btn pri">Salvar</button></div></div></div></div>
+<div class="scrim l2" style="background:rgba(0,0,0,.2)"><div class="card small"><div class="hd"><h3>Descartar alterações?</h3></div><div class="bd"><div class="msg">Há alterações não salvas.</div></div><div class="ft"><div class="fg"><button class="btn">Voltar</button></div><div class="fg"><button class="btn dan">Descartar</button></div></div></div></div>
+</div>
+
+<h2>4. Dialog alto com rolagem</h2>
+<p class="note">Janela pequena: o cartão ocupa a área útil, cabeçalho e rodapé fixos, corpo rola (FR-13).</p>
+<div class="app" style="height:300px"><div class="side"></div><div class="main"><div class="row"></div></div>
+<div class="scrim"><div class="card wide" style="height:100%"><div class="hd"><h3>Transações de investimento</h3><button class="x">✕</button></div><div class="bd list" style="flex:1"><div class="r"><span>Compra ITUB4</span><span>R$ 1.000,00</span></div><div class="r"><span>Venda PETR4</span><span>R$ 540,00</span></div><div class="r"><span>Dividendo VALE3</span><span>R$ 120,00</span></div><div class="r"><span>Compra BBAS3</span><span>R$ 800,00</span></div><div class="r"><span>Compra WEGE3</span><span>R$ 450,00</span></div><div class="r"><span>Venda ITSA4</span><span>R$ 300,00</span></div></div><div class="ft"><div class="fg"><button class="btn">Fechar</button></div><div class="fg"><button class="btn">Editar</button><button class="btn dan">Excluir</button></div></div></div></div></div>
+
+<h2>5. Toasts: aviso, sucesso, erro persistente, agrupado</h2>
+<p class="note">Reusa o toast escuro existente (escuro nos dois temas) com a barra de cor por tipo. <b>Aviso/sucesso</b>: somem em ~4 s, sem botão fechar obrigatório, não vão ao centro de notificações. <b>Erro</b>: fica até fechar (✕), mensagem completa. Repetição do mesmo texto mostra contador em vez de empilhar.</p>
+<div class="app" style="height:340px"><div class="side"></div><div class="main"><div class="row"></div><div class="row" style="width:70%"></div></div>
+<div class="toasts">
+<div class="toast k-err"><i></i><div class="t"><b>Erro ao salvar a transação</b><span>O saldo da carteira ficaria negativo. Revise o valor e tente de novo.</span></div><button class="c">✕</button></div>
+<div class="toast k-warn"><i></i><div class="t"><b>Nenhum item selecionado <span class="tag">×3</span></b><span>Selecione uma transação para editar.</span></div></div>
+<div class="toast k-ok"><i></i><div class="t"><b>Salvo</b><span>Despesa adicionada.</span></div></div>
+</div></div>
+<p class="cap">De cima para baixo: erro (permanente, com ✕), aviso agrupado (×3, transitório), sucesso (transitório). Empilhados no canto inferior direito, como os toasts de hoje.</p>
+
+<h2>6. Padrão de botões (FR-17): posição relativa e estilos</h2>
+<p class="note">Regra: botões de sair (Cancelar, Fechar, Não, Voltar) ficam sempre à <b>esquerda</b> dos botões de ação (Salvar, Sim, Confirmar, Editar, Excluir), que ficam à <b>direita</b> deles. Os botões ficam sempre juntos, lado a lado (gap de 8 px), nunca separados nas pontas do cartão. O conjunto fica centralizado (padrão) ou à direita; a ordem relativa não muda.</p>
+<div class="sw">
+<div class="box"><b>Estilos <span class="badge">primário · secundário · perigo</span></b><div class="fg" style="flex-wrap:wrap"><button class="btn">Secundário</button><button class="btn pri">Primário</button><button class="btn dan">Perigo (Excluir)</button></div></div>
+<div class="box"><b>Alinhamento: centralizado (formulários, padrão)</b><div class="ft"><div class="fg"><button class="btn">Cancelar</button></div><div class="fg"><button class="btn pri">Salvar</button></div></div></div>
+<div class="box"><b>Alinhamento: centralizado, um grupo só</b><div class="ft c"><div class="fg"><button class="btn">Não</button><button class="btn pri">Sim</button></div></div></div>
+<div class="box"><b>Alinhamento: à direita (diálogos simples)</b><div class="ft e"><div class="fg"><button class="btn">Cancelar</button><button class="btn pri">OK</button></div></div></div>
+<div class="box"><b>Destrutivo centralizado</b><div class="ft c"><div class="fg"><button class="btn">Cancelar</button><button class="btn dan">Excluir</button></div></div></div>
+<div class="box"><b>Lista: sair à esquerda, ações à direita</b><div class="ft"><div class="fg"><button class="btn">Fechar</button></div><div class="fg"><button class="btn">Editar</button><button class="btn dan">Excluir</button></div></div></div>
+</div>
+
+<h2>Decisões e estados</h2>
+<ul class="l"><li>Foco inicial: primeiro campo (formulário) ou botão "Não" (confirmação); Tab fica preso no dialog do topo.</li>
+<li>Botão ✕ no cabeçalho dos formulários e listas; confirmações não têm ✕ (decidem por Sim/Não).</li>
+<li>Largura: pequeno 340, padrão 420, largo 560 (listas); altura máxima = área útil.</li>
+<li>Rodapé padronizado: botões juntos (gap 8 px) e centralizados; Cancelar/Não/Voltar/Fechar sempre à esquerda dos botões de ação (Salvar/Sim/Confirmar/Editar/Excluir). Primário roxo, perigo vermelho (Excluir, Descartar), secundário contornado.</li>
+<li>Scrim não fecha o dialog (A2); ESC fecha o topo.</li></ul>
+</body></html>

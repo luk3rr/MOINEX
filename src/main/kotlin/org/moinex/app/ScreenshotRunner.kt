@@ -8,6 +8,7 @@ package org.moinex.app
 
 import javafx.application.Platform
 import javafx.event.Event
+import javafx.geometry.Insets
 import javafx.scene.Scene
 import javafx.scene.SnapshotParameters
 import javafx.scene.control.Button
@@ -17,13 +18,19 @@ import javafx.scene.image.Image
 import javafx.scene.image.PixelFormat
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.input.MouseButton
+import javafx.scene.input.MouseEvent
+import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
-import javafx.stage.Window
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogCard
+import org.moinex.common.ui.DialogResize
+import org.moinex.common.ui.DialogSize
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.PeriodType
@@ -100,6 +107,12 @@ class ScreenshotRunner(
         private const val FUNDAMENTAL_CAPTURE_FIXTURE = "/capture/fundamental-analysis-sample.json"
         private const val SEARCH_CAPTURE_QUERY = "Adicionar"
         private const val REFUSED_EXIT_CODE = 2
+        private const val STACK_STEP_MILLIS = 900L
+        private const val TOAST_REPEATS = 3
+        private const val RESIZE_CAPTURE_WIDTH = 420.0
+        private const val RESIZE_DRAG_PIXELS = 80.0
+        private const val STACK_BUTTON_SPACING = 8.0
+        private const val STACK_BODY_PADDING = 16.0
 
         fun isEnabled(): Boolean = System.getProperty(CapturePlan.PROPERTY_CAPTURE_DIR) != null
     }
@@ -239,6 +252,29 @@ class ScreenshotRunner(
 
             CaptureKind.REBALANCE -> captureRebalance(stage, mainController, target, file)
 
+            CaptureKind.DIALOG_STACK -> captureDialogStack(stage, mainController, target, file)
+
+            CaptureKind.DIALOG_LAYOUT -> captureDialogLayout(stage, mainController, target, file)
+
+            CaptureKind.DIALOG_RESIZE -> captureDialogResize(stage, mainController, target, file)
+
+            CaptureKind.TOASTS -> {
+                mainController.loadContent(target.fxml, target.styleSheet!!)
+                delay(target.settleMillis.milliseconds)
+                repeat(TOAST_REPEATS) {
+                    WindowUtils.showInformationDialog("No item selected", "Select a transaction to edit it.")
+                }
+                WindowUtils.showSuccessDialog("Saved", "The expense was added.")
+                WindowUtils.showErrorDialog(
+                    "Could not save",
+                    "The wallet balance would become negative. Review the value and try again.",
+                )
+                delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
+                writePng(snapshot(stage), file)
+                WindowUtils.toastHub?.clear()
+                delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
+            }
+
             CaptureKind.TAB -> {
                 mainController.loadContent(target.fxml, target.styleSheet!!)
                 delay(target.settleMillis.milliseconds)
@@ -254,26 +290,207 @@ class ScreenshotRunner(
         if (file.exists()) logger.info("Saved {}", file.name) else logger.warn("Not saved: {}", file.name)
     }
 
+    private suspend fun captureDialogStack(
+        stage: Stage,
+        mainController: MainController,
+        target: CaptureTarget,
+        file: File,
+    ) {
+        val host = mainController.dialogHost
+        mainController.loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
+        delay(target.settleMillis.milliseconds)
+
+        val (formRoot, _) = WindowUtils.loadEmbedded<AddExpenseController>(Files.ADD_EXPENSE_FXML, springContext)
+        val form =
+            DialogCard(
+                preferencesService.translate(TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE),
+                formRoot,
+                closeTooltip = preferencesService.translate(TranslationKeys.DIALOG_BUTTON_CLOSE),
+            )
+        val question =
+            stackQuestionCard(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_DELETE), danger = true)
+        val confirm =
+            stackQuestionCard(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_CONFIRM), danger = false)
+        val depths = mutableListOf<Int>()
+
+        FxUtils.launchOnFxThread {
+            delay(STACK_STEP_MILLIS.milliseconds)
+            Platform.runLater { host.show(question) }
+        }
+        FxUtils.launchOnFxThread {
+            delay(STACK_STEP_MILLIS.milliseconds * 2)
+            Platform.runLater { host.show(confirm) }
+        }
+        FxUtils.launchOnFxThread {
+            delay(STACK_STEP_MILLIS.milliseconds * 3)
+            depths.add(host.depth)
+            writePng(snapshot(stage), file)
+            Platform.runLater {
+                confirm.closeDialog()
+                depths.add(host.depth)
+                question.closeDialog()
+                depths.add(host.depth)
+                form.closeDialog()
+                depths.add(host.depth)
+                logger.info("Dialog stack depths after the snapshot and each close (expected [3, 2, 1, 0]): {}", depths)
+            }
+        }
+
+        yield()
+        host.show(form)
+    }
+
+    private suspend fun captureDialogLayout(
+        stage: Stage,
+        mainController: MainController,
+        target: CaptureTarget,
+        file: File,
+    ) {
+        val host = mainController.dialogHost
+        val key = WindowUtils.sizeKeyOf(target.fxml)
+        val (width, height) = target.detail!!.split("x").map { it.toDouble() }
+        WindowUtils.dialogSizes.save(key, DialogResize.Size(width, height))
+
+        FxUtils.launchOnFxThread {
+            delay(target.settleMillis.milliseconds)
+            if (host.depth == 0) {
+                logger.error("The dialog '{}' did not open; nothing captured", target.id)
+            } else {
+                writePng(snapshot(stage), file)
+                host.closeAll()
+            }
+            WindowUtils.dialogSizes.clear(key)
+        }
+
+        yield()
+
+        WindowUtils.openModalWindow(target.fxml, target.id, springContext, { _: Any? -> })
+    }
+
+    private suspend fun captureDialogResize(
+        stage: Stage,
+        mainController: MainController,
+        target: CaptureTarget,
+        file: File,
+    ) {
+        val host = mainController.dialogHost
+        val key = "capture-resize"
+        WindowUtils.dialogSizes.clear(key)
+        mainController.loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
+        delay(target.settleMillis.milliseconds)
+
+        fun newCard(): DialogCard {
+            val (root, _) = WindowUtils.loadEmbedded<AddExpenseController>(Files.ADD_EXPENSE_FXML, springContext)
+            return DialogCard(
+                preferencesService.translate(TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE),
+                root,
+                width = RESIZE_CAPTURE_WIDTH,
+                sizeKey = key,
+                sizeStore = WindowUtils.dialogSizes,
+            )
+        }
+
+        fun mouse(
+            type: javafx.event.EventType<MouseEvent>,
+            card: DialogCard,
+            dx: Double,
+        ) = MouseEvent(
+            card,
+            card,
+            type,
+            card.localToScene(card.width - 2, card.height / 2).x + dx,
+            card.localToScene(card.width - 2, card.height / 2).y,
+            card.localToScreen(card.width - 2, card.height / 2).x + dx,
+            card.localToScreen(card.width - 2, card.height / 2).y,
+            MouseButton.PRIMARY,
+            1,
+            false,
+            false,
+            false,
+            false,
+            type != MouseEvent.MOUSE_RELEASED,
+            false,
+            false,
+            false,
+            false,
+            true,
+            null,
+        )
+
+        val first = newCard()
+        host.present(first)
+        delay(target.settleMillis.milliseconds)
+        val before = first.width
+        val pressed = mouse(MouseEvent.MOUSE_PRESSED, first, 0.0)
+        Event.fireEvent(first, pressed)
+        val dragged = mouse(MouseEvent.MOUSE_DRAGGED, first, RESIZE_DRAG_PIXELS)
+        Event.fireEvent(first, dragged)
+        delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
+        val during = first.width
+        Event.fireEvent(first, mouse(MouseEvent.MOUSE_RELEASED, first, RESIZE_DRAG_PIXELS))
+        writePng(snapshot(stage), file)
+        val saved = WindowUtils.dialogSizes.load(key)
+        host.closeAll()
+        delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
+
+        val second = newCard()
+        host.present(second)
+        delay(target.settleMillis.milliseconds)
+        logger.info(
+            "Dialog resize: width {} -> {} (expected +{}), saved {}, reopened at {}",
+            before,
+            during,
+            RESIZE_DRAG_PIXELS * 2,
+            saved,
+            second.width,
+        )
+        host.closeAll()
+        WindowUtils.dialogSizes.clear(key)
+    }
+
+    private fun stackQuestionCard(
+        actionLabel: String,
+        danger: Boolean,
+    ): DialogCard {
+        val cancel = Button(preferencesService.translate(TranslationKeys.DIALOG_BUTTON_CANCEL))
+        val action =
+            Button(actionLabel).apply {
+                styleClass.add(if (danger) "danger" else "accent")
+            }
+        val buttons = HBox(cancel, action).apply { spacing = STACK_BUTTON_SPACING }
+        val card =
+            DialogCard(
+                preferencesService.translate(TranslationKeys.DIALOG_CONFIRMATION_TITLE),
+                Label(preferencesService.translate(TranslationKeys.DIALOG_CONFIRMATION_TITLE)).apply {
+                    padding =
+                        Insets(STACK_BODY_PADDING)
+                },
+                size = DialogSize.SMALL,
+                closable = false,
+                footer = buttons,
+            )
+        cancel.setOnAction { card.closeDialog() }
+        action.setOnAction { card.closeDialog() }
+        card.initialFocus = cancel
+        return card
+    }
+
     private suspend fun captureAddExpenseDialog(
         mainStage: Stage,
         target: CaptureTarget,
         file: File,
     ) {
+        val host = springContext.getBean<MainController>().dialogHost
+
         FxUtils.launchOnFxThread {
             delay(target.settleMillis.milliseconds)
-            val dialog =
-                Window
-                    .getWindows()
-                    .filterIsInstance<Stage>()
-                    .lastOrNull { it.isShowing && it !== mainStage }
-
-            if (dialog == null) {
+            if (host.depth == 0) {
                 logger.error("The dialog '{}' did not open; nothing captured", target.id)
             } else {
-                pressEnter(dialog)
+                pressEnter(mainStage)
                 delay(target.settleMillis.milliseconds)
-                writePng(snapshot(dialog), file)
-                dialog.close()
+                writePng(snapshot(mainStage), file)
+                host.closeAll()
             }
         }
 
@@ -498,20 +715,16 @@ class ScreenshotRunner(
         file: File,
         prepare: suspend (Stage) -> Unit,
     ) {
+        val host = springContext.getBean<MainController>().dialogHost
+
         FxUtils.launchOnFxThread {
             delay(target.settleMillis.milliseconds)
-            val dialog =
-                Window
-                    .getWindows()
-                    .filterIsInstance<Stage>()
-                    .lastOrNull { it.isShowing && it !== mainStage }
-
-            if (dialog == null) {
+            if (host.depth == 0) {
                 logger.error("The dialog '{}' did not open; nothing captured", target.id)
             } else {
-                prepare(dialog)
-                writePng(snapshot(dialog), file)
-                dialog.close()
+                prepare(mainStage)
+                writePng(snapshot(mainStage), file)
+                host.closeAll()
             }
         }
     }
@@ -579,25 +792,26 @@ class ScreenshotRunner(
         target: CaptureTarget,
         file: File,
     ) {
+        val host = springContext.getBean<MainController>().dialogHost
+
         FxUtils.launchOnFxThread {
             delay(target.settleMillis.milliseconds)
-            val alert =
-                Window
-                    .getWindows()
-                    .filterIsInstance<Stage>()
-                    .lastOrNull { it.isShowing && it !== mainStage }
-
-            if (alert == null) {
-                logger.error("The alert '{}' did not open; nothing captured", target.id)
+            if (host.depth == 0) {
+                logger.error("The confirmation '{}' did not open; nothing captured", target.id)
             } else {
-                writePng(snapshot(alert), file)
-                alert.close()
+                writePng(snapshot(mainStage), file)
+                host.closeAll()
             }
         }
 
         yield()
 
-        WindowUtils.showConfirmationDialog("Delete this item?", "This action cannot be undone.")
+        WindowUtils.showConfirmationDialog(
+            "Delete this item?",
+            "This action cannot be undone.",
+            preferencesService.bundle,
+            danger = true,
+        )
     }
 
     private fun snapshot(stage: Stage): Image = stage.scene.root.snapshot(SnapshotParameters(), null)

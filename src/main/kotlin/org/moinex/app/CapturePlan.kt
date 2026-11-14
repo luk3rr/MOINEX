@@ -24,6 +24,10 @@ enum class CaptureKind {
     REBALANCE,
     TAB,
     BOND_HISTORY,
+    DIALOG_STACK,
+    TOASTS,
+    DIALOG_RESIZE,
+    DIALOG_LAYOUT,
 }
 
 /**
@@ -176,6 +180,37 @@ object CapturePlan {
                 Files.HOME_STYLE_SHEET,
                 HEAVY_SETTLE_MILLIS,
                 detail = HOME_NET_WORTH_PAGE_CLICKS + HOVER_SUFFIX,
+            ),
+            CaptureTarget(33, "dialog-stack", CaptureKind.DIALOG_STACK, Files.ADD_EXPENSE_FXML),
+            CaptureTarget(34, "toasts", CaptureKind.TOASTS, Files.HOME_FXML, Files.HOME_STYLE_SHEET),
+            CaptureTarget(35, "dialog-resize", CaptureKind.DIALOG_RESIZE, Files.ADD_EXPENSE_FXML),
+            CaptureTarget(
+                36,
+                "layout-add-wallet",
+                CaptureKind.DIALOG_LAYOUT,
+                Files.ADD_WALLET_FXML,
+                detail = "560x420",
+            ),
+            CaptureTarget(
+                37,
+                "layout-add-wishlist-item",
+                CaptureKind.DIALOG_LAYOUT,
+                Files.ADD_WISHLIST_ITEM_FXML,
+                detail = "700x720",
+            ),
+            CaptureTarget(
+                38,
+                "layout-add-crypto-exchange",
+                CaptureKind.DIALOG_LAYOUT,
+                Files.ADD_CRYPTO_EXCHANGE_FXML,
+                detail = "620x720",
+            ),
+            CaptureTarget(
+                39,
+                "layout-add-income",
+                CaptureKind.DIALOG_LAYOUT,
+                Files.ADD_INCOME_FXML,
+                detail = "640x620",
             ),
         )
 

@@ -21,13 +21,14 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import org.json.JSONObject
 import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isUpdateRecommended
+import org.moinex.common.ui.closeDialog
+import org.moinex.common.ui.refitDialogWindow
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -480,8 +481,7 @@ class FundamentalAnalysisController(
 
     @FXML
     fun handleClose() {
-        val stage = companyNameValueLabel.scene.window as Stage
-        stage.close()
+        companyNameValueLabel.closeDialog()
     }
 
     fun setTicker(ticker: Ticker) {
@@ -633,8 +633,7 @@ class FundamentalAnalysisController(
             populateMetricsTabs(data)
 
             // Force window to recalculate size after content is loaded
-            val stage = companyNameValueLabel.scene?.window as? Stage
-            stage?.sizeToScene()
+            companyNameValueLabel.refitDialogWindow()
         }.onFailure { e ->
             logger.error("Error parsing analysis JSON", e)
             WindowUtils.showErrorDialog(

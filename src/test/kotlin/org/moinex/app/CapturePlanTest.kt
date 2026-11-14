@@ -47,11 +47,18 @@ class CapturePlanTest :
                             "ticker-detail-income",
                             "fire-hover",
                             "home-net-worth-hover",
+                            "dialog-stack",
+                            "toasts",
+                            "dialog-resize",
+                            "layout-add-wallet",
+                            "layout-add-wishlist-item",
+                            "layout-add-crypto-exchange",
+                            "layout-add-income",
                         )
                 }
 
-                Then("the indexes are the fixed ones, with all 32 slots filled") {
-                    targets.map { it.index } shouldContainExactly (1..32).toList()
+                Then("the indexes are the fixed ones, with all 39 slots filled") {
+                    targets.map { it.index } shouldContainExactly (1..39).toList()
                 }
 
                 Then("every screen has a stylesheet and every dialog or alert has none") {
@@ -59,8 +66,11 @@ class CapturePlanTest :
                         .filter { it.kind == CaptureKind.SCREEN }
                         .all { it.styleSheet != null } shouldBe true
                     targets
-                        .filter { it.kind == CaptureKind.DIALOG || it.kind == CaptureKind.ALERT }
-                        .all { it.styleSheet == null } shouldBe true
+                        .filter {
+                            it.kind == CaptureKind.DIALOG ||
+                                it.kind == CaptureKind.ALERT ||
+                                it.kind == CaptureKind.DIALOG_STACK
+                        }.all { it.styleSheet == null } shouldBe true
                 }
             }
         }

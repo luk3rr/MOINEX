@@ -89,8 +89,8 @@
             </TabPane>
             <HBox alignment="CENTER" spacing="10.0">
                <children>
-                  <Button fx:id="fundamentalButton" onAction="#handleFundamentalAnalysis" text="%savings.stocksFunds.button.fundamentalAnalysis" />
                   <Button onAction="#handleClose" text="%tickerDetail.close" />
+                  <Button fx:id="fundamentalButton" onAction="#handleFundamentalAnalysis" text="%savings.stocksFunds.button.fundamentalAnalysis" />
                </children>
                <padding>
                   <Insets top="5.0" />

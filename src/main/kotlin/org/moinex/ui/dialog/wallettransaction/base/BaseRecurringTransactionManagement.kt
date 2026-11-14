@@ -14,9 +14,9 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.model.Category
 import org.moinex.model.enums.RecurringTransactionFrequency
@@ -105,8 +105,7 @@ abstract class BaseRecurringTransactionManagement(
 
     @FXML
     protected fun handleCancel() {
-        val stage = descriptionField.scene.window as Stage
-        stage.close()
+        descriptionField.closeDialog()
     }
 
     @FXML

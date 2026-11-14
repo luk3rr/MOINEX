@@ -12,10 +12,10 @@ import jakarta.persistence.EntityExistsException
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.CheckBox
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.goal.Goal
@@ -118,7 +118,7 @@ class EditGoalController(
                 goalService.updateGoal(goal)
             }
 
-            (nameField.scene.window as Stage).close()
+            nameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

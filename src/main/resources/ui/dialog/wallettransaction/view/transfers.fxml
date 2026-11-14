@@ -62,7 +62,7 @@
             <Button minWidth="90.0" onAction="#handleCancel" text="%dialog.button.cancel" />
             
             
-            <Button minWidth="90.0" onAction="#handleAdd" text="%dialog.button.add" />
+            <Button styleClass="accent" minWidth="90.0" onAction="#handleAdd" text="%dialog.button.add" />
          </children>
       </HBox>
    </children>

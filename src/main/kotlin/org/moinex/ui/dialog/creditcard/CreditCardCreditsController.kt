@@ -15,9 +15,9 @@ import javafx.geometry.Pos
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCardCredit
@@ -77,7 +77,7 @@ class CreditCardCreditsController(
 
     @FXML
     private fun handleCancel() {
-        (searchField.scene.window as Stage).close()
+        searchField.closeDialog()
     }
 
     private fun loadCreditCardCreditsFromDatabase() {

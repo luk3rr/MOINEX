@@ -9,7 +9,7 @@ package org.moinex.ui.dialog.ai
 import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.control.PasswordField
-import javafx.stage.Stage
+import org.moinex.common.ui.closeDialog
 import org.springframework.stereotype.Controller
 
 /**
@@ -43,11 +43,11 @@ class FilePasswordController {
         if (passwordField.text.isEmpty()) return
 
         confirmedPassword = passwordField.text
-        (passwordField.scene.window as Stage).close()
+        passwordField.closeDialog()
     }
 
     @FXML
     private fun handleCancel() {
-        (passwordField.scene.window as Stage).close()
+        passwordField.closeDialog()
     }
 }

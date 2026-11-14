@@ -340,6 +340,7 @@ class GoalController(
                     ),
                     message,
                     preferencesService.bundle,
+                    danger = true,
                 )
             ) {
                 goalService.deleteGoal(goal.id!!)

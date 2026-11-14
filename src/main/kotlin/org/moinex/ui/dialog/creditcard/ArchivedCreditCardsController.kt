@@ -15,10 +15,10 @@ import javafx.geometry.Pos
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCard
@@ -112,6 +112,7 @@ class ArchivedCreditCardsController(
                     .translate(TranslationKeys.CREDITCARD_DIALOG_DELETE_TITLE)
                     .replace("{0}", selectedCrc.name),
                 preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DELETE_MESSAGE),
+                danger = true,
             )
         ) {
             runCatching {
@@ -129,7 +130,7 @@ class ArchivedCreditCardsController(
 
     @FXML
     private fun handleCancel() {
-        (searchField.scene.window as Stage).close()
+        searchField.closeDialog()
     }
 
     private fun loadArchivedCreditCardsFromDatabase() {

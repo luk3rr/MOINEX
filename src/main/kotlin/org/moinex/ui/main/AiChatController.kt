@@ -630,6 +630,7 @@ class AiChatController(
                     preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_MESSAGE),
                     chatTitleLabel.text,
                 ),
+                danger = true,
             )
         if (!confirmed) return
 
@@ -647,6 +648,7 @@ class AiChatController(
             WindowUtils.showConfirmationDialog(
                 preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_ALL_HEADER),
                 preferencesService.translate(TranslationKeys.AI_HISTORY_DELETE_ALL_MESSAGE),
+                danger = true,
             )
         if (!confirmed) return
 

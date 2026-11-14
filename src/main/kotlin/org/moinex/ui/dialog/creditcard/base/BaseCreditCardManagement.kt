@@ -11,8 +11,8 @@ package org.moinex.ui.dialog.creditcard.base
 import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.model.creditcard.CreditCardOperator
 import org.moinex.model.dto.form.CreditCardFormDTO
@@ -73,7 +73,7 @@ abstract class BaseCreditCardManagement(
 
     @FXML
     protected open fun handleCancel() {
-        (nameField.scene.window as Stage).close()
+        nameField.closeDialog()
     }
 
     protected fun loadCreditCardOperatorsFromDatabase() {

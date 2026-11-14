@@ -16,13 +16,13 @@ import javafx.geometry.Pos
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.BondTableColumns
 import org.moinex.common.ui.BondTableColumns.asQuantityColumn
 import org.moinex.common.ui.BondTableColumns.asUnitPriceColumn
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Bond
@@ -127,6 +127,7 @@ class ArchivedBondsController(
                 ),
                 preferencesService.translate(TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_MESSAGE),
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             runCatching {
@@ -148,7 +149,7 @@ class ArchivedBondsController(
 
     @FXML
     private fun handleCancel() {
-        (searchField.scene.window as Stage).close()
+        searchField.closeDialog()
     }
 
     private fun loadArchivedBondsFromDatabase() {

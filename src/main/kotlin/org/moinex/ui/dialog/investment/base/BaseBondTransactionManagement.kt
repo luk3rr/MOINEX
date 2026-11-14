@@ -17,7 +17,6 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
-import javafx.stage.Stage
 import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
@@ -25,6 +24,7 @@ import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isHeldInReais
 import org.moinex.common.helper.SuggestionsHandlerHelper
 import org.moinex.common.ui.Icons
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -170,7 +170,7 @@ abstract class BaseBondTransactionManagement(
 
     @FXML
     protected open fun handleCancel() {
-        (bondNameLabel.scene.window as Stage).close()
+        bondNameLabel.closeDialog()
     }
 
     @FXML

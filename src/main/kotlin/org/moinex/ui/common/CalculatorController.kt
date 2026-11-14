@@ -13,10 +13,10 @@ import javafx.scene.control.ListView
 import javafx.scene.control.TextField
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
-import javafx.stage.Stage
 import net.objecthunter.exp4j.ExpressionBuilder
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.CalculationEntry
 import org.moinex.service.CalculatorService
@@ -160,7 +160,7 @@ class CalculatorController(
     @FXML
     private fun finish() {
         calculate()
-        (mainDisplay.scene.window as Stage).close()
+        mainDisplay.closeDialog()
     }
 
     @FXML

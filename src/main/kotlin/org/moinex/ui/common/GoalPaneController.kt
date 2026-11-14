@@ -405,6 +405,7 @@ class GoalPaneController(
                     preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TITLE),
                     message,
                     preferencesService.bundle,
+                    danger = true,
                 )
             ) {
                 goalService.deleteGoal(currentGoal.id!!)

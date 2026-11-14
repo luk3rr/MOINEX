@@ -18,13 +18,13 @@ import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.RecurringTransactionStatus
@@ -149,6 +149,7 @@ class RecurringTransactionController(
                     TranslationKeys.WALLETTRANSACTION_DIALOG_REMOVE_RECURRING_TRANSACTION_MESSAGE,
                 ),
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             recurringTransactionService.deleteRecurringTransaction(selectedRecurringTransaction.id!!)
@@ -159,8 +160,7 @@ class RecurringTransactionController(
 
     @FXML
     private fun handleCancel() {
-        val stage = searchField.scene.window as Stage
-        stage.close()
+        searchField.closeDialog()
     }
 
     private fun loadRecurringTransactionsFromDatabase() {

@@ -101,7 +101,7 @@ class FieldValidation(
     }
 
     private fun resizeWindow(control: Control) {
-        Platform.runLater { control.scene?.window?.sizeToScene() }
+        Platform.runLater { control.refitDialogWindow() }
     }
 
     private fun rowOf(control: Control): Node? {

@@ -20,6 +20,9 @@ object Styles {
     const val COLORED_ICON: String = "colored-icon"
     const val ICON_POSITIVE: String = "icon-positive"
     const val ICON_NEGATIVE: String = "icon-negative"
+    const val ICON_ACCENT: String = "icon-accent"
+    const val BUTTON_PRIMARY: String = "accent"
+    const val BUTTON_DANGER: String = "danger"
     const val FIELD_ERROR: String = "field-error"
     const val FIELD_INVALID: String = "field-invalid"
 
@@ -107,6 +110,7 @@ object Styles {
     const val NOTIFICATION_TOAST_TITLE = "notification-toast-title"
     const val NOTIFICATION_TOAST_MESSAGE = "notification-toast-message"
     const val NOTIFICATION_TOAST_CLOSE = "notification-toast-close"
+    const val NOTIFICATION_TOAST_COUNT = "notification-toast-count"
 
     // Notification list cell styles
     const val NOTIFICATION_CELL = "notification-cell"

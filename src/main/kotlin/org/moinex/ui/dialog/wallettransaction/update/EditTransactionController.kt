@@ -11,10 +11,10 @@ package org.moinex.ui.dialog.wallettransaction.update
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
-import javafx.stage.Stage
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionStatus
@@ -149,7 +149,7 @@ class EditTransactionController(
                 walletService.updateWalletTransaction(walletTransaction!!)
             }
 
-            (descriptionField.scene.window as Stage).close()
+            descriptionField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

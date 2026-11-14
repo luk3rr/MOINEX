@@ -10,9 +10,9 @@ package org.moinex.ui.dialog.wallettransaction.create
 
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
-import javafx.stage.Stage
 import org.moinex.ai.operation.DraftValues
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.WalletTransaction
@@ -81,7 +81,7 @@ class AddIncomeController(
                 publishNotification = true,
             )
 
-            (descriptionField.scene.window as Stage).close()
+            descriptionField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

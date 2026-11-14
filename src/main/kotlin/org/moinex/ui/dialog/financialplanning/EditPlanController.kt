@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.financialplanning.BudgetGroup
 import org.moinex.model.financialplanning.FinancialPlan
@@ -79,7 +80,7 @@ class EditPlanController(
 
             financialPlanningService.updatePlan(financialPlan)
 
-            planNameField.scene.window.hide()
+            planNameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

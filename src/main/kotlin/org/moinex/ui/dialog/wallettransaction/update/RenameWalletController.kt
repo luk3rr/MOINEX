@@ -13,10 +13,10 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.DialogForm
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Wallet
@@ -86,14 +86,12 @@ class RenameWalletController(
             }
         }
 
-        val stage = walletComboBox.scene.window as Stage
-        stage.close()
+        walletComboBox.closeDialog()
     }
 
     @FXML
     private fun handleCancel() {
-        val stage = walletComboBox.scene.window as Stage
-        stage.close()
+        walletComboBox.closeDialog()
     }
 
     private fun loadWalletsFromDatabase() {

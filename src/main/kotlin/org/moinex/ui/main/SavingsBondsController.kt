@@ -239,6 +239,7 @@ class SavingsBondsController(
                     preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE),
                     selectedBond.name,
                 ),
+                danger = true,
             )
 
         if (confirmed) {

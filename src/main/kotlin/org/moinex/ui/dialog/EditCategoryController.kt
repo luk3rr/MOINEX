@@ -12,8 +12,8 @@ import javafx.fxml.FXML
 import javafx.scene.control.CheckBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.service.CategoryService
@@ -94,11 +94,11 @@ class EditCategoryController(
             }
         }
 
-        (categoryNewNameField.scene.window as Stage).close()
+        categoryNewNameField.closeDialog()
     }
 
     @FXML
     private fun handleCancel() {
-        (categoryNewNameField.scene.window as Stage).close()
+        categoryNewNameField.closeDialog()
     }
 }

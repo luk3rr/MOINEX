@@ -21,7 +21,6 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
@@ -29,6 +28,7 @@ import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.BondRateText
 import org.moinex.common.ui.ChartCrosshair
 import org.moinex.common.ui.SegmentedFilter
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.BondDetailDTO
@@ -364,6 +364,6 @@ class BondDetailController(
 
     @FXML
     private fun handleClose() {
-        (archiveButton.scene.window as Stage).close()
+        archiveButton.closeDialog()
     }
 }

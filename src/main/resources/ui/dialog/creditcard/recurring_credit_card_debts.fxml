@@ -32,7 +32,7 @@
             <Button minWidth="90.0" onAction="#handleClose" text="%dialog.button.close" />
             
             
-            <Button minWidth="90.0" onAction="#handleCreate" text="%dialog.button.create" />
+            <Button styleClass="accent" minWidth="90.0" onAction="#handleCreate" text="%dialog.button.create" />
          </children>
       </HBox>
    </children>

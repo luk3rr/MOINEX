@@ -189,6 +189,7 @@ class CreditCardPaneController(
                 ),
                 preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_MESSAGE),
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             runCatching {

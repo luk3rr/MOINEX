@@ -351,6 +351,7 @@ class WalletPaneController(
                 preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_MESSAGE) +
                     "\n" + virtualWalletsMessage,
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             runCatching {

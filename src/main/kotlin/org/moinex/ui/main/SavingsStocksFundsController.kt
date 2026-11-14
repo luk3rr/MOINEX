@@ -437,6 +437,7 @@ class SavingsStocksFundsController(
                 )} ${selectedTicker.name} (${selectedTicker.symbol})",
                 preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_RESET_HISTORY_CONFIRM_MESSAGE),
                 preferencesService.bundle,
+                danger = true,
             )
 
         if (confirmed) {
@@ -638,6 +639,7 @@ class SavingsStocksFundsController(
                     "${selectedTicker.name} (${selectedTicker.symbol})",
                 "",
                 preferencesService.bundle,
+                danger = true,
             )
 
         if (confirmed) {

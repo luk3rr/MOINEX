@@ -18,10 +18,10 @@ import javafx.scene.control.Hyperlink
 import javafx.scene.control.Label
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.AssetType
@@ -110,7 +110,7 @@ class AddTickerController(
                 ),
             )
 
-            (nameField.scene.window as Stage).close()
+            nameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

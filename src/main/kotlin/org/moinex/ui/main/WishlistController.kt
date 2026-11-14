@@ -205,6 +205,7 @@ class WishlistController(
             WindowUtils.showConfirmationDialog(
                 preferencesService.translate(TranslationKeys.WISHLIST_DELETE_CONFIRMATION_TITLE),
                 preferencesService.translate(TranslationKeys.WISHLIST_DELETE_CONFIRMATION_MESSAGE),
+                danger = true,
             )
 
         if (confirmed) {

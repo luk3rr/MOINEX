@@ -14,10 +14,11 @@ import javafx.fxml.FXML
 import javafx.scene.control.RadioButton
 import javafx.scene.control.TitledPane
 import javafx.scene.control.ToggleGroup
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
+import org.moinex.common.ui.refitDialogWindow
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.enums.GoalFundingStrategy
@@ -107,7 +108,7 @@ class AddGoalController(
                 strategy,
             )
 
-            (nameField.scene.window as Stage).close()
+            nameField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {
@@ -151,7 +152,7 @@ class AddGoalController(
             goalFundingStrategyPane.isVisible = showOptions
             goalFundingStrategyPane.isManaged = showOptions
 
-            goalFundingStrategyPane.scene?.window?.sizeToScene()
+            goalFundingStrategyPane.refitDialogWindow()
         }
 
         masterWalletComboBox.valueProperty().addListener { _, _, _ -> updateVisibility() }

@@ -15,11 +15,11 @@ import javafx.geometry.Pos
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -129,6 +129,7 @@ class ManageCategoryController(
                 preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE) + " " +
                     selectedCategory.name,
                 preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_MESSAGE),
+                danger = true,
             )
         ) {
             runCatching {
@@ -146,7 +147,7 @@ class ManageCategoryController(
 
     @FXML
     private fun handleCancel() {
-        (searchField.scene.window as Stage).close()
+        searchField.closeDialog()
     }
 
     private fun loadCategoryFromDatabase() {

@@ -13,8 +13,8 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.service.PreferencesService
@@ -72,7 +72,7 @@ abstract class BaseGoalManagement(
 
     @FXML
     protected open fun handleCancel() {
-        (nameField.scene.window as Stage).close()
+        nameField.closeDialog()
     }
 
     private fun populateComboBoxes() {

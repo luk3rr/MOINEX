@@ -113,6 +113,7 @@
     /* ── Semantic ────────────────────────────────────────── */
     theme-positive: #1A7F37;
     theme-negative: #C62F3E;
+    theme-on-negative: #FFFFFF;
     theme-warning:  #9A6700;
 
     /* ── Allocation bars ─────────────────────────────────── */

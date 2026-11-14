@@ -19,6 +19,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.extension.isNotEqual
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.AssetType
@@ -178,7 +179,7 @@ class EditInvestmentTargetController(
         runCatching {
             investmentTargetService.saveTargets(targets)
 
-            targetsContainer.scene.window.hide()
+            targetsContainer.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is IllegalStateException -> {
@@ -201,6 +202,6 @@ class EditInvestmentTargetController(
 
     @FXML
     private fun handleCancel() {
-        targetsContainer.scene.window.hide()
+        targetsContainer.closeDialog()
     }
 }

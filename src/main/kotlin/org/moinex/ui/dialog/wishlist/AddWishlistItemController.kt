@@ -7,9 +7,9 @@
 package org.moinex.ui.dialog.wishlist
 
 import javafx.fxml.FXML
-import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wishlist.WishlistItem
 import org.moinex.service.CategoryService
@@ -65,7 +65,7 @@ class AddWishlistItemController(
 
             wishlistService.createItem(newItem, formData.links)
 
-            (titleField.scene.window as Stage).close()
+            titleField.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

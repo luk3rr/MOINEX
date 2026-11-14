@@ -59,6 +59,7 @@ object Icons {
     const val SIGN_IN: String = "mdal-login"
     const val SIGN_OUT: String = "mdal-exit_to_app"
     const val SUCCESS: String = "mdal-check_circle"
+    const val WARNING: String = "mdmz-warning"
     const val SYNCHRONIZE: String = "mdmz-sync"
     const val TRADE: String = "mdmz-swap_horiz"
     const val TRANSACTION: String = "mdmz-receipt"

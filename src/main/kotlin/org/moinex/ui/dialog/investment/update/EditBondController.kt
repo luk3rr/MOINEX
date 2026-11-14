@@ -15,11 +15,11 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.DialogForm
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BondType
@@ -184,7 +184,7 @@ class EditBondController(
                 }
             }
 
-            (saveButton.scene.window as Stage).close()
+            saveButton.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is EntityNotFoundException, is IllegalArgumentException -> {
@@ -205,7 +205,7 @@ class EditBondController(
 
     @FXML
     fun handleCancel() {
-        (cancelButton.scene.window as Stage).close()
+        cancelButton.closeDialog()
     }
 
     private fun configureComboBoxes() {

@@ -14,12 +14,12 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
@@ -182,7 +182,7 @@ class AddBondSaleController(
                 ),
             )
 
-            (bondNameLabel.scene.window as Stage).close()
+            bondNameLabel.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

@@ -34,6 +34,12 @@
     -fx-wrap-text: true;
 }
 
+.notification-toast-count {
+    -fx-text-fill: theme-toast-message;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
 .notification-toast-close {
     -fx-background-color: transparent;
     -fx-text-fill: theme-toast-close;

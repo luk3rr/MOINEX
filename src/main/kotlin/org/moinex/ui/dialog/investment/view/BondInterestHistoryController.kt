@@ -20,6 +20,7 @@ import javafx.scene.layout.VBox
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.NotificationType
@@ -337,6 +338,7 @@ class BondInterestHistoryController(
                     preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RESET_MESSAGE),
                     selected.referenceMonth.toString(),
                 ),
+                danger = true,
             )
         ) {
             return
@@ -444,6 +446,6 @@ class BondInterestHistoryController(
 
     @FXML
     private fun handleClose() {
-        closeButton.scene.window.hide()
+        closeButton.closeDialog()
     }
 }

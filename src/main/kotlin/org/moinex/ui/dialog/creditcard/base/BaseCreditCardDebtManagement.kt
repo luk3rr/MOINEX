@@ -13,7 +13,6 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
@@ -21,6 +20,7 @@ import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
 import org.moinex.common.extension.toYearMonth
 import org.moinex.common.helper.SuggestionsHandlerHelper
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -120,7 +120,7 @@ abstract class BaseCreditCardDebtManagement(
 
     @FXML
     protected open fun handleCancel() {
-        (crcComboBox.scene.window as Stage).close()
+        crcComboBox.closeDialog()
     }
 
     @FXML

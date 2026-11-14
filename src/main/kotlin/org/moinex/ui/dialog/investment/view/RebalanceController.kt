@@ -12,9 +12,9 @@ import javafx.geometry.Pos
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.AllocationDTO
 import org.moinex.model.dto.RebalanceAction
@@ -61,7 +61,7 @@ class RebalanceController(
 
     @FXML
     fun handleClose() {
-        (rebalanceTable.scene.window as Stage).close()
+        rebalanceTable.closeDialog()
     }
 
     private fun refresh() {

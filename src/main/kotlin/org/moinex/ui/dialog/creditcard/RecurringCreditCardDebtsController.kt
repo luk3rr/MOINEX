@@ -16,13 +16,13 @@ import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.RecurringCreditCardDebt
@@ -143,6 +143,7 @@ class RecurringCreditCardDebtsController(
                     TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_DELETE_CONFIRM_MESSAGE,
                 ),
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             return
@@ -175,7 +176,7 @@ class RecurringCreditCardDebtsController(
 
     @FXML
     private fun handleClose() {
-        (recurringDebtsTableView.scene.window as Stage).close()
+        recurringDebtsTableView.closeDialog()
     }
 
     private fun loadData() {

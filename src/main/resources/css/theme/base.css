@@ -26,12 +26,31 @@
     -color-button-fg-pressed: theme-on-accent;
 }
 
+.button.danger {
+    -color-button-bg: theme-negative;
+    -color-button-bg-hover: theme-negative;
+    -color-button-bg-focused: theme-negative;
+    -color-button-bg-pressed: theme-negative;
+    -color-button-border: theme-negative;
+    -color-button-border-hover: theme-negative;
+    -color-button-border-focused: theme-negative;
+    -color-button-border-pressed: theme-negative;
+    -color-button-fg: theme-on-negative;
+    -color-button-fg-hover: theme-on-negative;
+    -color-button-fg-focused: theme-on-negative;
+    -color-button-fg-pressed: theme-on-negative;
+}
+
 .app-icon {
     -fx-icon-color: theme-icon;
 }
 
 .app-icon.icon-positive {
     -fx-icon-color: theme-positive;
+}
+
+.app-icon.icon-accent {
+    -fx-icon-color: theme-accent-text;
 }
 
 .app-icon.icon-negative {

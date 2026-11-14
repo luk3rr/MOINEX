@@ -19,11 +19,11 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Transfer
@@ -133,6 +133,7 @@ class TransferController(
                     selectedTransfer.id,
                 ),
                 preferencesService.bundle,
+                danger = true,
             )
         ) {
             runCatching {
@@ -154,8 +155,7 @@ class TransferController(
 
     @FXML
     private fun handleCancel() {
-        val stage = searchField.scene.window as Stage
-        stage.close()
+        searchField.closeDialog()
     }
 
     private fun configureDatePickers() {

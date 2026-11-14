@@ -11,12 +11,12 @@ package org.moinex.ui.dialog.investment.update
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.TextField
-import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.ui.FieldValidation
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
@@ -206,7 +206,7 @@ class EditBondSaleController(
                 )
             }
 
-            (bondNameLabel.scene.window as Stage).close()
+            bondNameLabel.closeDialog()
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

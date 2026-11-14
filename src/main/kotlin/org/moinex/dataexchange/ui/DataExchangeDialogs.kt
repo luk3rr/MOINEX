@@ -7,6 +7,7 @@
 package org.moinex.dataexchange.ui
 
 import javafx.application.Platform
+import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
@@ -21,6 +22,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogCard
+import org.moinex.common.ui.DialogSize
+import org.moinex.common.ui.closeDialog
 import org.moinex.common.util.WindowUtils
 import org.moinex.config.AppDispatchers
 import org.moinex.dataexchange.export.ExportService
@@ -49,7 +53,7 @@ class DataExchangeDialogs(
         val model = ExportViewModel.from(catalog, exportService.counts())
         val scope = CoroutineScope(SupervisorJob() + AppDispatchers.IO)
         var job: Job? = null
-        lateinit var stage: Stage
+        lateinit var stage: Presented
         lateinit var dialog: ExportDialog
 
         dialog =
@@ -99,9 +103,10 @@ class DataExchangeDialogs(
                     if (job == null) stage.close()
                 },
             )
-        stage = newStage(text.t(TranslationKeys.DATA_EXCHANGE_EXPORT_TITLE), dialog.root, owner)
-        stage.setOnHidden { scope.coroutineContext[Job]?.cancel() }
-        stage.show()
+        stage =
+            present(text.t(TranslationKeys.DATA_EXCHANGE_EXPORT_TITLE), dialog.root, owner, "data-export") {
+                scope.coroutineContext[Job]?.cancel()
+            }
     }
 
     fun openImport(owner: Window? = null) {
@@ -112,7 +117,7 @@ class DataExchangeDialogs(
             )
         val scope = CoroutineScope(SupervisorJob() + AppDispatchers.IO)
         var job: Job? = null
-        lateinit var stage: Stage
+        lateinit var stage: Presented
         lateinit var dialog: ImportDialog
 
         val actions =
@@ -160,9 +165,10 @@ class DataExchangeDialogs(
                 }
             }
         dialog = ImportDialog(model, text, actions)
-        stage = newStage(text.t(TranslationKeys.DATA_EXCHANGE_IMPORT_TITLE), dialog.root, owner)
-        stage.setOnHidden { scope.coroutineContext[Job]?.cancel() }
-        stage.show()
+        stage =
+            present(text.t(TranslationKeys.DATA_EXCHANGE_IMPORT_TITLE), dialog.root, owner, "data-import") {
+                scope.coroutineContext[Job]?.cancel()
+            }
     }
 
     fun saveTemplate(owner: Window? = null) {
@@ -214,32 +220,64 @@ class DataExchangeDialogs(
             }
     }
 
-    private fun newStage(
+    /**
+     * A dialog that is open, in the overlay of the main window or, when it is not ready, in a window of its own.
+     */
+    private class Presented(
+        val close: () -> Unit,
+        val window: () -> Window?,
+    )
+
+    private fun present(
         title: String,
-        root: javafx.scene.Parent,
+        root: Parent,
         owner: Window?,
-    ): Stage =
-        Stage().apply {
-            initModality(Modality.APPLICATION_MODAL)
-            owner?.let { initOwner(it) }
-            this.title = title
-            scene =
-                Scene(root).apply {
-                    addEventHandler(KeyEvent.KEY_PRESSED) { event ->
-                        if (event.code == KeyCode.ESCAPE) {
-                            event.consume()
-                            window?.hide()
-                        }
-                    }
-                    stylesheets.add(
-                        DataExchangeDialogs::class.java.getResource(Files.COMMON_STYLE_SHEET)?.toExternalForm()
-                            ?: throw IllegalStateException("Common stylesheet not found"),
-                    )
-                }
+        sizeKey: String,
+        onHidden: () -> Unit,
+    ): Presented {
+        val host = WindowUtils.dialogHost
+        val commonStyleSheet =
+            DataExchangeDialogs::class.java.getResource(Files.COMMON_STYLE_SHEET)?.toExternalForm()
+                ?: throw IllegalStateException("Common stylesheet not found")
+
+        if (host != null) {
+            val card =
+                DialogCard(
+                    title,
+                    root,
+                    closeTooltip = preferences.translate(TranslationKeys.DIALOG_BUTTON_CLOSE),
+                    width = maxOf(DialogSize.DEFAULT.width, root.prefWidth(-1.0) + DialogCard.SCROLLBAR_ALLOWANCE),
+                    sizeKey = sizeKey,
+                    sizeStore = WindowUtils.dialogSizes,
+                )
+            card.stylesheets.add(commonStyleSheet)
+            host.present(card, listOf(Runnable(onHidden)))
+            return Presented({ card.closeDialog() }, { card.scene?.window })
         }
 
+        val stage =
+            Stage().apply {
+                initModality(Modality.APPLICATION_MODAL)
+                owner?.let { initOwner(it) }
+                this.title = title
+                scene =
+                    Scene(root).apply {
+                        addEventHandler(KeyEvent.KEY_PRESSED) { event ->
+                            if (event.code == KeyCode.ESCAPE) {
+                                event.consume()
+                                window?.hide()
+                            }
+                        }
+                        stylesheets.add(commonStyleSheet)
+                    }
+                setOnHidden { onHidden() }
+            }
+        stage.show()
+        return Presented({ stage.close() }, { stage })
+    }
+
     private fun chooseTarget(
-        stage: Stage,
+        stage: Presented,
         format: ExportFormat,
     ): Path? {
         val extension = if (format == ExportFormat.XLSX) "xlsx" else "zip"
@@ -249,7 +287,7 @@ class DataExchangeDialogs(
                 initialFileName = "moinex-export-${LocalDate.now()}.$extension"
                 extensionFilters.add(FileChooser.ExtensionFilter(extension.uppercase(), "*.$extension"))
             }
-        val chosen = chooser.showSaveDialog(stage)?.toPath() ?: return null
+        val chosen = chooser.showSaveDialog(stage.window())?.toPath() ?: return null
         return if (chosen.fileName
                 .toString()
                 .lowercase()
@@ -261,7 +299,7 @@ class DataExchangeDialogs(
         }
     }
 
-    private fun chooseSource(stage: Stage): Path? =
+    private fun chooseSource(stage: Presented): Path? =
         FileChooser()
             .apply {
                 title = text.t(TranslationKeys.DATA_EXCHANGE_IMPORT_CHOOSE_CHOOSER)
@@ -272,6 +310,6 @@ class DataExchangeDialogs(
                         "*.zip",
                     ),
                 )
-            }.showOpenDialog(stage)
+            }.showOpenDialog(stage.window())
             ?.toPath()
 }
