@@ -2385,7 +2385,6 @@ object TranslationKeys {
     const val AI_MATCH_REASON_SAME_CARD: String = "aimatch.reason.sameCard"
     const val AI_MATCH_REASON_ACCOUNT_UNKNOWN: String = "aimatch.reason.accountUnknown"
     const val AI_MATCH_REASON_SIMILAR_DESCRIPTION: String = "aimatch.reason.similarDescription"
-    const val AI_CHAT_IGNORED_HEADER: String = "aichat.ignored.header"
     const val AI_CHAT_IGNORED_ITEM: String = "aichat.ignored.item"
     const val AI_CHAT_IGNORED_TARGET_WALLET_TRANSACTION: String = "aichat.ignored.target.walletTransaction"
     const val AI_CHAT_IGNORED_TARGET_CREDIT_CARD_DEBT: String = "aichat.ignored.target.creditCardDebt"

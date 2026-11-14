@@ -56,7 +56,6 @@ import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
-import org.moinex.model.dto.ai.IgnoredLine
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
@@ -65,7 +64,6 @@ import org.moinex.service.ai.ChatConversationState
 import org.moinex.service.ai.ChatSummary
 import org.moinex.service.ai.PersistOutcome
 import org.moinex.service.ai.SearchHit
-import org.moinex.service.ai.StoredChangeSet
 import org.moinex.service.ai.StoredConversation
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.investment.BondService
@@ -264,7 +262,7 @@ class AiChatController(
         ) {
             openLatestConversation()
         } else {
-            renderMessages(conversationState.messages(), emptyList(), null)
+            renderMessages(conversationState.messages(), null)
             refreshConversationList()
         }
         updateHeader()
@@ -470,9 +468,6 @@ class AiChatController(
                 }
                 result.notice?.let { appendNotice(it) }
                 if (changeSet != null) {
-                    if (changeSet.ignored.isNotEmpty()) {
-                        appendNotice(ignoredLinesText(changeSet.ignored))
-                    }
                     if (hasProposals) {
                         reviewSession.add(changeSet)
                         reviewHidden = false
@@ -491,10 +486,6 @@ class AiChatController(
 
     private fun errorText(result: ChatTurnResult.Error): String =
         MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_ERROR), result.message)
-
-    private fun ignoredLinesText(ignored: List<IgnoredLine>): String =
-        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_IGNORED_HEADER), ignored.size) +
-            "\n\n" + ignored.joinToString("\n\n") { it.display }
 
     private fun setupReviewPanel() {
         val panel =
@@ -595,7 +586,7 @@ class AiChatController(
         showEmptyConversation = true
         reviewSession.clear()
         updateReviewVisibility()
-        renderMessages(emptyList(), emptyList(), null)
+        renderMessages(emptyList(), null)
         conversationsList.selectionModel.clearSelection()
         updateHeader()
     }
@@ -658,7 +649,7 @@ class AiChatController(
             showEmptyConversation = true
             reviewSession.clear()
             updateReviewVisibility()
-            renderMessages(emptyList(), emptyList(), null)
+            renderMessages(emptyList(), null)
             refreshConversationList()
         }
     }
@@ -780,7 +771,7 @@ class AiChatController(
             if (stored != null) {
                 applyStored(stored, null)
             } else {
-                renderMessages(emptyList(), emptyList(), null)
+                renderMessages(emptyList(), null)
                 updateHeader()
             }
             refreshConversationList()
@@ -797,7 +788,7 @@ class AiChatController(
         reviewSession.load(stored.changeSets)
         reviewHidden = reviewSession.openCount() == 0
         updateReviewVisibility()
-        renderMessages(stored.messages, stored.changeSets, focusPosition)
+        renderMessages(stored.messages, focusPosition)
         knownChats = knownChats.filter { it.id != stored.chat.id } + stored.chat
         updateHeader()
         selectActiveRow()
@@ -805,12 +796,10 @@ class AiChatController(
 
     private fun renderMessages(
         messages: List<ChatMessage>,
-        changeSets: List<StoredChangeSet>,
         focusPosition: Int?,
     ) {
         messagesContainer.children.clear()
         rowsByPosition.clear()
-        val setsByMessage = changeSets.groupBy { it.messageIndex }
         messages.forEachIndexed { index, message ->
             if (message.isShownInChat) {
                 if (message.role == ChatRole.NOTICE) {
@@ -820,9 +809,6 @@ class AiChatController(
                         appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
                 }
             }
-            setsByMessage[index]
-                ?.filter { it.changeSet.ignored.isNotEmpty() }
-                ?.forEach { appendNotice(ignoredLinesText(it.changeSet.ignored)) }
         }
         if (focusPosition != null) scrollToPosition(focusPosition) else scrollToBottom()
     }
