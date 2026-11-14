@@ -79,8 +79,8 @@ class ChatConversationState(
     ): PersistOutcome {
         val turn =
             result.turnMessages.ifEmpty {
-                listOf(
-                    ChatMessage(role = ChatRole.ASSISTANT, content = result.reply),
+                listOfNotNull(
+                    ChatMessage(role = ChatRole.ASSISTANT, content = result.reply).takeIf { result.notice == null },
                 )
             }
         messages +=
@@ -91,13 +91,14 @@ class ChatConversationState(
                     message
                 }
             }
+        result.notice?.let { messages += ChatMessage(role = ChatRole.NOTICE, content = it) }
         return persist(result.changeSet)
     }
 
-    /** Stores [message] as the assistant's answer of a turn that failed, so the conversation shows it when reopened. */
+    /** Stores [message] as an app notice for a turn that failed, so the conversation shows it when reopened. */
     @Synchronized
     fun failTurn(message: String): PersistOutcome {
-        messages += ChatMessage(role = ChatRole.ASSISTANT, content = message)
+        messages += ChatMessage(role = ChatRole.NOTICE, content = message)
         return persist(null)
     }
 

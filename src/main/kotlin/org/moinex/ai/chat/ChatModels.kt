@@ -13,6 +13,9 @@ enum class ChatRole {
     USER,
     ASSISTANT,
     TOOL,
+
+    /** A message from the app (an error, a limit reached): shown in the chat, stored, never sent to the model. */
+    NOTICE,
 }
 
 /**
@@ -45,6 +48,7 @@ val ChatMessage.isShownInChat: Boolean
         when (role) {
             ChatRole.USER -> true
             ChatRole.ASSISTANT -> toolCalls.isEmpty()
+            ChatRole.NOTICE -> true
             else -> false
         } &&
             (displayText ?: content).isNotBlank()
@@ -69,12 +73,15 @@ data class LlmResponse(
 /**
  * [Success.turnMessages] are the messages the turn added to the conversation, in order: the assistant messages that
  * asked for tools, the tool results, and the final answer. They are what the model needs to carry on the conversation.
+ * [Success.notice] is a message from the app, not from the model (e.g. the tool call limit): it is shown as a system
+ * notice and never stored as an assistant answer.
  */
 sealed class ChatTurnResult {
     data class Success(
         val reply: String,
         val changeSet: ChangeSet? = null,
         val turnMessages: List<ChatMessage> = emptyList(),
+        val notice: String? = null,
     ) : ChatTurnResult()
 
     data object NoProviderConfigured : ChatTurnResult()

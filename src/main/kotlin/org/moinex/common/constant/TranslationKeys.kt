@@ -2237,6 +2237,7 @@ object TranslationKeys {
     const val AI_CHAT_ASSISTANT: String = "aichat.assistant"
     const val AI_CHAT_SERVICE_UNKNOWN_ERROR: String = "aichat.service.unknownError"
     const val AI_CHAT_SERVICE_TOOL_LIMIT_EXCEEDED: String = "aichat.service.toolLimitExceeded"
+    const val AI_CHAT_SERVICE_PROPOSALS_UNREADABLE: String = "aichat.service.proposalsUnreadable"
     const val AI_CHAT_ATTACH_BUTTON: String = "aichat.attach.button"
     const val AI_CHAT_ATTACH_FILE_FILTER: String = "aichat.attach.fileFilter"
     const val AI_CHAT_ATTACH_ERROR: String = "aichat.attach.error"

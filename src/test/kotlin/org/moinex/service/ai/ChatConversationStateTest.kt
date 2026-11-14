@@ -100,10 +100,27 @@ class ChatConversationStateTest :
                 state.startTurn(user)
                 state.failTurn("Erro ao consultar o assistente: limite")
 
-                Then("the error is stored as the assistant's answer, so it shows when the chat is reopened") {
-                    stored.captured.map { it.role } shouldBe listOf(ChatRole.ASSISTANT)
+                Then("the error is stored as an app notice, so it shows as one when the chat is reopened") {
+                    stored.captured.map { it.role } shouldBe listOf(ChatRole.NOTICE)
                     stored.captured.single().content shouldBe "Erro ao consultar o assistente: limite"
-                    state.messages().map { it.role } shouldBe listOf(ChatRole.USER, ChatRole.ASSISTANT)
+                    state.messages().map { it.role } shouldBe listOf(ChatRole.USER, ChatRole.NOTICE)
+                }
+            }
+
+            When("a turn ends with an app notice") {
+                state.startTurn(user)
+                state.finishTurn(
+                    ChatTurnResult.Success(
+                        reply = "",
+                        turnMessages = listOf(ChatMessage(role = ChatRole.TOOL, content = "{}", toolCallId = "1")),
+                        notice = "limit reached",
+                    ),
+                    10,
+                )
+
+                Then("the notice is stored as a NOTICE message and no empty assistant answer is added") {
+                    state.messages().map { it.role } shouldBe listOf(ChatRole.USER, ChatRole.TOOL, ChatRole.NOTICE)
+                    state.messages().last().content shouldBe "limit reached"
                 }
             }
 

@@ -465,9 +465,10 @@ class AiChatController(
             is ChatTurnResult.Success -> {
                 val changeSet = result.changeSet
                 val hasProposals = changeSet?.changes?.isNotEmpty() == true
-                if (result.reply.isNotBlank() || !hasProposals) {
+                if (result.reply.isNotBlank() || (!hasProposals && result.notice == null)) {
                     appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
                 }
+                result.notice?.let { appendNotice(it) }
                 if (changeSet != null) {
                     if (changeSet.ignored.isNotEmpty()) {
                         appendNotice(ignoredLinesText(changeSet.ignored))
@@ -812,8 +813,12 @@ class AiChatController(
         val setsByMessage = changeSets.groupBy { it.messageIndex }
         messages.forEachIndexed { index, message ->
             if (message.isShownInChat) {
-                rowsByPosition[index] =
-                    appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
+                if (message.role == ChatRole.NOTICE) {
+                    appendNotice(message.displayText ?: message.content)
+                } else {
+                    rowsByPosition[index] =
+                        appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
+                }
             }
             setsByMessage[index]
                 ?.filter { it.changeSet.ignored.isNotEmpty() }

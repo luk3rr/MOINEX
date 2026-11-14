@@ -48,6 +48,7 @@ class AiChatService(
     companion object {
         private const val OLD_RESULT_LIMIT = 2000
         private const val LOG_LIMIT = 4000
+        private const val MAX_FAILED_PROPOSAL_ROUNDS = 4
         private val logger = LoggerFactory.getLogger(AiChatService::class.java)
 
         private fun clip(text: String): String =
@@ -68,7 +69,7 @@ class AiChatService(
                 add(this@AiChatService.proposeChangesTool)
             }
 
-        var conversation = listOf(systemMessage()) + history
+        var conversation = listOf(systemMessage()) + history.filter { it.role != ChatRole.NOTICE }
         if (logger.isDebugEnabled) {
             logger.debug(
                 "AI turn start: provider={}, history={} messages, tools={}, maxIterations={}",
@@ -81,6 +82,7 @@ class AiChatService(
             history.lastOrNull()?.let { logger.debug("AI last message ({}): {}", it.role, clip(it.content)) }
         }
         var iterations = 0
+        var failedProposalRounds = 0
         val turnMessages = mutableListOf<ChatMessage>()
         val proposedChanges = mutableListOf<ProposedChange>()
         val ignoredLines = mutableListOf<IgnoredLine>()
@@ -119,20 +121,34 @@ class AiChatService(
                 )
             }
 
-            if (iterations >= aiPromptProperties.maxToolIterations) {
-                logger.warn("AI tool iteration limit reached ({})", aiPromptProperties.maxToolIterations)
-                val limitMessage = preferencesService.translate(TranslationKeys.AI_CHAT_SERVICE_TOOL_LIMIT_EXCEEDED)
+            val stopMessageKey =
+                when {
+                    iterations >= aiPromptProperties.maxToolIterations -> {
+                        logger.warn("AI tool iteration limit reached ({})", aiPromptProperties.maxToolIterations)
+                        TranslationKeys.AI_CHAT_SERVICE_TOOL_LIMIT_EXCEEDED
+                    }
+                    failedProposalRounds >= MAX_FAILED_PROPOSAL_ROUNDS -> {
+                        logger.warn(
+                            "AI gave up after {} propose_changes rounds without a usable item",
+                            failedProposalRounds,
+                        )
+                        TranslationKeys.AI_CHAT_SERVICE_PROPOSALS_UNREADABLE
+                    }
+                    else -> null
+                }
+            if (stopMessageKey != null) {
+                val stopMessage = preferencesService.translate(stopMessageKey)
                 val changeSet =
                     ChangeSet(UUID.randomUUID().toString(), proposedChanges, ignoredLines).takeUnless { it.isEmpty }
                 return if (changeSet != null) {
-                    turnMessages += ChatMessage(role = ChatRole.ASSISTANT, content = limitMessage)
                     ChatTurnResult.Success(
-                        reply = limitMessage,
+                        reply = "",
                         changeSet = changeSet,
                         turnMessages = turnMessages.toList(),
+                        notice = stopMessage,
                     )
                 } else {
-                    ChatTurnResult.Error(limitMessage)
+                    ChatTurnResult.Error(stopMessage)
                 }
             }
 
@@ -143,6 +159,8 @@ class AiChatService(
                     toolCalls = response.toolCalls,
                 )
 
+            var roundHadProposal = false
+            var roundHadUsableProposal = false
             val toolResultMessages =
                 response.toolCalls.map { call ->
                     onToolCall(call.toolName)
@@ -154,7 +172,10 @@ class AiChatService(
                     )
                     val result =
                         if (call.toolName == ProposeChangesTool.NAME) {
-                            proposeChanges(call.argumentsJson, proposedChanges, ignoredLines)
+                            val outcome = proposeChanges(call.argumentsJson, proposedChanges, ignoredLines)
+                            roundHadUsableProposal = roundHadUsableProposal || outcome.second
+                            roundHadProposal = true
+                            outcome.first
                         } else {
                             executeTool(tools, call.toolName, call.argumentsJson)
                         }
@@ -169,6 +190,9 @@ class AiChatService(
                     )
                 }
 
+            if (roundHadProposal) {
+                failedProposalRounds = if (roundHadUsableProposal) 0 else failedProposalRounds + 1
+            }
             turnMessages += assistantMessage
             turnMessages += toolResultMessages
             conversation = compactOldResults(conversation) + assistantMessage + toolResultMessages
@@ -212,7 +236,7 @@ class AiChatService(
         argumentsJson: String,
         proposedChanges: MutableList<ProposedChange>,
         ignoredLines: MutableList<IgnoredLine>,
-    ): String =
+    ): Pair<String, Boolean> =
         runCatching {
             val outcome = proposeChangesTool.propose(argumentsJson)
             outcome.changeSet.changes.forEach { change ->
@@ -224,8 +248,9 @@ class AiChatService(
                 if (!repeated) proposedChanges += change
             }
             ignoredLines.addAll(outcome.changeSet.ignored)
-            proposeChangesTool.toModelJson(outcome)
-        }.getOrElse { e -> JSONObject().put("error", e.message ?: "tool_execution_failed").toString() }
+            proposeChangesTool.toModelJson(outcome) to
+                (outcome.changeSet.changes.isNotEmpty() || outcome.changeSet.ignored.isNotEmpty())
+        }.getOrElse { e -> JSONObject().put("error", e.message ?: "tool_execution_failed").toString() to false }
 
     private fun executeTool(
         tools: List<LlmTool>,

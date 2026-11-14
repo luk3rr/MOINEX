@@ -124,6 +124,30 @@ class AiChatServiceTest :
             }
         }
 
+        Given("a stored conversation that holds an app notice") {
+            every { llmProviderFactory.currentProvider() } returns provider
+            every { preferencesService.locale } returns Locale.ENGLISH
+            every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
+            stubTurnContext()
+            coEvery { provider.chat(any(), any()) } returns LlmResponse(text = "ok")
+
+            When("sending the next message") {
+                service.sendMessage(
+                    listOf(
+                        ChatMessage(role = ChatRole.USER, content = "Hi"),
+                        ChatMessage(role = ChatRole.NOTICE, content = "Error: boom"),
+                        ChatMessage(role = ChatRole.USER, content = "Again"),
+                    ),
+                )
+
+                Then("the notice is not sent to the provider") {
+                    coVerify {
+                        provider.chat(match { messages -> messages.none { it.role == ChatRole.NOTICE } }, any())
+                    }
+                }
+            }
+        }
+
         Given("no AI provider is configured") {
             every { llmProviderFactory.currentProvider() } returns null
 
